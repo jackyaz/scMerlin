@@ -186,8 +186,6 @@ ScriptHeader(){
 }
 
 MainMenu(){
-	printf "\\e[1mRouter\\e[0m\\n\\n"
-	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mServices\\e[0m\\n"
 	printf "\\e[1m(selecting an option will restart the service)\\e[0m\\n\\n"
 	printf "1.    DNS/DHCP Server (dnsmasq)\\n"
@@ -202,7 +200,9 @@ MainMenu(){
 		if [ "$DIVERSION_STATUS" = "on" ]; then DIVERSION_STATUS="Disable"; else DIVERSION_STATUS="Enable"; fi
 		printf "7.    %s Diversion ad-blocking\\n" "$DIVERSION_STATUS"
 	fi
-	printf "\\n\\e[1mOther\\e[0m\\n\\n"
+	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
+	printf "r.    Reboot router\\n\\n"
+	printf "\\e[1mOther\\e[0m\\n\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCM_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCM_NAME"
