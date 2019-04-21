@@ -189,7 +189,7 @@ ScriptHeader(){
 
 MainMenu(){
 	printf "\\e[1mServices\\e[0m\\n"
-	printf "\\e[1mSelecting an option will restart the service\\e[0m\\n\\n"
+	printf "\\e[1m(selecting an option will restart the service)\\e[0m\\n\\n"
 	printf "1.    DNS/DHCP Server (dnsmasq)\\n"
 	printf "2.    FTP Server (vsftpd)\\n"
 	printf "3.    Internet connection\\n"
