@@ -188,6 +188,8 @@ ScriptHeader(){
 }
 
 MainMenu(){
+	printf "\\e[1mRouter\\e[0m\\n\\n"
+	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mServices\\e[0m\\n"
 	printf "\\e[1m(selecting an option will restart the service)\\e[0m\\n\\n"
 	printf "1.    DNS/DHCP Server (dnsmasq)\\n"
@@ -210,7 +212,6 @@ MainMenu(){
 	printf "\\n"
 	printf "\\e[1m#####################################################\\e[0m\\n"
 	printf "\\n"
-	
 	while true; do
 		printf "Choose an option:    "
 		read -r "menu"
@@ -218,7 +219,83 @@ MainMenu(){
 			1)
 				printf "\\n"
 				if Check_Lock "menu"; then
-					:
+					service restart_dnsmasq >/dev/null 2>&1
+					Clear_Lock
+				fi
+				PressEnter
+				break
+			;;
+			2)
+				printf "\\n"
+				if Check_Lock "menu"; then
+					service restart_ftpd >/dev/null 2>&1
+					Clear_Lock
+				fi
+				PressEnter
+				break
+			;;
+			3)
+				printf "\\n"
+				if Check_Lock "menu"; then
+					service restart_wan >/dev/null 2>&1
+					Clear_Lock
+				fi
+				PressEnter
+				break
+			;;
+			4)
+				printf "\\n"
+				if Check_Lock "menu"; then
+					service restart_samba >/dev/null 2>&1
+					Clear_Lock
+				fi
+				PressEnter
+				break
+			;;
+			5)
+				printf "\\n"
+				if Check_Lock "menu"; then
+					service restart_httpd >/dev/null 2>&1
+					Clear_Lock
+				fi
+				PressEnter
+				break
+			;;
+			6)
+				printf "\\n"
+				if Check_Lock "menu"; then
+					service restart_wireless >/dev/null 2>&1
+					Clear_Lock
+				fi
+				PressEnter
+				break
+			;;
+			7)
+				printf "\\n"
+				if Check_Lock "menu"; then
+					/opt/bin/diversion a
+					Clear_Lock
+				fi
+				PressEnter
+				break
+			;;
+			r)
+				printf "\\n"
+				if Check_Lock "menu"; then
+					while true; do
+						printf "\\n\\e[1mAre you sure you want to reboot? (y/n)\\e[0m\\n"
+						read -r "confirm"
+						case "$confirm" in
+							y|Y)
+								service reboot >/dev/null 2>&1
+								break
+							;;
+							*)
+								break
+							;;
+						esac
+					done
+					Clear_Lock
 				fi
 				PressEnter
 				break
