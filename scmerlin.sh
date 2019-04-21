@@ -196,13 +196,13 @@ MainMenu(){
 	printf "4.    SAMBA\\n"
 	printf "5.    Web Interface (httpd)\\n"
 	printf "6.    WiFi\\n\\n"
-	printf "\\e[Scripts\\e[0m\\n"
+	printf "\\e[1mScripts\\e[0m\\n\\n"
 	if [ -f /opt/bin/diversion ]; then
 		DIVERSION_STATUS=$(grep "adblocking" /opt/share/diversion/.conf/diversion.conf | cut -f2 -d"=")
 		if [ "$DIVERSION_STATUS" = "on" ]; then DIVERSION_STATUS="Disable"; else DIVERSION_STATUS="Enable"; fi
 		printf "7.    %s Diversion ad-blocking\\n" "$DIVERSION_STATUS"
 	fi
-	printf "\\e[1mOther\\e[0m\\n\\n"
+	printf "\\n\\e[1mOther\\e[0m\\n\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCM_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCM_NAME"
