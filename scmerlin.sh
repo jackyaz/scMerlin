@@ -188,8 +188,14 @@ ScriptHeader(){
 }
 
 MainMenu(){
-	printf "1.    Check connection now\\n\\n"
-	printf "2.    Set preferred ping server\\n      Currently: %s\\n\\n" "$(ShowPingServer)"
+	printf "\\e[1m#      Services\\e[0m\\n"
+	printf "\\e[1m#      Selecting an option will restart the service\\e[0m\\n"
+	printf "1.    DNS/DHCP Server (dnsmasq)\\n"
+	printf "2.    FTP Server (vsftpd)\\n"
+	printf "3.    Internet connection\\n"
+	printf "4.    SAMBA\\n"
+	printf "5.    Web Interface (httpd)\\n"
+	printf "6.    WiFi\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCM_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCM_NAME"
@@ -205,14 +211,8 @@ MainMenu(){
 			1)
 				printf "\\n"
 				if Check_Lock "menu"; then
-					Menu_GenerateStats
+					:
 				fi
-				PressEnter
-				break
-			;;
-			2)
-				printf "\\n"
-				Menu_SetPingServer
 				PressEnter
 				break
 			;;
