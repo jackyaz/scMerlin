@@ -1,5 +1,5 @@
 # scMerlin - service and script control menu for AsusWRT-Merlin
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/91af8db9cd354643a8ef6a7117be90fb)](https://www.codacy.com/app/jackyaz/scmerlin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jackyaz/scmerlin&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bfd397624cdf4803a465d4ae1530e7fe)](https://www.codacy.com/app/jackyaz/scMerlin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jackyaz/scMerlin&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.com/jackyaz/scmerlin.svg?branch=master)](https://travis-ci.com/jackyaz/scmerlin)
 
 ## v1.0.0
