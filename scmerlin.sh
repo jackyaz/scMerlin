@@ -112,8 +112,6 @@ Update_Version(){
 		force)
 			serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCM_REPO/$SCM_NAME.sh" | grep "SCM_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
 			Print_Output "true" "Downloading latest version ($serverver) of $SCM_NAME" "$PASS"
-			Update_File "SCMstats_www.asp"
-			Modify_WebUI_File
 			/usr/sbin/curl -fsL --retry 3 "$SCM_REPO/$SCM_NAME.sh" -o "/jffs/scripts/$SCM_NAME" && Print_Output "true" "$SCM_NAME successfully updated"
 			chmod 0755 /jffs/scripts/"$SCM_NAME"
 			Clear_Lock
