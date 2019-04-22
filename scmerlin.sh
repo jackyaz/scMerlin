@@ -240,8 +240,20 @@ MainMenu(){
 			3)
 				printf "\\n"
 				if Check_Lock "menu"; then
-					service restart_wan >/dev/null 2>&1
-					Clear_Lock
+					while true; do
+						printf "\\n\\e[1mInternet connection will take 30s-60s to reconnect. Continue? (y/n)\\e[0m\\n"
+						read -r "confirm"
+						case "$confirm" in
+							y|Y)
+								service restart_wan >/dev/null 2>&1
+								Clear_Lock
+								break
+							;;
+							*)
+								break
+							;;
+						esac
+					done
 				fi
 				PressEnter
 				break
