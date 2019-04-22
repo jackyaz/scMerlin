@@ -291,7 +291,7 @@ MainMenu(){
 				if [ -f /jffs/scripts/firewall ]; then
 					if Check_Lock "menu"; then
 						if [ "$SKYNET_STATUS" = "Enable" ]; then
-							/jffs/scripts/firewall start
+							/jffs/scripts/firewall restart
 						else
 							/jffs/scripts/firewall disable
 						fi
