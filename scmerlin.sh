@@ -196,9 +196,14 @@ MainMenu(){
 	printf "6.    WiFi\\n\\n"
 	printf "\\e[1mScripts\\e[0m\\n\\n"
 	if [ -f /opt/bin/diversion ]; then
-		DIVERSION_STATUS=$(grep "adblocking" /opt/share/diversion/.conf/diversion.conf | cut -f2 -d"=")
+		DIVERSION_STATUS="$(grep "adblocking" /opt/share/diversion/.conf/diversion.conf | cut -f2 -d"=")"
 		if [ "$DIVERSION_STATUS" = "on" ]; then DIVERSION_STATUS="Disable"; else DIVERSION_STATUS="Enable"; fi
 		printf "7.    %s Diversion ad-blocking\\n" "$DIVERSION_STATUS"
+	fi
+	if [ -f /jffs/scripts/firewall ]; then
+		SKYNET_STATUS=""
+		if iptables -t raw -S | grep -q Skynet; then SKYNET_STATUS="Disable"; else SKYNET_STATUS="Enable"; fi
+		printf "8.    %s Skynet firwall\\n" "$SKYNET_STATUS"
 	fi
 	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
 	printf "r.    Reboot router\\n\\n"
@@ -270,9 +275,30 @@ MainMenu(){
 			;;
 			7)
 				printf "\\n"
-				if Check_Lock "menu"; then
-					/opt/bin/diversion a
-					Clear_Lock
+				if [ -f /opt/bin/diversion ]; then
+					if Check_Lock "menu"; then
+						/opt/bin/diversion a
+						Clear_Lock
+					fi
+				else
+					printf "\\n\\e[1mInvalid selection (Diversion not installed)\\e[0m\\n"
+				fi
+				PressEnter
+				break
+			;;
+			8)
+				printf "\\n"
+				if [ -f /jffs/scripts/firewall ]; then
+					if Check_Lock "menu"; then
+						if [ "$SKYNET_STATUS" = "Enable" ]; then
+							/jffs/scripts/firewall start
+						else
+							/jffs/scripts/firewall disable
+						fi
+						Clear_Lock
+					fi
+				else
+					printf "\\n\\e[1mInvalid selection (Skynet not installed)\\e[0m\\n"
 				fi
 				PressEnter
 				break
