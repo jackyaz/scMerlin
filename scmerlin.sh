@@ -203,7 +203,7 @@ MainMenu(){
 	if [ -f /jffs/scripts/firewall ]; then
 		SKYNET_STATUS=""
 		if iptables -t raw -S | grep -q Skynet; then SKYNET_STATUS="Disable"; else SKYNET_STATUS="Enable"; fi
-		printf "8.    %s Skynet firwall\\n" "$SKYNET_STATUS"
+		printf "8.    %s Skynet firewall\\n" "$SKYNET_STATUS"
 	fi
 	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
 	printf "r.    Reboot router\\n\\n"
