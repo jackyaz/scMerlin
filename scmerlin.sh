@@ -191,7 +191,7 @@ MainMenu(){
 	printf "1.    DNS/DHCP Server (dnsmasq)\\n"
 	printf "2.    Internet connection\\n"
 	printf "3.    Web Interface (httpd)\\n"
-	printf "4.    WiFi\\n\\n"
+	printf "4.    WiFi\\n"
 	ENABLED_FTP="$(nvram get enable_ftp)"
 	if ! Validate_Number "" "$ENABLED_FTP" "silent"; then ENABLED_FTP=0; fi
 	if [ "$ENABLED_FTP" -eq 1 ]; then
@@ -202,7 +202,7 @@ MainMenu(){
 	if [ "$ENABLED_SAMBA" -eq 1 ]; then
 		printf "6.    SAMBA\\n"
 	fi
-	printf "\\e[1mScripts\\e[0m\\n\\n"
+	printf "\\n\\e[1mScripts\\e[0m\\n\\n"
 	if [ -f /opt/bin/diversion ]; then
 		DIVERSION_STATUS="$(grep "adblocking" /opt/share/diversion/.conf/diversion.conf | cut -f2 -d"=")"
 		if [ "$DIVERSION_STATUS" = "on" ]; then DIVERSION_STATUS="Disable"; else DIVERSION_STATUS="Enable"; fi
