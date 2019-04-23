@@ -41,7 +41,7 @@ If this does not work, you will need to use the full path:
 Launch scMerlin and select option u
 
 ## Help
-Please post about any issues and problems here: [scMerlin on SNBForums](https://www.snbforums.com/threads/spdmerlin-automated-speedtests-with-graphs.55904/)
+Please post about any issues and problems here: [scMerlin on SNBForums](https://www.snbforums.com/threads/scmerlin-service-and-script-control-menu-for-asuswrt-merlin.56277/))
 
 ## FAQs
 ### I haven't used scripts before on AsusWRT-Merlin
