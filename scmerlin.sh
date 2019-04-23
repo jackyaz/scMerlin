@@ -189,11 +189,19 @@ MainMenu(){
 	printf "\\e[1mServices\\e[0m\\n"
 	printf "\\e[1m(selecting an option will restart the service)\\e[0m\\n\\n"
 	printf "1.    DNS/DHCP Server (dnsmasq)\\n"
-	printf "2.    FTP Server (vsftpd)\\n"
-	printf "3.    Internet connection\\n"
-	printf "4.    SAMBA\\n"
-	printf "5.    Web Interface (httpd)\\n"
-	printf "6.    WiFi\\n\\n"
+	printf "2.    Internet connection\\n"
+	printf "3.    Web Interface (httpd)\\n"
+	printf "4.    WiFi\\n\\n"
+	ENABLED_FTP="$(nvram get enable_ftp)"
+	if ! Validate_Number "" "$ENABLED_FTP" "silent"; then ENABLED_FTP=0; fi
+	if [ "$ENABLED_FTP" -eq 1 ]; then
+		printf "5.    FTP Server (vsftpd)\\n"
+	fi
+	ENABLED_SAMBA="$(nvram get enable_samba)"
+	if ! Validate_Number "" "$ENABLED_SAMBA" "silent"; then ENABLED_SAMBA=0; fi
+	if [ "$ENABLED_SAMBA" -eq 1 ]; then
+		printf "6.    SAMBA\\n"
+	fi
 	printf "\\e[1mScripts\\e[0m\\n\\n"
 	if [ -f /opt/bin/diversion ]; then
 		DIVERSION_STATUS="$(grep "adblocking" /opt/share/diversion/.conf/diversion.conf | cut -f2 -d"=")"
@@ -231,15 +239,6 @@ MainMenu(){
 			2)
 				printf "\\n"
 				if Check_Lock "menu"; then
-					service restart_ftpd >/dev/null 2>&1
-					Clear_Lock
-				fi
-				PressEnter
-				break
-			;;
-			3)
-				printf "\\n"
-				if Check_Lock "menu"; then
 					while true; do
 						printf "\\n\\e[1mInternet connection will take 30s-60s to reconnect. Continue? (y/n)\\e[0m\\n"
 						read -r "confirm"
@@ -258,16 +257,7 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			4)
-				printf "\\n"
-				if Check_Lock "menu"; then
-					service restart_samba >/dev/null 2>&1
-					Clear_Lock
-				fi
-				PressEnter
-				break
-			;;
-			5)
+			3)
 				printf "\\n"
 				if Check_Lock "menu"; then
 					service restart_httpd >/dev/null 2>&1
@@ -276,11 +266,37 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			6)
+			4)
 				printf "\\n"
 				if Check_Lock "menu"; then
 					service restart_wireless >/dev/null 2>&1
 					Clear_Lock
+				fi
+				PressEnter
+				break
+			;;
+			5)
+				printf "\\n"
+				if [ "$ENABLED_FTP" -eq 1 ]; then
+					if Check_Lock "menu"; then
+						service restart_ftpd >/dev/null 2>&1
+						Clear_Lock
+					fi
+				else
+				printf "\\n\\e[1mInvalid selection (FTP not enabled)\\e[0m\\n"
+				fi
+				PressEnter
+				break
+			;;
+			6)
+				printf "\\n"
+				if [ "$ENABLED_SAMBA" -eq 1 ]; then
+					if Check_Lock "menu"; then
+						service restart_samba >/dev/null 2>&1
+						Clear_Lock
+					fi
+				else
+					printf "\\n\\e[1mInvalid selection (Samba not enabled)\\e[0m\\n"
 				fi
 				PressEnter
 				break
