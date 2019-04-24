@@ -9,7 +9,8 @@ Quick access to controlling services and scripts on your router
 
 scMerlin is free to use under the [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0) (GPL 3.0).
 
-![Menu UI](https://puu.sh/DhMkl/c9422df564.png)
+Example menu (options added/removed dynamically depending on which service(s) you have enabled on your router)
+![Menu UI](https://puu.sh/DjmJr/15b3000866.png)
 
 ### Supporting development
 Love the script and want to support future development? Any and all donations gratefully received!
