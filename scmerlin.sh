@@ -202,7 +202,9 @@ MainMenu(){
 	if [ "$ENABLED_SAMBA" -eq 1 ]; then
 		printf "6.    SAMBA\\n"
 	fi
-	printf "\\n\\e[1mScripts\\e[0m\\n\\n"
+	if [ -f /opt/bin/diversion ] || [ -f /jffs/scripts/firewall ]; then
+		printf "\\n\\e[1mScripts\\e[0m\\n\\n"
+	fi
 	if [ -f /opt/bin/diversion ]; then
 		DIVERSION_STATUS="$(grep "adblocking" /opt/share/diversion/.conf/diversion.conf | cut -f2 -d"=")"
 		if [ "$DIVERSION_STATUS" = "on" ]; then DIVERSION_STATUS="Disable"; else DIVERSION_STATUS="Enable"; fi
@@ -212,6 +214,10 @@ MainMenu(){
 		SKYNET_STATUS=""
 		if iptables -t raw -S | grep -q Skynet; then SKYNET_STATUS="Disable"; else SKYNET_STATUS="Enable"; fi
 		printf "8.    %s Skynet firewall\\n" "$SKYNET_STATUS"
+	fi
+	if [ -f /opt/bin/opkg ]; then
+		printf "\\n\\e[1mEntware\\e[0m\\n\\n"
+		printf "t.    Restart all Entware scripts\\n\\n"
 	fi
 	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
 	printf "r.    Reboot router\\n\\n"
@@ -327,6 +333,31 @@ MainMenu(){
 					fi
 				else
 					printf "\\n\\e[1mInvalid selection (Skynet not installed)\\e[0m\\n"
+				fi
+				PressEnter
+				break
+			;;
+			t)
+				printf "\\n"
+				if [ -f /opt/bin/opkg ]; then
+					if Check_Lock "menu"; then
+						while true; do
+							printf "\\n\\e[1mAre you sure you want to restart all Entware scripts? (y/n)\\e[0m\\n"
+							read -r "confirm"
+							case "$confirm" in
+								y|Y)
+									/opt/etc/init.d/rc.unslung restart
+									break
+								;;
+								*)
+									break
+								;;
+							esac
+						done
+						Clear_Lock
+					fi
+				else
+					printf "\\n\\e[1mInvalid selection (Entware not installed)\\e[0m\\n"
 				fi
 				PressEnter
 				break
