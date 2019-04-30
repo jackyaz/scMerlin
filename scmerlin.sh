@@ -202,7 +202,7 @@ MainMenu(){
 	if [ "$ENABLED_SAMBA" -eq 1 ]; then
 		printf "6.    SAMBA\\n"
 	fi
-	ENABLED_DDNS="$(nvram get dns_enable_x)"
+	ENABLED_DDNS="$(nvram get ddns_enable_x)"
 	if ! Validate_Number "" "$ENABLED_DDNS" "silent"; then ENABLED_DDNS=0; fi
 	if [ "$ENABLED_DDNS" -eq 1 ]; then
 		printf "7.    DDNS client\\n"
