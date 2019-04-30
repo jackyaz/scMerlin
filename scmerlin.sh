@@ -17,7 +17,7 @@ readonly SCM_NAME="scmerlin"
 #shellcheck disable=SC2019
 #shellcheck disable=SC2018
 readonly SCM_NAME_LOWER=$(echo $SCM_NAME | tr 'A-Z' 'a-z')
-readonly SCM_VERSION="v1.0.1"
+readonly SCM_VERSION="v1.0.2"
 readonly SCM_BRANCH="master"
 readonly SCM_REPO="https://raw.githubusercontent.com/jackyaz/""$SCM_NAME""/""$SCM_BRANCH"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
@@ -202,18 +202,23 @@ MainMenu(){
 	if [ "$ENABLED_SAMBA" -eq 1 ]; then
 		printf "6.    SAMBA\\n"
 	fi
+	ENABLED_DDNS="$(nvram get dns_enable_x)"
+	if ! Validate_Number "" "$ENABLED_DDNS" "silent"; then ENABLED_DDNS=0; fi
+	if [ "$ENABLED_DDNS" -eq 1 ]; then
+		printf "7.    DDNS client\\n"
+	fi
 	if [ -f /opt/bin/diversion ] || [ -f /jffs/scripts/firewall ]; then
 		printf "\\n\\e[1mScripts\\e[0m\\n\\n"
 	fi
 	if [ -f /opt/bin/diversion ]; then
 		DIVERSION_STATUS="$(grep "adblocking" /opt/share/diversion/.conf/diversion.conf | cut -f2 -d"=")"
 		if [ "$DIVERSION_STATUS" = "on" ]; then DIVERSION_STATUS="Disable"; else DIVERSION_STATUS="Enable"; fi
-		printf "7.    %s Diversion ad-blocking\\n" "$DIVERSION_STATUS"
+		printf "d.    %s Diversion ad-blocking\\n" "$DIVERSION_STATUS"
 	fi
 	if [ -f /jffs/scripts/firewall ]; then
 		SKYNET_STATUS=""
 		if iptables -t raw -S | grep -q Skynet; then SKYNET_STATUS="Disable"; else SKYNET_STATUS="Enable"; fi
-		printf "8.    %s Skynet firewall\\n" "$SKYNET_STATUS"
+		printf "s.    %s Skynet firewall\\n" "$SKYNET_STATUS"
 	fi
 	if [ -f /opt/bin/opkg ]; then
 		printf "\\n\\e[1mEntware\\e[0m\\n\\n"
@@ -309,6 +314,19 @@ MainMenu(){
 			;;
 			7)
 				printf "\\n"
+				if [ "$ENABLED_DDNS" -eq 1 ]; then
+					if Check_Lock "menu"; then
+						service restart_ddns >/dev/null 2>&1
+						Clear_Lock
+					fi
+				else
+					printf "\\n\\e[1mInvalid selection (DDNS client not enabled)\\e[0m\\n"
+				fi
+				PressEnter
+				break
+			;;
+			d)
+				printf "\\n"
 				if [ -f /opt/bin/diversion ]; then
 					if Check_Lock "menu"; then
 						/opt/bin/diversion a
@@ -320,7 +338,7 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			8)
+			s)
 				printf "\\n"
 				if [ -f /jffs/scripts/firewall ]; then
 					if Check_Lock "menu"; then
