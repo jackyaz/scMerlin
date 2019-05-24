@@ -226,6 +226,7 @@ MainMenu(){
 	fi
 	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
 	printf "c.    View running processes\\n"
+	printf "m.    View RAM/memory usage\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
 	printf "u.    Check for updates\\n"
@@ -409,6 +410,12 @@ MainMenu(){
 					program="top"
 				fi
 				"$program"
+				PressEnter
+				break
+			;;
+			m)
+				printf "\\n"
+				free
 				PressEnter
 				break
 			;;
