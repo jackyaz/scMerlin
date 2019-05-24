@@ -385,7 +385,7 @@ MainMenu(){
 				printf "\\n"
 				program=""
 				if [ -f /opt/bin/opkg ]; then
-					if [ -f /opt/bin/opkg ]; then
+					if [ -f /opt/bin/htop ]; then
 						program="htop"
 					else
 						program=""
