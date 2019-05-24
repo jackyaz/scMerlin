@@ -414,6 +414,7 @@ MainMenu(){
 				break
 			;;
 			m)
+				ScriptHeader
 				printf "\\n"
 				free
 				PressEnter
