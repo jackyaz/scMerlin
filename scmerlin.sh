@@ -17,7 +17,7 @@ readonly SCM_NAME="scmerlin"
 #shellcheck disable=SC2019
 #shellcheck disable=SC2018
 readonly SCM_NAME_LOWER=$(echo $SCM_NAME | tr 'A-Z' 'a-z')
-readonly SCM_VERSION="v1.0.2"
+readonly SCM_VERSION="v1.0.3"
 readonly SCM_BRANCH="master"
 readonly SCM_REPO="https://raw.githubusercontent.com/jackyaz/""$SCM_NAME""/""$SCM_BRANCH"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
@@ -225,6 +225,7 @@ MainMenu(){
 		printf "t.    Restart all Entware scripts\\n"
 	fi
 	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
+	printf "c.    View running processes\\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
 	printf "u.    Check for updates\\n"
@@ -377,6 +378,37 @@ MainMenu(){
 				else
 					printf "\\n\\e[1mInvalid selection (Entware not installed)\\e[0m\\n"
 				fi
+				PressEnter
+				break
+			;;
+			c)
+				printf "\\n"
+				program=""
+				if [ -f /opt/bin/opkg ]; then
+					if [ -f /opt/bin/opkg ]; then
+						program="htop"
+					else
+						program=""
+						while true; do
+							printf "\\n\\e[1mWould you like to install htop (enhanced version of top)? (y/n)\\e[0m\\n"
+							read -r "confirm"
+							case "$confirm" in
+								y|Y)
+									program="htop"
+									opkg install htop
+									break
+								;;
+								*)
+									program="top"
+									break
+								;;
+							esac
+						done
+					fi
+				else
+					program="top"
+				fi
+				"$program"
 				PressEnter
 				break
 			;;
