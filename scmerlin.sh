@@ -17,7 +17,7 @@ readonly SCM_NAME="scmerlin"
 #shellcheck disable=SC2019
 #shellcheck disable=SC2018
 readonly SCM_NAME_LOWER=$(echo $SCM_NAME | tr 'A-Z' 'a-z')
-readonly SCM_VERSION="v1.0.3"
+readonly SCM_VERSION="v1.0.4"
 readonly SCM_BRANCH="master"
 readonly SCM_REPO="https://raw.githubusercontent.com/jackyaz/""$SCM_NAME""/""$SCM_BRANCH"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
@@ -207,6 +207,11 @@ MainMenu(){
 	if [ "$ENABLED_DDNS" -eq 1 ]; then
 		printf "7.    DDNS client\\n"
 	fi
+	ENABLED_NTPD="$(nvram get ntpd_enable)"
+	if ! Validate_Number "" "$ENABLED_NTPD" "silent"; then ENABLED_NTPD=0; fi
+	if [ -f /opt/etc/init.d/S77ntpd ] || [ "$ENABLED_NTPD" -eq 1 ]; then
+		printf "8.    ntpd (time service)\\n"
+	fi
 	if [ -f /opt/bin/diversion ] || [ -f /jffs/scripts/firewall ]; then
 		printf "\\n\\e[1mScripts\\e[0m\\n\\n"
 	fi
@@ -319,6 +324,24 @@ MainMenu(){
 				if [ "$ENABLED_DDNS" -eq 1 ]; then
 					if Check_Lock "menu"; then
 						service restart_ddns >/dev/null 2>&1
+						Clear_Lock
+					fi
+				else
+					printf "\\n\\e[1mInvalid selection (DDNS client not enabled)\\e[0m\\n"
+				fi
+				PressEnter
+				break
+			;;
+			8)
+				printf "\\n"
+				if [ "$ENABLED_NTPD" -eq 1 ]; then
+					if Check_Lock "menu"; then
+						service restart_time >/dev/null 2>&1
+						Clear_Lock
+					fi
+				elif [ -f "/opt/etc/init.d/S77ntpd" ]; then
+					if Check_Lock "menu"; then
+						/opt/etc/init.d/S77ntpd restart
 						Clear_Lock
 					fi
 				else
