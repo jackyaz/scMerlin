@@ -209,7 +209,7 @@ MainMenu(){
 	vpnclients="$(nvram show 2> /dev/null | grep ^vpn_client._addr)"
 	vpnenabled="false"
 	for vpnclient in $vpnclients; do
-		if [ -n "$(nvram get "$(echo $vpnclient | cut -f1 -d'=')")" ]; then
+		if [ -n "$(nvram get "$(echo "$vpnclient" | cut -f1 -d'=')")" ]; then
 			vpnenabled="true"
 		fi
 	done
@@ -218,7 +218,7 @@ MainMenu(){
 		printf "\\e[1m(selecting an option will restart the VPN client)\\e[0m\\n\\n"
 		vpnnum=1
 		for vpnclient in $vpnclients; do
-			if [ -n "$(nvram get "$(echo $vpnclient | cut -f1 -d'=')")" ]; then
+			if [ -n "$(nvram get "$(echo "$vpnclient" | cut -f1 -d'=')")" ]; then
 				printf "v%s.    VPN Client %s\\n" "$vpnnum" "$vpnnum"
 				vpnnum=$((vpnnum + 1))
 			fi
