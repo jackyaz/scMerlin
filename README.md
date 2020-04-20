@@ -2,8 +2,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/bfd397624cdf4803a465d4ae1530e7fe)](https://www.codacy.com/app/jackyaz/scMerlin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jackyaz/scMerlin&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.com/jackyaz/scMerlin.svg?branch=master)](https://travis-ci.com/jackyaz/scMerlin)
 
-## v1.0.5
-### Updated on 2020-01-28
+## v1.1.0
+### Updated on 2020-04-20
 ## About
 Quick access to controlling services and scripts on your router
 
@@ -15,12 +15,6 @@ Example menu (options added/removed dynamically depending on which service(s) yo
 ### Supporting development
 Love the script and want to support future development? Any and all donations gratefully received!
 [**PayPal donation**](https://paypal.me/jackyaz21)
-
-## Supported Models
-All modes supported by [Asuswrt-Merlin](https://asuswrt.lostrealm.ca/about). Models confirmed to work are below:
-*   RT-AC68U
-*   RT-AC86U
-*   RT-AC3100
 
 ## Installation
 Using your preferred SSH client/terminal, copy and paste the following command, then press Enter:
