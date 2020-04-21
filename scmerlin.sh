@@ -17,8 +17,8 @@ readonly SCM_NAME="scmerlin"
 #shellcheck disable=SC2019
 #shellcheck disable=SC2018
 readonly SCM_NAME_LOWER=$(echo $SCM_NAME | tr 'A-Z' 'a-z')
-readonly SCM_VERSION="v1.1.0"
-readonly SCM_BRANCH="master"
+readonly SCM_VERSION="v1.1.1"
+readonly SCM_BRANCH="develop"
 readonly SCM_REPO="https://raw.githubusercontent.com/jackyaz/""$SCM_NAME""/""$SCM_BRANCH"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
@@ -219,7 +219,7 @@ MainMenu(){
 		vpnnum=1
 		for vpnclient in $vpnclients; do
 			if [ -n "$(nvram get "$(echo "$vpnclient" | cut -f1 -d'=')")" ]; then
-				printf "v%s.    VPN Client %s\\n" "$vpnnum" "$vpnnum"
+				printf "v%s.    VPN Client %s (%s)\\n" "$vpnnum" "$vpnnum" "$(nvram get vpn_client"$vpnnum"_desc)"
 				vpnnum=$((vpnnum + 1))
 			fi
 		done
