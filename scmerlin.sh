@@ -220,8 +220,8 @@ MainMenu(){
 		for vpnclient in $vpnclients; do
 			if [ -n "$(nvram get "$(echo "$vpnclient" | cut -f1 -d'=')")" ]; then
 				printf "vc%s.    VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
-				vpnclientnum=$((vpnclientnum + 1))
 			fi
+			vpnclientnum=$((vpnclientnum + 1))
 		done
 	fi
 	vpnservercount="$(nvram get vpn_serverx_start | awk '{n=split($0, array, ",")} END{print n-1 }')"
