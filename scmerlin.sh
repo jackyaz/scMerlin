@@ -17,7 +17,7 @@ readonly SCM_NAME="scmerlin"
 #shellcheck disable=SC2019
 #shellcheck disable=SC2018
 readonly SCM_NAME_LOWER=$(echo $SCM_NAME | tr 'A-Z' 'a-z')
-readonly SCM_VERSION="v1.1.0"
+readonly SCM_VERSION="v1.1.1"
 readonly SCM_BRANCH="master"
 readonly SCM_REPO="https://raw.githubusercontent.com/jackyaz/""$SCM_NAME""/""$SCM_BRANCH"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
@@ -207,21 +207,36 @@ MainMenu(){
 		printf "8.    ntpd (time service)\\n"
 	fi
 	vpnclients="$(nvram show 2> /dev/null | grep ^vpn_client._addr)"
-	vpnenabled="false"
+	vpnclientenabled="false"
 	for vpnclient in $vpnclients; do
 		if [ -n "$(nvram get "$(echo "$vpnclient" | cut -f1 -d'=')")" ]; then
-			vpnenabled="true"
+			vpnclientenabled="true"
 		fi
 	done
-	if [ "$vpnenabled" = "true" ]; then
-		printf "\\n\\e[1mVPN clients\\e[0m\\n"
-		printf "\\e[1m(selecting an option will restart the VPN client)\\e[0m\\n\\n"
-		vpnnum=1
+	if [ "$vpnclientenabled" = "true" ]; then
+		printf "\\n\\e[1mVPN Clients\\e[0m\\n"
+		printf "\\e[1m(selecting an option will restart the VPN Client)\\e[0m\\n\\n"
+		vpnclientnum=1
 		for vpnclient in $vpnclients; do
 			if [ -n "$(nvram get "$(echo "$vpnclient" | cut -f1 -d'=')")" ]; then
-				printf "v%s.    VPN Client %s\\n" "$vpnnum" "$vpnnum"
-				vpnnum=$((vpnnum + 1))
+				printf "vc%s.    VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
+				vpnclientnum=$((vpnclientnum + 1))
 			fi
+		done
+	fi
+	vpnservercount="$(nvram get vpn_serverx_start | awk '{n=split($0, array, ",")} END{print n-1 }')"
+	vpnserverenabled="false"
+	if [ "$vpnservercount" -gt 0 ]; then
+		vpnserverenabled="true"
+	fi
+	if [ "$vpnserverenabled" = "true" ]; then
+		printf "\\n\\e[1mVPN Servers\\e[0m\\n"
+		printf "\\e[1m(selecting an option will restart the VPN Server)\\e[0m\\n\\n"
+		vpnservernum=1
+		while [ "$vpnservernum" -le "$vpnservercount" ]; do
+			vpnservernumactual="$(nvram get vpn_serverx_start | awk -v i="$vpnservernum" -F',' '{ print $i }')"
+			printf "vs%s.    VPN Server %s\\n" "$vpnservernumactual" "$vpnservernumactual"
+			vpnservernum=$((vpnservernum + 1))
 		done
 	fi
 	if [ -f /opt/bin/diversion ] || [ -f /jffs/scripts/firewall ]; then
@@ -362,52 +377,72 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			v1)
+			vc1)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client1_addr)" ]; then
 					service restart_vpnclient1 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
 			;;
-			v2)
+			vc2)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client2_addr)" ]; then
 					service restart_vpnclient2 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
 			;;
-			v3)
+			vc3)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client3_addr)" ]; then
 					service restart_vpnclient3 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
 			;;
-			v4)
+			vc4)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client4_addr)" ]; then
 					service restart_vpnclient4 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
 			;;
-			v5)
+			vc5)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client5_addr)" ]; then
 					service restart_vpnclient5 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+				fi
+				PressEnter
+				break
+			;;
+			vs1)
+				printf "\\n"
+				if nvram get vpn_serverx_start | grep -q 1; then
+					service restart_vpnserver1 >/dev/null 2>&1
+				else
+					printf "\\n\\e[1mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
+				fi
+				PressEnter
+				break
+			;;
+			vs2)
+				printf "\\n"
+				if nvram get vpn_serverx_start | grep -q 2; then
+					service restart_vpnserver2 >/dev/null 2>&1
+				else
+					printf "\\n\\e[1mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -514,6 +549,10 @@ MainMenu(){
 				printf "\\n"
 				if Check_Lock "menu"; then
 					while true; do
+						if [ "$ROUTER_MODEL" = "RT-AC86U" ]; then
+							printf "\\n\\e[1m\\e[33mRemote reboots are not recommend for %s\\e[0m" "$ROUTER_MODEL"
+							printf "\\n\\e[1m\\e[33mSome %s fail to reboot correctly and require a manual power cycle\\e[0m\\n" "$ROUTER_MODEL"
+						fi
 						printf "\\n\\e[1mAre you sure you want to reboot? (y/n)\\e[0m\\n"
 						read -r "confirm"
 						case "$confirm" in
