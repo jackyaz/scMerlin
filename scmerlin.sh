@@ -207,20 +207,20 @@ MainMenu(){
 		printf "8.    ntpd (time service)\\n"
 	fi
 	vpnclients="$(nvram show 2> /dev/null | grep ^vpn_client._addr)"
-	vpnenabled="false"
+	vpnclientenabled="false"
 	for vpnclient in $vpnclients; do
 		if [ -n "$(nvram get "$(echo "$vpnclient" | cut -f1 -d'=')")" ]; then
-			vpnenabled="true"
+			vpnclientenabled="true"
 		fi
 	done
-	if [ "$vpnenabled" = "true" ]; then
-		printf "\\n\\e[1mVPN clients\\e[0m\\n"
-		printf "\\e[1m(selecting an option will restart the VPN client)\\e[0m\\n\\n"
-		vpnnum=1
+	if [ "$vpnclientenabled" = "true" ]; then
+		printf "\\n\\e[1mVPN Clients\\e[0m\\n"
+		printf "\\e[1m(selecting an option will restart the VPN Client)\\e[0m\\n\\n"
+		vpnclientnum=1
 		for vpnclient in $vpnclients; do
 			if [ -n "$(nvram get "$(echo "$vpnclient" | cut -f1 -d'=')")" ]; then
-				printf "v%s.    VPN Client %s (%s)\\n" "$vpnnum" "$vpnnum" "$(nvram get vpn_client"$vpnnum"_desc)"
-				vpnnum=$((vpnnum + 1))
+				printf "vc%s.    VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
+				vpnclientnum=$((vpnclientnum + 1))
 			fi
 		done
 	fi
@@ -362,52 +362,56 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			v1)
+			vc1)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client1_addr)" ]; then
 					service restart_vpnclient1 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
 			;;
-			v2)
+			vc2)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client2_addr)" ]; then
 					service restart_vpnclient2 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
 			;;
-			v3)
+			vc3)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client3_addr)" ]; then
 					service restart_vpnclient3 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
 			;;
-			v4)
+			vc4)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client4_addr)" ]; then
 					service restart_vpnclient4 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
 			;;
-			v5)
+			vc5)
 				printf "\\n"
 				if [ -n "$(nvram get vpn_client5_addr)" ]; then
 					service restart_vpnclient5 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+				fi
+				PressEnter
+				break
+			;;
 				fi
 				PressEnter
 				break
