@@ -224,6 +224,21 @@ MainMenu(){
 			fi
 		done
 	fi
+	vpnservercount="$(nvram get vpn_serverx_start | awk '{n=split($0, array, ",")} END{print n-1 }')"
+	vpnserverenabled="false"
+	if [ "$vpnservercount" -gt 0 ]; then
+		vpnserverenabled="true"
+	fi
+	if [ "$vpnserverenabled" = "true" ]; then
+		printf "\\n\\e[1mVPN Servers\\e[0m\\n"
+		printf "\\e[1m(selecting an option will restart the VPN Server)\\e[0m\\n\\n"
+		vpnservernum=1
+		while [ "$vpnservernum" -le "$vpnservercount" ]; do
+			vpnservernumactual="$(nvram get vpn_serverx_start | awk -v i="$vpnservernum" -F',' '{ print $i }')"
+			printf "vs%s.    VPN Server %s\\n" "$vpnservernumactual" "$vpnservernumactual"
+			vpnservernum=$((vpnservernum + 1))
+		done
+	fi
 	if [ -f /opt/bin/diversion ] || [ -f /jffs/scripts/firewall ]; then
 		printf "\\n\\e[1mScripts\\e[0m\\n\\n"
 	fi
@@ -412,6 +427,22 @@ MainMenu(){
 				PressEnter
 				break
 			;;
+			vs1)
+				printf "\\n"
+				if nvram get vpn_serverx_start | grep -q 1; then
+					service restart_vpnserver1 >/dev/null 2>&1
+				else
+					printf "\\n\\e[1mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
+				fi
+				PressEnter
+				break
+			;;
+			vs2)
+				printf "\\n"
+				if nvram get vpn_serverx_start | grep -q 2; then
+					service restart_vpnserver2 >/dev/null 2>&1
+				else
+					printf "\\n\\e[1mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
