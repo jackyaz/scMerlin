@@ -514,6 +514,10 @@ MainMenu(){
 				printf "\\n"
 				if Check_Lock "menu"; then
 					while true; do
+						if [ "$ROUTER_MODEL" = "RT-AC86U" ]; then
+							printf "\\n\\e[1m\\e[33mRemote reboots are not recommend for %s\\e[0m" "$ROUTER_MODEL"
+							printf "\\n\\e[1m\\e[33mSome %s fail to reboot correctly and require a manual power cycle\\e[0m\\n" "$ROUTER_MODEL"
+						fi
 						printf "\\n\\e[1mAre you sure you want to reboot? (y/n)\\e[0m\\n"
 						read -r "confirm"
 						case "$confirm" in
