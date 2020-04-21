@@ -18,7 +18,7 @@ readonly SCM_NAME="scmerlin"
 #shellcheck disable=SC2018
 readonly SCM_NAME_LOWER=$(echo $SCM_NAME | tr 'A-Z' 'a-z')
 readonly SCM_VERSION="v1.1.1"
-readonly SCM_BRANCH="develop"
+readonly SCM_BRANCH="master"
 readonly SCM_REPO="https://raw.githubusercontent.com/jackyaz/""$SCM_NAME""/""$SCM_BRANCH"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
