@@ -95,6 +95,7 @@ Update_Version(){
 			/usr/sbin/curl -fsL --retry 3 "$SCM_REPO/$SCM_NAME.sh" -o "/jffs/scripts/$SCM_NAME" && Print_Output "true" "$SCM_NAME successfully updated"
 			chmod 0755 /jffs/scripts/"$SCM_NAME"
 			Clear_Lock
+			exec "$0"
 			exit 0
 		else
 			Print_Output "true" "No new version - latest is $localver" "$WARN"
@@ -109,6 +110,7 @@ Update_Version(){
 			/usr/sbin/curl -fsL --retry 3 "$SCM_REPO/$SCM_NAME.sh" -o "/jffs/scripts/$SCM_NAME" && Print_Output "true" "$SCM_NAME successfully updated"
 			chmod 0755 /jffs/scripts/"$SCM_NAME"
 			Clear_Lock
+			exec "$0"
 			exit 0
 		;;
 	esac
