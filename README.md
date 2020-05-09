@@ -14,7 +14,10 @@ Example menu (options added/removed dynamically depending on which service(s) yo
 
 ### Supporting development
 Love the script and want to support future development? Any and all donations gratefully received!
+
 [**PayPal donation**](https://paypal.me/jackyaz21)
+
+[**Buy me a coffee**](https://www.buymeacoffee.com/jackyaz)
 
 ## Installation
 Using your preferred SSH client/terminal, copy and paste the following command, then press Enter:
