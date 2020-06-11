@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/jackyaz/scMerlin.svg?branch=master)](https://travis-ci.com/jackyaz/scMerlin)
 
 ## v1.1.2
-### Updated on 2020-06-05
+### Updated on 2020-06-11
 ## About
 Quick access to controlling services and scripts on your router
 
