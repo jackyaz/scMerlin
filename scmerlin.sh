@@ -219,7 +219,7 @@ MainMenu(){
 		printf "\\n\\e[1mVPN Clients\\e[0m\\n"
 		printf "\\e[1m(selecting an option will restart the VPN Client)\\e[0m\\n\\n"
 		vpnclientnum=1
-		while [ "$vpnclientnum" -lt 5 ]; do
+		while [ "$vpnclientnum" -lt 6 ]; do
 			if [ -n "$(nvram get vpn_client"$vpnclientnum"_addr)" ]; then
 				printf "vc%s.    VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
 			fi
