@@ -261,6 +261,7 @@ MainMenu(){
 	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
 	printf "c.    View running processes\\n"
 	printf "m.    View RAM/memory usage\n"
+	printf "t.    View router temperatures\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
 	printf "u.    Check for updates\\n"
@@ -544,6 +545,16 @@ MainMenu(){
 				ScriptHeader
 				printf "\\n"
 				free
+				PressEnter
+				break
+			;;
+			t)
+				ScriptHeader
+				printf "\\n"
+				printf "\\n\\e[1m\\e[33mTemperatures\\e[0m"
+				printf "CPU: %s°C\\n"  "$(cat /sys/class/thermal/thermal_zone0/temp | awk '{ print int($1/1000) }')"
+				printf "2.4 GHz: %s°C\\n"  "$(wl -i eth5 phy_tempsense | awk '{ print $1/2+20 }')"
+				printf "5 GHz: %s°C\\n"  "$(wl -i eth6 phy_tempsense | awk '{ print $1/2+20 }')"
 				PressEnter
 				break
 			;;
