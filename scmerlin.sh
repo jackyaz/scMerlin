@@ -551,8 +551,8 @@ MainMenu(){
 			t)
 				ScriptHeader
 				printf "\\n"
-				printf "CPU: %s°C\\n"  "$(cat /sys/class/thermal/thermal_zone0/temp | awk '{ print int($1/1000) }')"
 				printf "\\n\\e[1mTemperatures\\e[0m\\n\\n"
+				printf "CPU: %s°C\\n"  "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
 				printf "2.4 GHz: %s°C\\n"  "$(wl -i eth5 phy_tempsense | awk '{ print $1/2+20 }')"
 				printf "5 GHz: %s°C\\n\\n"  "$(wl -i eth6 phy_tempsense | awk '{ print $1/2+20 }')"
 				PressEnter
