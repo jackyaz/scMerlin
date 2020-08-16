@@ -256,7 +256,7 @@ MainMenu(){
 	fi
 	if [ -f /opt/bin/opkg ]; then
 		printf "\\n\\e[1mEntware\\e[0m\\n\\n"
-		printf "t.    Restart all Entware scripts\\n"
+		printf "et.    Restart all Entware scripts\\n"
 	fi
 	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
 	printf "c.    View running processes\\n"
@@ -479,7 +479,7 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			t)
+			et)
 				printf "\\n"
 				if [ -f /opt/bin/opkg ]; then
 					if Check_Lock "menu"; then
