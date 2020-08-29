@@ -17,7 +17,7 @@ readonly SCM_NAME="scmerlin"
 #shellcheck disable=SC2019
 #shellcheck disable=SC2018
 readonly SCM_NAME_LOWER=$(echo $SCM_NAME | tr 'A-Z' 'a-z')
-readonly SCM_VERSION="v1.1.2"
+readonly SCM_VERSION="v1.1.3"
 readonly SCM_BRANCH="master"
 readonly SCM_REPO="https://raw.githubusercontent.com/jackyaz/""$SCM_NAME""/""$SCM_BRANCH"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
@@ -256,11 +256,12 @@ MainMenu(){
 	fi
 	if [ -f /opt/bin/opkg ]; then
 		printf "\\n\\e[1mEntware\\e[0m\\n\\n"
-		printf "t.    Restart all Entware scripts\\n"
+		printf "et.    Restart all Entware scripts\\n"
 	fi
 	printf "\\n\\e[1mRouter\\e[0m\\n\\n"
 	printf "c.    View running processes\\n"
 	printf "m.    View RAM/memory usage\n"
+	printf "t.    View router temperatures\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
 	printf "u.    Check for updates\\n"
@@ -479,7 +480,7 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			t)
+			et)
 				printf "\\n"
 				if [ -f /opt/bin/opkg ]; then
 					if Check_Lock "menu"; then
@@ -544,6 +545,16 @@ MainMenu(){
 				ScriptHeader
 				printf "\\n"
 				free
+				PressEnter
+				break
+			;;
+			t)
+				ScriptHeader
+				printf "\\n"
+				printf "\\n\\e[1mTemperatures\\e[0m\\n\\n"
+				printf "CPU: %s°C\\n"  "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
+				printf "2.4 GHz: %s°C\\n"  "$(wl -i eth5 phy_tempsense | awk '{ print $1/2+20 }')"
+				printf "5 GHz: %s°C\\n\\n"  "$(wl -i eth6 phy_tempsense | awk '{ print $1/2+20 }')"
 				PressEnter
 				break
 			;;
