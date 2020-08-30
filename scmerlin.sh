@@ -554,19 +554,8 @@ MainMenu(){
 				printf "\\n\\e[1mTemperatures\\e[0m\\n\\n"
 				printf "CPU: %s°C\\n"  "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
 				
-				wl24=""
-				wl5=""
-				
-				if [ "$ROUTER_MODEL" = "RT-AX88U" ]; then
-					wl24="eth6"
-					wl5="eth7"
-				else
-					wl24="eth5"
-					wl5="eth6"
-				fi
-				
-				printf "2.4 GHz: %s°C\\n"  "$(wl -i "$wl24" phy_tempsense | awk '{ print $1/2+20 }')"
-				printf "5 GHz: %s°C\\n\\n"  "$(wl -i "$wl5" phy_tempsense | awk '{ print $1/2+20 }')"
+				printf "2.4 GHz: %s°C\\n"  "$(wl -i "$(nvram get wl0_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
+				printf "5 GHz: %s°C\\n\\n"  "$(wl -i "$(nvram get wl1_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
 				PressEnter
 				break
 			;;
