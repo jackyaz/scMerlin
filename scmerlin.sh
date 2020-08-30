@@ -552,7 +552,13 @@ MainMenu(){
 				ScriptHeader
 				printf "\\n"
 				printf "\\n\\e[1mTemperatures\\e[0m\\n\\n"
-				printf "CPU: %s°C\\n"  "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
+				if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
+					printf "CPU: %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
+				elif [ -f /proc/dmu/temperature ]; then
+					printf "CPU: %s\\n" "$(sed 's/CPU temperature : //' /proc/dmu/temperature)"
+				else
+					printf "CPU: N/A\\n"
+				fi
 				
 				printf "2.4 GHz: %s°C\\n" "$(wl -i "$(nvram get wl0_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
 				printf "5 GHz: %s°C\\n\\n" "$(wl -i "$(nvram get wl1_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
