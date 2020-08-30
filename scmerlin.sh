@@ -555,7 +555,7 @@ MainMenu(){
 				if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
 					printf "CPU: %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
 				elif [ -f /proc/dmu/temperature ]; then
-					printf "CPU:%s\\n" "$(cat /proc/dmu/temperature | cut -f2 -d':')"
+					printf "CPU:%s\\n" "$(cut -f2 -d':' /proc/dmu/temperature)"
 				else
 					printf "CPU: N/A\\n"
 				fi
