@@ -561,7 +561,12 @@ MainMenu(){
 				fi
 				
 				printf "2.4 GHz: %s°C\\n" "$(wl -i "$(nvram get wl0_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
-				printf "5 GHz: %s°C\\n\\n" "$(wl -i "$(nvram get wl1_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
+				
+				if [ "$ROUTER_MODEL" = "RT-AC87U" ]; then
+					printf "5 GHz: %s°C\\n\\n" "$(qcsapi_sockrpc get_temperature | awk 'FNR == 2 {print $3}')"
+				else
+					printf "5 GHz: %s°C\\n\\n" "$(wl -i "$(nvram get wl1_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
+				fi
 				PressEnter
 				break
 			;;
