@@ -375,7 +375,7 @@ MainMenu(){
 						Clear_Lock
 					fi
 				else
-					printf "\\n\\e[1mInvalid selection (DDNS client not enabled)\\e[0m\\n\\n"
+					printf "\\n\\e[1mInvalid selection (NTP server not enabled/installed)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
