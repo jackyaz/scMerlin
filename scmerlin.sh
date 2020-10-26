@@ -145,6 +145,7 @@ Update_Version(){
 			Print_Output "true" "MD5 hash of $SCRIPT_NAME does not match - downloading updated $serverver" "$PASS"
 		fi
 		
+		Update_File "scmerlin_www.asp"
 		Update_File "shared-jy.tar.gz"
 		Update_File "tailtop"
 		Update_File "tailtopd"
@@ -169,6 +170,7 @@ Update_Version(){
 	if [ "$1" = "force" ]; then
 		serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
 		Print_Output "true" "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
+		Update_File "scmerlin_www.asp"
 		Update_File "shared-jy.tar.gz"
 		Update_File "tailtop"
 		Update_File "tailtopd"
@@ -218,7 +220,21 @@ Update_File(){
 				Print_Output "true" "New version of $1 downloaded" "$PASS"
 			fi
 		fi
-	elif [ "$1" = "S99tailtop" ] || [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ]; then
+	elif [ "$1" = "S99tailtop" ]; then
+			tmpfile="/tmp/$1"
+			Download_File "$SCRIPT_REPO/$1" "$tmpfile"
+			if ! diff -q "$tmpfile" "/opt/etc/init.d/$1" >/dev/null 2>&1; then
+				if [ -f /opt/etc/init.d/S99tailtop ]; then
+					/opt/etc/init.d/S99tailtop >/dev/null 2>&1
+					sleep 2
+				fi
+				Download_File "$SCRIPT_REPO/$1" "/opt/etc/init.d/$1"
+				chmod 0755 "/opt/etc/init.d/$1"
+				/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+				Print_Output "true" "New version of $1 downloaded" "$PASS"
+			fi
+			rm -f "$tmpfile"
+	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ]; then
 			tmpfile="/tmp/$1"
 			Download_File "$SCRIPT_REPO/$1" "$tmpfile"
 			if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
@@ -229,11 +245,8 @@ Update_File(){
 				Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
 				chmod 0755 "$SCRIPT_DIR/$1"
 				Print_Output "true" "New version of $1 downloaded" "$PASS"
+				/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
 			fi
-			if [ "$1" = "S99tailtop" ]; then
-				mv "$SCRIPT_DIR/S99tailtop" /opt/etc/init.d/S99tailtop
-			fi
-			/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
 			rm -f "$tmpfile"
 	else
 		return 1
