@@ -13,13 +13,17 @@
 ####################################################
 
 ### Start of script variables ###
-readonly SCM_NAME="scmerlin"
-#shellcheck disable=SC2019
-#shellcheck disable=SC2018
-readonly SCM_NAME_LOWER=$(echo $SCM_NAME | tr 'A-Z' 'a-z')
-readonly SCM_VERSION="v1.1.3"
-readonly SCM_BRANCH="master"
-readonly SCM_REPO="https://raw.githubusercontent.com/jackyaz/""$SCM_NAME""/""$SCM_BRANCH"
+readonly SCRIPT_NAME="scmerlin"
+readonly SCM_VERSION="v1.1.4"
+readonly SCRIPT_VERSION="v1.1.4"
+readonly SCRIPT_BRANCH="develop"
+readonly SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/""$SCRIPT_NAME""/""$SCRIPT_BRANCH"
+readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
+readonly SCRIPT_WEBPAGE_DIR="$(readlink /www/user)"
+readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME"
+readonly SHARED_DIR="/jffs/addons/shared-jy"
+readonly SHARED_REPO="https://raw.githubusercontent.com/jackyaz/shared-jy/master"
+readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
 
@@ -33,25 +37,25 @@ readonly PASS="\\e[32m"
 # $1 = print to syslog, $2 = message to print, $3 = log level
 Print_Output(){
 	if [ "$1" = "true" ]; then
-		logger -t "$SCM_NAME" "$2"
-		printf "\\e[1m$3%s: $2\\e[0m\\n\\n" "$SCM_NAME"
+		logger -t "$SCRIPT_NAME" "$2"
+		printf "\\e[1m$3%s: $2\\e[0m\\n\\n" "$SCRIPT_NAME"
 	else
-		printf "\\e[1m$3%s: $2\\e[0m\\n\\n" "$SCM_NAME"
+		printf "\\e[1m$3%s: $2\\e[0m\\n\\n" "$SCRIPT_NAME"
 	fi
 }
 
 ### Code for these functions inspired by https://github.com/Adamm00 - credit to @Adamm ###
 Check_Lock(){
-	if [ -f "/tmp/$SCM_NAME.lock" ]; then
-		ageoflock=$(($(date +%s) - $(date +%s -r /tmp/$SCM_NAME.lock)))
+	if [ -f "/tmp/$SCRIPT_NAME.lock" ]; then
+		ageoflock=$(($(date +%s) - $(date +%s -r /tmp/$SCRIPT_NAME.lock)))
 		if [ "$ageoflock" -gt 60 ]; then
 			Print_Output "true" "Stale lock file found (>60 seconds old) - purging lock" "$ERR"
-			kill "$(sed -n '1p' /tmp/$SCM_NAME.lock)" >/dev/null 2>&1
+			kill "$(sed -n '1p' /tmp/$SCRIPT_NAME.lock)" >/dev/null 2>&1
 			Clear_Lock
-			echo "$$" > "/tmp/$SCM_NAME.lock"
+			echo "$$" > "/tmp/$SCRIPT_NAME.lock"
 			return 0
 		else
-			Print_Output "true" "Lock file found (age: $ageoflock seconds) - ping test likely currently running" "$ERR"
+			Print_Output "true" "Lock file found (age: $ageoflock seconds)" "$ERR"
 			if [ -z "$1" ]; then
 				exit 1
 			else
@@ -59,13 +63,13 @@ Check_Lock(){
 			fi
 		fi
 	else
-		echo "$$" > "/tmp/$SCM_NAME.lock"
+		echo "$$" > "/tmp/$SCRIPT_NAME.lock"
 		return 0
 	fi
 }
 
 Clear_Lock(){
-	rm -f "/tmp/$SCM_NAME.lock" 2>/dev/null
+	rm -f "/tmp/$SCRIPT_NAME.lock" 2>/dev/null
 	return 0
 }
 
@@ -136,14 +140,14 @@ Download_File(){
 Shortcut_SCM(){
 	case $1 in
 		create)
-			if [ -d "/opt/bin" ] && [ ! -f "/opt/bin/$SCM_NAME" ] && [ -f "/jffs/scripts/$SCM_NAME" ]; then
-				ln -s /jffs/scripts/"$SCM_NAME" /opt/bin
-				chmod 0755 /opt/bin/"$SCM_NAME"
+			if [ -d "/opt/bin" ] && [ ! -f "/opt/bin/$SCRIPT_NAME" ] && [ -f "/jffs/scripts/$SCRIPT_NAME" ]; then
+				ln -s /jffs/scripts/"$SCRIPT_NAME" /opt/bin
+				chmod 0755 /opt/bin/"$SCRIPT_NAME"
 			fi
 		;;
 		delete)
-			if [ -f "/opt/bin/$SCM_NAME" ]; then
-				rm -f /opt/bin/"$SCM_NAME"
+			if [ -f "/opt/bin/$SCRIPT_NAME" ]; then
+				rm -f /opt/bin/"$SCRIPT_NAME"
 			fi
 		;;
 	esac
@@ -173,7 +177,7 @@ ScriptHeader(){
 	printf "\\e[1m##   \__ \| (__ | |  | ||  __/| |   | || || | | |  ##\\e[0m\\n"
 	printf "\\e[1m##   |___/ \___||_|  |_| \___||_|   |_||_||_| |_|  ##\\e[0m\\n"
 	printf "\\e[1m##                                                 ##\\e[0m\\n"
-	printf "\\e[1m##               %s on %-9s               ##\\e[0m\\n" "$SCM_VERSION" "$ROUTER_MODEL"
+	printf "\\e[1m##               %s on %-9s               ##\\e[0m\\n" "$SCRIPT_VERSION" "$ROUTER_MODEL"
 	printf "\\e[1m##                                                 ##\\e[0m\\n"
 	printf "\\e[1m##       https://github.com/jackyaz/scMerlin       ##\\e[0m\\n"
 	printf "\\e[1m##                                                 ##\\e[0m\\n"
@@ -265,9 +269,9 @@ MainMenu(){
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
 	printf "u.    Check for updates\\n"
-	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCM_NAME"
-	printf "e.    Exit %s\\n\\n" "$SCM_NAME"
-	printf "z.    Uninstall %s\\n" "$SCM_NAME"
+	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
+	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
+	printf "z.    Uninstall %s\\n" "$SCRIPT_NAME"
 	printf "\\n"
 	printf "\\e[1m#####################################################\\e[0m\\n"
 	printf "\\n"
@@ -613,12 +617,12 @@ MainMenu(){
 			;;
 			e)
 				ScriptHeader
-				printf "\\n\\e[1mThanks for using %s!\\e[0m\\n\\n\\n" "$SCM_NAME"
+				printf "\\n\\e[1mThanks for using %s!\\e[0m\\n\\n\\n" "$SCRIPT_NAME"
 				exit 0
 			;;
 			z)
 				while true; do
-					printf "\\n\\e[1mAre you sure you want to uninstall %s? (y/n)\\e[0m\\n" "$SCM_NAME"
+					printf "\\n\\e[1mAre you sure you want to uninstall %s? (y/n)\\e[0m\\n" "$SCRIPT_NAME"
 					read -r "confirm"
 					case "$confirm" in
 						y|Y)
@@ -658,7 +662,7 @@ Check_Requirements(){
 }
 
 Menu_Install(){
-	Print_Output "true" "Welcome to $SCM_NAME $SCM_VERSION, a script by JackYaz"
+	Print_Output "true" "Welcome to $SCRIPT_NAME $SCRIPT_VERSION, a script by JackYaz"
 	sleep 1
 	Shortcut_SCM create
 	Clear_Lock
@@ -677,9 +681,9 @@ Menu_ForceUpdate(){
 }
 
 Menu_Uninstall(){
-	Print_Output "true" "Removing $SCM_NAME..." "$PASS"
+	Print_Output "true" "Removing $SCRIPT_NAME..." "$PASS"
 	Shortcut_SCM delete
-	rm -f "/jffs/scripts/$SCM_NAME" 2>/dev/null
+	rm -f "/jffs/scripts/$SCRIPT_NAME" 2>/dev/null
 	Clear_Lock
 	Print_Output "true" "Uninstall completed" "$PASS"
 }
