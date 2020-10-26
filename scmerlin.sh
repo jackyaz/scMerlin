@@ -186,7 +186,21 @@ Update_Version(){
 }
 
 Update_File(){
-	if [ "$1" = "shared-jy.tar.gz" ]; then
+	if [ "$1" = "scmerlin_www.asp" ]; then
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			if [ -f "$SCRIPT_DIR/$1" ]; then
+				Get_WebUI_Page "$SCRIPT_DIR/$1"
+				sed -i "\\~$MyPage~d" /tmp/menuTree.js
+				rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage" 2>/dev/null
+			fi
+			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+			Print_Output "true" "New version of $1 downloaded" "$PASS"
+			Mount_WebUI
+		fi
+		rm -f "$tmpfile"
+	elif [ "$1" = "shared-jy.tar.gz" ]; then
 		if [ ! -f "$SHARED_DIR/$1.md5" ]; then
 			Download_File "$SHARED_REPO/$1" "$SHARED_DIR/$1"
 			Download_File "$SHARED_REPO/$1.md5" "$SHARED_DIR/$1.md5"
@@ -268,6 +282,62 @@ Create_Symlinks(){
 
 Download_File(){
 	/usr/sbin/curl -fsL --retry 3 "$1" -o "$2"
+}
+
+Get_WebUI_Page(){
+	MyPage="none"
+	for i in 1 2 3 4 5 6 7 8 9 10; do
+		page="/www/user/user$i.asp"
+		if [ -f "$page" ] && [ "$(md5sum < "$1")" = "$(md5sum < "$page")" ]; then
+			MyPage="user$i.asp"
+			return
+		elif [ "$MyPage" = "none" ] && [ ! -f "$page" ]; then
+			MyPage="user$i.asp"
+		fi
+	done
+}
+
+Mount_WebUI(){
+	Get_WebUI_Page "$SCRIPT_DIR/scmerlin_www.asp"
+	if [ "$MyPage" = "none" ]; then
+		Print_Output "true" "Unable to mount $SCRIPT_NAME WebUI page, exiting" "$CRIT"
+		exit 1
+	fi
+	Print_Output "true" "Mounting $SCRIPT_NAME WebUI page as $MyPage" "$PASS"
+	cp -f "$SCRIPT_DIR/scmerlin_www.asp" "$SCRIPT_WEBPAGE_DIR/$MyPage"
+	echo "scmerlin" > "$SCRIPT_WEBPAGE_DIR/$(echo $MyPage | cut -f1 -d'.').title"
+	
+	if [ "$(uname -o)" = "ASUSWRT-Merlin" ]; then
+		if [ ! -f "/tmp/index_style.css" ]; then
+			cp -f "/www/index_style.css" "/tmp/"
+		fi
+		
+		if ! grep -q '.menu_Addons' /tmp/index_style.css ; then
+			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); }" >> /tmp/index_style.css
+		fi
+		
+		umount /www/index_style.css 2>/dev/null
+		mount -o bind /tmp/index_style.css /www/index_style.css
+		
+		if [ ! -f "/tmp/menuTree.js" ]; then
+			cp -f "/www/require/modules/menuTree.js" "/tmp/"
+		fi
+		
+		sed -i "\\~$MyPage~d" /tmp/menuTree.js
+		
+		if ! grep -q 'menuName: "Addons"' /tmp/menuTree.js ; then
+			lineinsbefore="$(( $(grep -n "exclude:" /tmp/menuTree.js | cut -f1 -d':') - 1))"
+			sed -i "$lineinsbefore"'i,\n{\nmenuName: "Addons",\nindex: "menu_Addons",\ntab: [\n{url: "ext/shared-jy/redirect.htm", tabName: "Help & Support"},\n{url: "NULL", tabName: "__INHERIT__"}\n]\n}' /tmp/menuTree.js
+		fi
+		
+		if ! grep -q "javascript:window.open('/ext/shared-jy/redirect.htm'" /tmp/menuTree.js ; then
+			sed -i "s~ext/shared-jy/redirect.htm~javascript:window.open('/ext/shared-jy/redirect.htm','_blank')~" /tmp/menuTree.js
+		fi
+		sed -i "/url: \"javascript:window.open('\/ext\/shared-jy\/redirect.htm'/i {url: \"$MyPage\", tabName: \"scmerlin\"}," /tmp/menuTree.js
+		
+		umount /www/require/modules/menuTree.js 2>/dev/null
+		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
+	fi
 }
 
 Shortcut_SCM(){
@@ -790,6 +860,15 @@ Menu_Install(){
 	MainMenu
 }
 
+Menu_Startup(){
+	Create_Dirs
+	Set_Version_Custom_Settings "local"
+	Create_Symlinks
+	Shortcut_SCM create
+	Mount_WebUI
+	Clear_Lock
+}
+
 Menu_Update(){
 	Update_Version
 	Clear_Lock
@@ -822,6 +901,12 @@ case "$1" in
 	install)
 		Check_Lock
 		Menu_Install
+		exit 0
+	;;
+	startup)
+		Check_Lock
+		sleep 20
+		Menu_Startup
 		exit 0
 	;;
 	update)
