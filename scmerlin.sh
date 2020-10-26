@@ -14,8 +14,8 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="scmerlin"
-readonly SCM_VERSION="v1.1.4"
-readonly SCRIPT_VERSION="v1.1.4"
+readonly SCM_VERSION="v2.0.0"
+readonly SCRIPT_VERSION="v2.0.0"
 readonly SCRIPT_BRANCH="develop"
 readonly SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/""$SCRIPT_NAME""/""$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME.d"
