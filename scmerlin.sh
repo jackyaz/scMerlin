@@ -146,6 +146,9 @@ Update_Version(){
 		fi
 		
 		Update_File "shared-jy.tar.gz"
+		Update_File "S99tailtop"
+		Update_File "tailtop"
+		Update_File "tailtopd"
 		
 		if [ "$isupdate" != "false" ]; then
 			/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME.sh" -o "/jffs/scripts/$SCRIPT_NAME" && Print_Output "true" "$SCRIPT_NAME successfully updated"
@@ -167,6 +170,9 @@ Update_Version(){
 		serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
 		Print_Output "true" "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
 		Update_File "shared-jy.tar.gz"
+		Update_File "S99tailtop"
+		Update_File "tailtop"
+		Update_File "tailtopd"
 		/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME.sh" -o "/jffs/scripts/$SCRIPT_NAME" && Print_Output "true" "$SCRIPT_NAME successfully updated"
 		chmod 0755 /jffs/scripts/"$SCRIPT_NAME"
 		Clear_Lock
@@ -198,6 +204,23 @@ Update_File(){
 				Print_Output "true" "New version of $1 downloaded" "$PASS"
 			fi
 		fi
+	elif [ "$1" = "S99tailtop" ] || [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ]; then
+			tmpfile="/tmp/$1"
+			Download_File "$SCRIPT_REPO/$1" "$tmpfile"
+			if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+				if [ -f /opt/etc/init.d/S99tailtop ]; then
+					/opt/etc/init.d/S99tailtop >/dev/null 2>&1
+					sleep 2
+				fi
+				Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+				chmod 0755 "$SCRIPT_DIR/$1"
+				Print_Output "true" "New version of $1 downloaded" "$PASS"
+			fi
+			if [ "$1" = "S99tailtop" ]; then
+				mv "$SCRIPT_DIR/S99tailtop" /opt/etc/init.d/S99tailtop
+				/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+			fi
+			rm -f "$tmpfile"
 	else
 		return 1
 	fi
@@ -243,6 +266,8 @@ Create_Dirs(){
 
 Create_Symlinks(){
 	rm -rf "${SCRIPT_WEB_DIR:?}/"* 2>/dev/null
+	
+	ln -s /tmp/scmerlin-top "$SCRIPT_WEB_DIR/top.htm" 2>/dev/null
 	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
 		ln -s "$SHARED_DIR" "$SHARED_WEB_DIR" 2>/dev/null

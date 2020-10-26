@@ -1,0 +1,16 @@
+#!/bin/sh
+#shellcheck disable=SC2039
+trap '' SIGHUP
+
+/jffs/addons/scmerlin.d/tailtop &
+
+while true; do
+	sleep 5
+	if [ "$(pidof tailtop | wc -w)" -lt 2 ]; then
+		logger -t "scmerlin" "tailtop dead, restarting..."
+		killall -q tailtop
+		sleep 5
+		/jffs/addons/scmerlin.d/tailtop &
+		logger -t "scmerlin" "tailtop restarted"
+	fi
+done
