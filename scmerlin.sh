@@ -146,9 +146,9 @@ Update_Version(){
 		fi
 		
 		Update_File "shared-jy.tar.gz"
-		Update_File "S99tailtop"
 		Update_File "tailtop"
 		Update_File "tailtopd"
+		Update_File "S99tailtop"
 		
 		if [ "$isupdate" != "false" ]; then
 			/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME.sh" -o "/jffs/scripts/$SCRIPT_NAME" && Print_Output "true" "$SCRIPT_NAME successfully updated"
@@ -170,9 +170,9 @@ Update_Version(){
 		serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
 		Print_Output "true" "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
 		Update_File "shared-jy.tar.gz"
-		Update_File "S99tailtop"
 		Update_File "tailtop"
 		Update_File "tailtopd"
+		Update_File "S99tailtop"
 		/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME.sh" -o "/jffs/scripts/$SCRIPT_NAME" && Print_Output "true" "$SCRIPT_NAME successfully updated"
 		chmod 0755 /jffs/scripts/"$SCRIPT_NAME"
 		Clear_Lock
@@ -218,8 +218,8 @@ Update_File(){
 			fi
 			if [ "$1" = "S99tailtop" ]; then
 				mv "$SCRIPT_DIR/S99tailtop" /opt/etc/init.d/S99tailtop
-				/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
 			fi
+			/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
 			rm -f "$tmpfile"
 	else
 		return 1
