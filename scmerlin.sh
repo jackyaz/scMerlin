@@ -293,6 +293,76 @@ Create_Symlinks(){
 	fi
 }
 
+Auto_ServiceEvent(){
+	case $1 in
+		create)
+			if [ -f /jffs/scripts/service-event ]; then
+				STARTUPLINECOUNT=$(grep -c '# '"$SCRIPT_NAME" /jffs/scripts/service-event)
+				# shellcheck disable=SC2016
+				STARTUPLINECOUNTEX=$(grep -cx "/jffs/scripts/$SCRIPT_NAME service_event"' "$1" "$2" &'' # '"$SCRIPT_NAME" /jffs/scripts/service-event)
+				
+				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/service-event
+				fi
+				
+				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
+					# shellcheck disable=SC2016
+					echo "/jffs/scripts/$SCRIPT_NAME service_event"' "$1" "$2" &'' # '"$SCRIPT_NAME" >> /jffs/scripts/service-event
+				fi
+			else
+				echo "#!/bin/sh" > /jffs/scripts/service-event
+				echo "" >> /jffs/scripts/service-event
+				# shellcheck disable=SC2016
+				echo "/jffs/scripts/$SCRIPT_NAME service_event"' "$1" "$2" &'' # '"$SCRIPT_NAME" >> /jffs/scripts/service-event
+				chmod 0755 /jffs/scripts/service-event
+			fi
+		;;
+		delete)
+			if [ -f /jffs/scripts/service-event ]; then
+				STARTUPLINECOUNT=$(grep -c '# '"$SCRIPT_NAME" /jffs/scripts/service-event)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/service-event
+				fi
+			fi
+		;;
+	esac
+}
+
+Auto_Startup(){
+	case $1 in
+		create)
+			if [ -f /jffs/scripts/services-start ]; then
+				STARTUPLINECOUNT=$(grep -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
+				STARTUPLINECOUNTEX=$(grep -cx "/jffs/scripts/$SCRIPT_NAME startup &"' # '"$SCRIPT_NAME" /jffs/scripts/services-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
+				fi
+				
+				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
+					echo "/jffs/scripts/$SCRIPT_NAME startup &"' # '"$SCRIPT_NAME" >> /jffs/scripts/services-start
+				fi
+			else
+				echo "#!/bin/sh" > /jffs/scripts/services-start
+				echo "" >> /jffs/scripts/services-start
+				echo "/jffs/scripts/$SCRIPT_NAME startup &"' # '"$SCRIPT_NAME" >> /jffs/scripts/services-start
+				chmod 0755 /jffs/scripts/services-start
+			fi
+		;;
+		delete)
+			if [ -f /jffs/scripts/services-start ]; then
+				STARTUPLINECOUNT=$(grep -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
+				fi
+			fi
+		;;
+	esac
+}
+
+
 Download_File(){
 	/usr/sbin/curl -fsL --retry 3 "$1" -o "$2"
 }
@@ -868,6 +938,8 @@ Menu_Install(){
 	Shortcut_SCM create
 	Set_Version_Custom_Settings "local"
 	Create_Symlinks
+	Auto_Startup create 2>/dev/null
+	Auto_ServiceEvent create 2>/dev/null
 	Clear_Lock
 	ScriptHeader
 	MainMenu
@@ -877,6 +949,8 @@ Menu_Startup(){
 	Create_Dirs
 	Set_Version_Custom_Settings "local"
 	Create_Symlinks
+	Auto_Startup create 2>/dev/null
+	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_SCM create
 	Mount_WebUI
 	Clear_Lock
@@ -895,6 +969,8 @@ Menu_ForceUpdate(){
 Menu_Uninstall(){
 	Print_Output "true" "Removing $SCRIPT_NAME..." "$PASS"
 	Shortcut_SCM delete
+	Auto_Startup delete 2>/dev/null
+	Auto_ServiceEvent delete 2>/dev/null
 	rm -f "/jffs/scripts/$SCRIPT_NAME" 2>/dev/null
 	Clear_Lock
 	Print_Output "true" "Uninstall completed" "$PASS"
@@ -963,6 +1039,8 @@ if [ -z "$1" ]; then
 	Shortcut_SCM create
 	Set_Version_Custom_Settings "local"
 	Create_Symlinks
+	Auto_Startup create 2>/dev/null
+	Auto_ServiceEvent create 2>/dev/null
 	ScriptHeader
 	MainMenu
 	exit 0
