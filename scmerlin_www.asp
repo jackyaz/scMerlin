@@ -1,4 +1,4 @@
-proclist<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
@@ -28,16 +28,16 @@ thead.collapsible-jquery {
 div.procTableContainer {
   height: 500px;
   overflow-y: scroll;
-  width: 750px;
+  width: 755px;
   border: 1px solid #000;
 }
 
 thead.procTableHeader th {
   background-image: linear-gradient(rgb(146, 160, 165) 0%, rgb(102, 117, 124) 100%);
   border-top: none !important;
-	border-left: none !important;
-	border-right: none !important;
-	border-bottom: 1px solid #000 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-bottom: 1px solid #000 !important;
   font-weight: bolder;
   padding: 2px;
   text-align: center;
@@ -49,9 +49,19 @@ thead.procTableHeader th:last-child {
   border-right: none !important;
 }
 
+thead.procTableHeader th:last-child {
+  text-align: left !important;
+  padding-left: 4px !important;
+}
+
 thead.procTableHeader th:first-child,
 thead.procTableHeader td:first-child {
   border-left: none !important;
+}
+
+tbody.procTableContent td:last-child, tbody.procTableContent tr.procNormalRow td:last-child, tbody.procTableContent tr.procAlternateRow td:last-child {
+  text-align: left !important;
+  padding-left: 4px !important;
 }
 
 tbody.procTableContent td, tbody.procTableContent tr.procNormalRow td {
@@ -64,6 +74,7 @@ tbody.procTableContent td, tbody.procTableContent tr.procNormalRow td {
   text-align: center;
   overflow: hidden !important;
   white-space: nowrap !important;
+  font-size: 12px !important;
 }
 
 tbody.procTableContent tr.procAlternateRow td {
@@ -96,6 +107,7 @@ var $j = jQuery.noConflict(); //avoid conflicts on John's fork (state.js)
 
 function initial(){
 	show_menu();
+	AddEventHandlers();
 	get_proclist_file();
 }
 
@@ -103,13 +115,13 @@ function BuildProcListTableHtml() {
 	var tablehtml = '<table border="0" cellpadding="0" cellspacing="0" width="100%" class="procTable" style="table-layout:fixed;">';
 	tablehtml += '<col style="width:50px;">';
 	tablehtml += '<col style="width:50px;">';
+	tablehtml += '<col style="width:75px;">';
 	tablehtml += '<col style="width:50px;">';
 	tablehtml += '<col style="width:50px;">';
 	tablehtml += '<col style="width:50px;">';
 	tablehtml += '<col style="width:50px;">';
 	tablehtml += '<col style="width:50px;">';
-	tablehtml += '<col style="width:50px;">';
-	tablehtml += '<col style="width:350px;">';
+	tablehtml += '<col style="width:750px;">';
 	tablehtml += '<thead class="procTableHeader">';
 	tablehtml += '<tr>';
 	tablehtml += '<th>PID</th>';
@@ -117,9 +129,9 @@ function BuildProcListTableHtml() {
 	tablehtml += '<th>USER</th>';
 	tablehtml += '<th>STAT</th>';
 	tablehtml += '<th>VSZ</th>';
-	tablehtml += '<th>VSZP</th>';
+	tablehtml += '<th>VSZ%</th>';
 	tablehtml += '<th>CPU</th>';
-	tablehtml += '<th>CPUP</th>';
+	tablehtml += '<th>CPU%</th>';
 	tablehtml += '<th>COMMAND</th>';
 	tablehtml += '</tr>';
 	tablehtml += '</thead>';
@@ -154,7 +166,9 @@ function get_proclist_file(){
 		},
 		success: function(data){
 			ParseProcList(data);
-			setTimeout("get_proclist_file();",1000);
+			if(document.getElementById("auto_refresh").checked){
+				setTimeout("get_proclist_file();",3000);
+			}
 		}
 	});
 }
@@ -223,8 +237,6 @@ function AddEventHandlers(){
 		}
 	});
 }
-
-
 
 /* http://www.alistapart.com/articles/zebratables/ */
 function stripedTable() {
@@ -295,16 +307,10 @@ function stripedTable() {
 <th>Update automatically?</th>
 <td>
 <label style="color:#FFCC00;display:block;">
-<input type="checkbox" checked="" id="auto_refresh" style="padding:0;margin:0;vertical-align:middle;position:relative;top:-1px;" />&nbsp;&nbsp;Table will refresh every 60s</label>
+<input type="checkbox" checked="" id="auto_refresh" style="padding:0;margin:0;vertical-align:middle;position:relative;top:-1px;" />&nbsp;&nbsp;Table will refresh every 3s</label>
 </td>
 </tr>
-<tr style="line-height:5px;">
-<td colspan="2">&nbsp;</td>
-</tr>
-
-<tr style="line-height:5px;">
-<td colspan="2">&nbsp;</td>
-</tr>
+<tr style="line-height:5px;"><td colspan="2">&nbsp;</td></tr>
 <tr>
 <td colspan="2" align="center" style="padding: 0px;">
 <div id="procTableContainer" class="procTableContainer"></div>
