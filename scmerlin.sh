@@ -696,28 +696,25 @@ case "$1" in
 		Menu_Install
 		exit 0
 	;;
-	develop)
-		Check_Lock
-		sed -i 's/^readonly SCM_BRANCH.*$/readonly SCM_BRANCH="develop"/' "/jffs/scripts/$SCM_NAME_LOWER"
-		Clear_Lock
-		exec "$0" "update"
-		exit 0
-	;;
-	stable)
-		Check_Lock
-		sed -i 's/^readonly SCM_BRANCH.*$/readonly SCM_BRANCH="master"/' "/jffs/scripts/$SCM_NAME_LOWER"
-		Clear_Lock
-		exec "$0" "update"
-		exit 0
-	;;
 	update)
-		Check_Lock
-		Menu_Update
+		Update_Version "unattended"
 		exit 0
 	;;
 	forceupdate)
-		Check_Lock
-		Menu_ForceUpdate
+		Update_Version "force" "unattended"
+		exit 0
+	;;
+	setversion)
+		Set_Version_Custom_Settings "local"
+		Set_Version_Custom_Settings "server" "$SCRIPT_VERSION"
+		if [ -z "$2" ]; then
+			exec "$0"
+		fi
+		exit 0
+	;;
+	checkupdate)
+		#shellcheck disable=SC2034
+		updatecheckresult="$(Update_Check)"
 		exit 0
 	;;
 	uninstall)
@@ -725,10 +722,18 @@ case "$1" in
 		Menu_Uninstall
 		exit 0
 	;;
+	develop)
+		sed -i 's/^readonly SCRIPT_BRANCH.*$/readonly SCRIPT_BRANCH="develop"/' "/jffs/scripts/$SCRIPT_NAME"
+		exec "$0" "update"
+		exit 0
+	;;
+	stable)
+		sed -i 's/^readonly SCRIPT_BRANCH.*$/readonly SCRIPT_BRANCH="master"/' "/jffs/scripts/$SCRIPT_NAME"
+		exec "$0" "update"
+		exit 0
+	;;
 	*)
-		Check_Lock
 		echo "Command not recognised, please try again"
-		Clear_Lock
 		exit 1
 	;;
 esac
