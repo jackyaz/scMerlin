@@ -6,7 +6,7 @@ trap '' SIGHUP
 
 while true; do
 	sleep 5
-	if [ "$(pidof tailtop | wc -w)" -lt 2 ]; then
+	if [ "$(pidof tailtop | wc -w)" -lt 1 ]; then
 		logger -t "scmerlin" "tailtop dead, restarting..."
 		killall -q tailtop
 		sleep 5

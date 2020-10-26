@@ -5,6 +5,7 @@ chmod 0755 /opt/bin/tailtopd
 
 if [ "$1" = "stop" ] || [ "$1" = "kill" ]; then
 	killall -q tailtopd
+	killall -q tailtop
 	rm -f /tmp/scmerlin-top*
 fi
 
