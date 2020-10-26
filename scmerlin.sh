@@ -243,14 +243,6 @@ Create_Dirs(){
 		mkdir -p "$SCRIPT_DIR"
 	fi
 	
-	if [ ! -d "$SCRIPT_STORAGE_DIR" ]; then
-		mkdir -p "$SCRIPT_STORAGE_DIR"
-	fi
-	
-	if [ ! -d "$CSV_OUTPUT_DIR" ]; then
-		mkdir -p "$CSV_OUTPUT_DIR"
-	fi
-	
 	if [ ! -d "$SHARED_DIR" ]; then
 		mkdir -p "$SHARED_DIR"
 	fi
