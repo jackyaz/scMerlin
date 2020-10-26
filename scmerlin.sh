@@ -281,59 +281,44 @@ MainMenu(){
 		case "$menu" in
 			1)
 				printf "\\n"
-				if Check_Lock "menu"; then
-					service restart_dnsmasq >/dev/null 2>&1
-					Clear_Lock
-				fi
+				service restart_dnsmasq >/dev/null 2>&1
 				PressEnter
 				break
 			;;
 			2)
 				printf "\\n"
-				if Check_Lock "menu"; then
-					while true; do
-						printf "\\n\\e[1mInternet connection will take 30s-60s to reconnect. Continue? (y/n)\\e[0m\\n"
-						read -r "confirm"
-						case "$confirm" in
-							y|Y)
-								service restart_wan >/dev/null 2>&1
-								Clear_Lock
-								break
-							;;
-							*)
-								break
-							;;
-						esac
-					done
-				fi
+				while true; do
+					printf "\\n\\e[1mInternet connection will take 30s-60s to reconnect. Continue? (y/n)\\e[0m\\n"
+					read -r "confirm"
+					case "$confirm" in
+						y|Y)
+							service restart_wan >/dev/null 2>&1
+							break
+						;;
+						*)
+							break
+						;;
+					esac
+				done
 				PressEnter
 				break
 			;;
 			3)
 				printf "\\n"
-				if Check_Lock "menu"; then
-					service restart_httpd >/dev/null 2>&1
-					Clear_Lock
-				fi
+				service restart_httpd >/dev/null 2>&1
 				PressEnter
 				break
 			;;
 			4)
 				printf "\\n"
-				if Check_Lock "menu"; then
-					service restart_wireless >/dev/null 2>&1
-					Clear_Lock
-				fi
+				service restart_wireless >/dev/null 2>&1
 				PressEnter
 				break
 			;;
 			5)
 				printf "\\n"
 				if [ "$ENABLED_FTP" -eq 1 ]; then
-					if Check_Lock "menu"; then
-						service restart_ftpd >/dev/null 2>&1
-						Clear_Lock
-					fi
+					service restart_ftpd >/dev/null 2>&1
 				else
 				printf "\\n\\e[1mInvalid selection (FTP not enabled)\\e[0m\\n\\n"
 				fi
@@ -343,10 +328,7 @@ MainMenu(){
 			6)
 				printf "\\n"
 				if [ "$ENABLED_SAMBA" -eq 1 ]; then
-					if Check_Lock "menu"; then
-						service restart_samba >/dev/null 2>&1
-						Clear_Lock
-					fi
+					service restart_samba >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (Samba not enabled)\\e[0m\\n\\n"
 				fi
@@ -356,10 +338,7 @@ MainMenu(){
 			7)
 				printf "\\n"
 				if [ "$ENABLED_DDNS" -eq 1 ]; then
-					if Check_Lock "menu"; then
-						service restart_ddns >/dev/null 2>&1
-						Clear_Lock
-					fi
+					service restart_ddns >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (DDNS client not enabled)\\e[0m\\n\\n"
 				fi
@@ -369,15 +348,9 @@ MainMenu(){
 			8)
 				printf "\\n"
 				if [ "$ENABLED_NTPD" -eq 1 ]; then
-					if Check_Lock "menu"; then
-						service restart_time >/dev/null 2>&1
-						Clear_Lock
-					fi
+					service restart_time >/dev/null 2>&1
 				elif [ -f "/opt/etc/init.d/S77ntpd" ]; then
-					if Check_Lock "menu"; then
-						/opt/etc/init.d/S77ntpd restart
-						Clear_Lock
-					fi
+					/opt/etc/init.d/S77ntpd restart
 				else
 					printf "\\n\\e[1mInvalid selection (NTP server not enabled/installed)\\e[0m\\n\\n"
 				fi
