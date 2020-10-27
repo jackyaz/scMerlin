@@ -89,6 +89,10 @@ tbody.procTableContent tr.procAlternateRow td {
   overflow: hidden !important;
   white-space: nowrap !important;
 }
+
+th.sortable {
+  cursor: pointer;
+}
 </style>
 <script language="JavaScript" type="text/javascript" src="/ext/shared-jy/jquery.js"></script>
 <script language="JavaScript" type="text/javascript" src="/ext/shared-jy/moment.js"></script>
@@ -104,6 +108,9 @@ tbody.procTableContent tr.procAlternateRow td {
 <script>
 var arrayproclistlines = [];
 var originalarrayproclistlines = [];
+var sortfield = "CPU%";
+var sortname = "CPU%";
+var sortdir = "desc";
 
 var $j = jQuery.noConflict(); //avoid conflicts on John's fork (state.js)
 
@@ -120,21 +127,21 @@ function BuildProcListTableHtml() {
 	tablehtml += '<col style="width:75px;">';
 	tablehtml += '<col style="width:50px;">';
 	tablehtml += '<col style="width:50px;">';
+	tablehtml += '<col style="width:55px;">';
 	tablehtml += '<col style="width:50px;">';
-	tablehtml += '<col style="width:50px;">';
-	tablehtml += '<col style="width:50px;">';
-	tablehtml += '<col style="width:750px;">';
+	tablehtml += '<col style="width:55px;">';
+	tablehtml += '<col style="width:740px;">';
 	tablehtml += '<thead class="procTableHeader">';
 	tablehtml += '<tr>';
-	tablehtml += '<th>PID</th>';
-	tablehtml += '<th>PPID</th>';
-	tablehtml += '<th>USER</th>';
-	tablehtml += '<th>STAT</th>';
-	tablehtml += '<th>VSZ</th>';
-	tablehtml += '<th>VSZ%</th>';
-	tablehtml += '<th>CPU</th>';
-	tablehtml += '<th>CPU%</th>';
-	tablehtml += '<th>COMMAND</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">PID</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">PPID</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">USER</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">STAT</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">VSZ</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">VSZ%</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">CPU</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">CPU%</th>';
+	tablehtml += '<th class="sortable" onclick="SortTable(this.innerHTML)">COMMAND</th>';
 	tablehtml += '</tr>';
 	tablehtml += '</thead>';
 	tablehtml += '<tbody class="procTableContent">';
@@ -194,9 +201,7 @@ function ParseProcList(data){
 		arrayproclistlines.push(parsedprocline);
 	}
 	originalarrayproclistlines = arrayproclistlines;
-	$j("#procTableContainer").empty();
-	$j("#procTableContainer").append(BuildProcListTableHtml());
-	stripedTable();
+	SortTable(sortname+" "+sortdir.replace("desc","↑").replace("asc","↓").trim());
 }
 
 function GetCookie(cookiename,returntype){
@@ -258,6 +263,73 @@ function stripedTable() {
 			}
 		}
 	}
+}
+
+function SortTable(sorttext){
+	sortname = sorttext.replace("↑","").replace("↓","").trim();
+	var sorttype = "number";
+	sortfield=sortname;
+	switch(sortname){
+		case "VSZ%":
+			sortfield="VSZP";
+		break;
+		case "CPU%":
+			sortfield="CPUP";
+		break;
+		case "USER":
+			sorttype = "string";
+		break;
+		case "STAT":
+			sorttype = "string";
+		break;
+		case "COMMAND":
+			sorttype = "string";
+		break;
+	}
+	
+	if(sorttype == "string"){
+		if(sorttext.indexOf("↓") == -1 && sorttext.indexOf("↑") == -1){
+			eval("arrayproclistlines = arrayproclistlines.sort((a,b) => (a."+sortfield+" > b."+sortfield+") ? 1 : ((b."+sortfield+" > a."+sortfield+") ? -1 : 0)); ");
+			sortdir = "asc";
+		}
+		else if(sorttext.indexOf("↓") != -1){
+			eval("arrayproclistlines = arrayproclistlines.sort((a,b) => (a."+sortfield+" > b."+sortfield+") ? 1 : ((b."+sortfield+" > a."+sortfield+") ? -1 : 0)); ");
+			sortdir = "asc";
+		}
+		else{
+			eval("arrayproclistlines = arrayproclistlines.sort((a,b) => (a."+sortfield+" < b."+sortfield+") ? 1 : ((b."+sortfield+" < a."+sortfield+") ? -1 : 0)); ");
+			sortdir = "desc";
+		}
+	}
+	else if(sorttype == "number"){
+		if(sorttext.indexOf("↓") == -1 && sorttext.indexOf("↑") == -1){
+			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(a."+sortfield+") - parseFloat(b."+sortfield+")); ");
+			sortdir = "asc";
+		}
+		else if(sorttext.indexOf("↓") != -1){
+			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(a."+sortfield+") - parseFloat(b."+sortfield+")); ");
+			sortdir = "asc";
+		}
+		else{
+			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(b."+sortfield+") - parseFloat(a."+sortfield+")); ");
+			sortdir = "desc";
+		}
+	}
+	
+	$j("#procTableContainer").empty();
+	$j("#procTableContainer").append(BuildProcListTableHtml());
+	stripedTable();
+	
+	$j(".sortable").each(function(index,element){
+		if(element.innerHTML == sortname){
+			if(sortdir == "asc"){
+				element.innerHTML = sortname + " ↑";
+			}
+			else{
+				element.innerHTML = sortname + " ↓";
+			}
+		}
+	});
 }
 </script>
 </head>
