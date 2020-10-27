@@ -42,6 +42,8 @@ thead.procTableHeader th {
   padding: 2px;
   text-align: center;
   color: #fff;
+	position: sticky;
+  top: 0;
 }
 
 thead.procTableHeader th:first-child,
