@@ -303,15 +303,15 @@ function SortTable(sorttext){
 	}
 	else if(sorttype == "number"){
 		if(sorttext.indexOf("↓") == -1 && sorttext.indexOf("↑") == -1){
-			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(a."+sortfield+") - parseFloat(b."+sortfield+")); ");
+			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(a."+sortfield+".replace('m','000')) - parseFloat(b."+sortfield+".replace('m','000'))); ");
 			sortdir = "asc";
 		}
 		else if(sorttext.indexOf("↓") != -1){
-			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(a."+sortfield+") - parseFloat(b."+sortfield+")); ");
+			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(a."+sortfield+".replace('m','000')) - parseFloat(b."+sortfield+".replace('m','000'))); ");
 			sortdir = "asc";
 		}
 		else{
-			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(b."+sortfield+") - parseFloat(a."+sortfield+")); ");
+			eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(b."+sortfield+".replace('m','000')) - parseFloat(a."+sortfield+".replace('m','000'))); ");
 			sortdir = "desc";
 		}
 	}
