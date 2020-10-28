@@ -384,6 +384,7 @@ Mount_WebUI(){
 	Get_WebUI_Page "$SCRIPT_DIR/scmerlin_www.asp"
 	if [ "$MyPage" = "none" ]; then
 		Print_Output "true" "Unable to mount $SCRIPT_NAME WebUI page, exiting" "$CRIT"
+		Clear_Lock
 		exit 1
 	fi
 	Print_Output "true" "Mounting $SCRIPT_NAME WebUI page as $MyPage" "$PASS"
