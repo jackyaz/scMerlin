@@ -111,6 +111,7 @@ var originalarrayproclistlines = [];
 var sortfield = "CPU%";
 var sortname = "CPU%";
 var sortdir = "desc";
+var tout;
 
 var $j = jQuery.noConflict(); //avoid conflicts on John's fork (state.js)
 
@@ -171,12 +172,12 @@ function get_proclist_file(){
 		url: '/ext/scmerlin/top.htm',
 		dataType: 'text',
 		error: function(xhr){
-			setTimeout(get_proclist_file, 1000);
+			tout = setTimeout(get_proclist_file, 1000);
 		},
 		success: function(data){
 			ParseProcList(data);
 			if(document.getElementById("auto_refresh").checked){
-				setTimeout("get_proclist_file();",3000);
+				tout = setTimeout("get_proclist_file();",3000);
 			}
 		}
 	});
@@ -243,6 +244,8 @@ function AddEventHandlers(){
 			$j(this).siblings().toggle(true);
 		}
 	});
+	
+	$j("#auto_refresh")[0].addEventListener("click", function(){ToggleRefresh();});
 }
 
 /* http://www.alistapart.com/articles/zebratables/ */
@@ -330,6 +333,10 @@ function SortTable(sorttext){
 			}
 		}
 	});
+}
+
+function ToggleRefresh(){
+	$j("#auto_refresh").prop('checked', function(i, v) { if(v){get_proclist_file();} else{clearTimeout(tout);} });
 }
 </script>
 </head>
