@@ -1077,6 +1077,19 @@ case "$1" in
 		Menu_Startup
 		exit 0
 	;;
+	service_event)
+		if [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME""config" ]; then
+			Conf_FromSettings
+			exit 0
+		elif [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME""checkupdate" ]; then
+			updatecheckresult="$(Update_Check)"
+			exit 0
+		elif [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME""doupdate" ]; then
+			Update_Version "force" "unattended"
+			exit 0
+		fi
+		exit 0
+	;;
 	update)
 		Update_Version "unattended"
 		exit 0
