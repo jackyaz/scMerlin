@@ -7,7 +7,7 @@
 <meta http-equiv="Expires" content="-1">
 <link rel="shortcut icon" href="images/favicon.png">
 <link rel="icon" href="images/favicon.png">
-<title>scmerlin</title>
+<title>scMerlin</title>
 <link rel="stylesheet" type="text/css" href="/index_style.css">
 <link rel="stylesheet" type="text/css" href="/form_style.css">
 <style>
@@ -106,6 +106,17 @@ th.sortable {
 <script language="JavaScript" type="text/javascript" src="/client_function.js"></script>
 <script language="JavaScript" type="text/javascript" src="/validator.js"></script>
 <script>
+var custom_settings;
+function LoadCustomSettings(){
+	custom_settings = <% get_custom_settings(); %>;
+	for (var prop in custom_settings) {
+		if (Object.prototype.hasOwnProperty.call(custom_settings, prop)) {
+			if(prop.indexOf("scmerlin") != -1 && prop.indexOf("scmerlin_version") == -1){
+				eval("delete custom_settings."+prop)
+			}
+		}
+	}
+}
 var arrayproclistlines = [];
 var originalarrayproclistlines = [];
 var sortfield = "CPU%";
@@ -115,10 +126,100 @@ var tout;
 
 var $j = jQuery.noConflict(); //avoid conflicts on John's fork (state.js)
 
+function SetCurrentPage(){
+	document.form.next_page.value = window.location.pathname.substring(1);
+	document.form.current_page.value = window.location.pathname.substring(1);
+}
+
 function initial(){
+	SetCurrentPage();
+	LoadCustomSettings();
 	show_menu();
-	AddEventHandlers();
 	get_proclist_file();
+	ScriptUpdateLayout();
+	AddEventHandlers();
+}
+
+function ScriptUpdateLayout(){
+	var localver = GetVersionNumber("local");
+	var serverver = GetVersionNumber("server");
+	$j("#scripttitle").text($j("#scripttitle").text()+" - "+localver);
+	$j("#scmerlin_version_local").text(localver);
+	
+	if (localver != serverver && serverver != "N/A"){
+		$j("#scmerlin_version_server").text("Updated version available: "+serverver);
+		showhide("btnChkUpdate", false);
+		showhide("scmerlin_version_server", true);
+		showhide("btnDoUpdate", true);
+	}
+}
+
+function reload(){
+	location.reload(true);
+}
+
+function update_status(){
+	$j.ajax({
+		url: '/ext/scmerlin/detect_update.js',
+		dataType: 'script',
+		timeout: 3000,
+		error:	function(xhr){
+			setTimeout('update_status();', 1000);
+		},
+		success: function(){
+			if (updatestatus == "InProgress"){
+				setTimeout('update_status();', 1000);
+			}
+			else{
+				document.getElementById("imgChkUpdate").style.display = "none";
+				showhide("scmerlin_version_server", true);
+				if(updatestatus != "None"){
+					$j("#scmerlin_version_server").text("Updated version available: "+updatestatus);
+					showhide("btnChkUpdate", false);
+					showhide("btnDoUpdate", true);
+				}
+				else{
+					$j("#scmerlin_version_server").text("No update available");
+					showhide("btnChkUpdate", true);
+					showhide("btnDoUpdate", false);
+				}
+			}
+		}
+	});
+}
+
+function CheckUpdate(){
+	showhide("btnChkUpdate", false);
+	document.formChkVer.action_script.value="start_scmerlincheckupdate"
+	document.formChkVer.submit();
+	document.getElementById("imgChkUpdate").style.display = "";
+	setTimeout("update_status();", 2000);
+}
+
+function DoUpdate(){
+	var action_script_tmp = "start_scmerlindoupdate";
+	document.form.action_script.value = action_script_tmp;
+	var restart_time = 20;
+	document.form.action_wait.value = restart_time;
+	showLoading();
+	document.form.submit();
+}
+
+function GetVersionNumber(versiontype){
+	var versionprop;
+	if(versiontype == "local"){
+		versionprop = custom_settings.scmerlin_version_local;
+	}
+	else if(versiontype == "server"){
+		versionprop = custom_settings.scmerlin_version_server;
+	}
+	
+	if(typeof versionprop == 'undefined' || versionprop == null){
+		return "N/A";
+	}
+	else{
+		return versionprop;
+	}
 }
 
 function BuildProcListTableHtml() {
@@ -345,7 +446,7 @@ function ToggleRefresh(){
 <div id="Loading" class="popup_bg"></div>
 <iframe name="hidden_frame" id="hidden_frame" src="about:blank" width="0" height="0" frameborder="0"></iframe>
 <form method="post" name="form" id="ruleForm" action="/start_apply.htm" target="hidden_frame">
-<input type="hidden" name="action_script" value="start_uiDivStats">
+<input type="hidden" name="action_script" value="start_scmerlin">
 <input type="hidden" name="current_page" value="">
 <input type="hidden" name="next_page" value="">
 <input type="hidden" name="modified" value="0">
@@ -372,10 +473,27 @@ function ToggleRefresh(){
 <tr bgcolor="#4D595D">
 <td valign="top">
 <div>&nbsp;</div>
-<div class="formfonttitle" id="scripttitle" style="text-align:center;">scmerlin</div>
+<div class="formfonttitle" id="scripttitle" style="text-align:center;">scMerlin</div>
 <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
-<div id="formfontdesc" class="formfontdesc">WebUI of running processes</div>
-
+<div class="formfontdesc">scMerlin allows you to use easily control the most common services/scripts on your router.</div>
+<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_buttons">
+<thead class="collapsible-jquery" id="scripttools">
+<tr><td colspan="2">Utilities (click to expand/collapse)</td></tr>
+</thead>
+<tr>
+<th width="20%">Version information</th>
+<td>
+<span id="scmerlin_version_local" style="color:#FFFFFF;"></span>
+&nbsp;&nbsp;&nbsp;
+<span id="scmerlin_version_server" style="display:none;">Update version</span>
+&nbsp;&nbsp;&nbsp;
+<input type="button" class="button_gen" onclick="CheckUpdate();" value="Check" id="btnChkUpdate">
+<img id="imgChkUpdate" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>
+<input type="button" class="button_gen" onclick="DoUpdate();" value="Update" id="btnDoUpdate" style="display:none;">
+&nbsp;&nbsp;&nbsp;
+</td>
+</tr>
+</table>
 <!-- Start Process List -->
 <div style="line-height:10px;">&nbsp;</div>
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_proclist">
@@ -408,6 +526,14 @@ function ToggleRefresh(){
 </td>
 </tr>
 </table>
+</form>
+<form method="post" name="formChkVer" action="/start_apply.htm" target="hidden_frame">
+<input type="hidden" name="productid" value="<% nvram_get("productid"); %>">
+<input type="hidden" name="current_page" value="">
+<input type="hidden" name="next_page" value="">
+<input type="hidden" name="action_mode" value="apply">
+<input type="hidden" name="action_script" value="">
+<input type="hidden" name="action_wait" value="">
 </form>
 <div id="footer">
 </div>
