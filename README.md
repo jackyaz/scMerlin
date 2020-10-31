@@ -35,7 +35,7 @@ If this does not work, you will need to use the full path:
 ```
 
 ## Screenshots
-Example menu (options added/removed dynamically depending on which service(s) you have enabled on your router)
+Example menu:
 ![Menu UI](https://puu.sh/DjmJr/15b3000866.png)
 
 ## Help
