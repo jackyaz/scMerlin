@@ -482,26 +482,10 @@ MainMenu(){
 	printf "2.    Internet connection\\n"
 	printf "3.    Web Interface (httpd)\\n"
 	printf "4.    WiFi\\n"
-	ENABLED_FTP="$(nvram get enable_ftp)"
-	if ! Validate_Number "" "$ENABLED_FTP" "silent"; then ENABLED_FTP=0; fi
-	if [ "$ENABLED_FTP" -eq 1 ]; then
-		printf "5.    FTP Server (vsftpd)\\n"
-	fi
-	ENABLED_SAMBA="$(nvram get enable_samba)"
-	if ! Validate_Number "" "$ENABLED_SAMBA" "silent"; then ENABLED_SAMBA=0; fi
-	if [ "$ENABLED_SAMBA" -eq 1 ]; then
-		printf "6.    SAMBA\\n"
-	fi
-	ENABLED_DDNS="$(nvram get ddns_enable_x)"
-	if ! Validate_Number "" "$ENABLED_DDNS" "silent"; then ENABLED_DDNS=0; fi
-	if [ "$ENABLED_DDNS" -eq 1 ]; then
-		printf "7.    DDNS client\\n"
-	fi
-	ENABLED_NTPD="$(nvram get ntpd_enable)"
-	if ! Validate_Number "" "$ENABLED_NTPD" "silent"; then ENABLED_NTPD=0; fi
-	if [ -f /opt/etc/init.d/S77ntpd ] || [ "$ENABLED_NTPD" -eq 1 ]; then
-		printf "8.    ntpd (time service)\\n"
-	fi
+	printf "5.    FTP Server (vsftpd)\\n"
+	printf "6.    SAMBA\\n"
+	printf "7.    DDNS client\\n"
+	printf "8.    ntpd/chronyd (time service)\\n"
 	vpnclients="$(nvram show 2> /dev/null | grep ^vpn_client._addr)"
 	vpnclientenabled="false"
 	for vpnclient in $vpnclients; do
@@ -606,8 +590,10 @@ MainMenu(){
 				break
 			;;
 			5)
-				printf "\\n"
+				ENABLED_FTP="$(nvram get enable_ftp)"
+				if ! Validate_Number "" "$ENABLED_FTP" "silent"; then ENABLED_FTP=0; fi
 				if [ "$ENABLED_FTP" -eq 1 ]; then
+					printf "\\n"
 					service restart_ftpd >/dev/null 2>&1
 				else
 				printf "\\n\\e[1mInvalid selection (FTP not enabled)\\e[0m\\n\\n"
@@ -616,8 +602,10 @@ MainMenu(){
 				break
 			;;
 			6)
-				printf "\\n"
+				ENABLED_SAMBA="$(nvram get enable_samba)"
+				if ! Validate_Number "" "$ENABLED_SAMBA" "silent"; then ENABLED_SAMBA=0; fi
 				if [ "$ENABLED_SAMBA" -eq 1 ]; then
+					printf "\\n"
 					service restart_samba >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (Samba not enabled)\\e[0m\\n\\n"
@@ -626,8 +614,10 @@ MainMenu(){
 				break
 			;;
 			7)
-				printf "\\n"
+				ENABLED_DDNS="$(nvram get ddns_enable_x)"
+				if ! Validate_Number "" "$ENABLED_DDNS" "silent"; then ENABLED_DDNS=0; fi
 				if [ "$ENABLED_DDNS" -eq 1 ]; then
+					printf "\\n"
 					service restart_ddns >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (DDNS client not enabled)\\e[0m\\n\\n"
@@ -636,11 +626,17 @@ MainMenu(){
 				break
 			;;
 			8)
-				printf "\\n"
+				ENABLED_NTPD="$(nvram get ntpd_enable)"
+				if ! Validate_Number "" "$ENABLED_NTPD" "silent"; then ENABLED_NTPD=0; fi
 				if [ "$ENABLED_NTPD" -eq 1 ]; then
+					printf "\\n"
 					service restart_time >/dev/null 2>&1
 				elif [ -f "/opt/etc/init.d/S77ntpd" ]; then
+					printf "\\n"
 					/opt/etc/init.d/S77ntpd restart
+				elif [ -f "/opt/etc/init.d/S77chronyd" ]; then
+					printf "\\n"
+					/opt/etc/init.d/S77chronyd restart
 				else
 					printf "\\n\\e[1mInvalid selection (NTP server not enabled/installed)\\e[0m\\n\\n"
 				fi
@@ -648,8 +644,8 @@ MainMenu(){
 				break
 			;;
 			vc1)
-				printf "\\n"
 				if [ -n "$(nvram get vpn_client1_addr)" ]; then
+					printf "\\n"
 					service restart_vpnclient1 >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
@@ -658,8 +654,8 @@ MainMenu(){
 				break
 			;;
 			vc2)
-				printf "\\n"
 				if [ -n "$(nvram get vpn_client2_addr)" ]; then
+					printf "\\n"
 					service restart_vpnclient2 >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
@@ -668,8 +664,8 @@ MainMenu(){
 				break
 			;;
 			vc3)
-				printf "\\n"
 				if [ -n "$(nvram get vpn_client3_addr)" ]; then
+					printf "\\n"
 					service restart_vpnclient3 >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
@@ -678,8 +674,8 @@ MainMenu(){
 				break
 			;;
 			vc4)
-				printf "\\n"
 				if [ -n "$(nvram get vpn_client4_addr)" ]; then
+					printf "\\n"
 					service restart_vpnclient4 >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
@@ -688,8 +684,8 @@ MainMenu(){
 				break
 			;;
 			vc5)
-				printf "\\n"
 				if [ -n "$(nvram get vpn_client5_addr)" ]; then
+					printf "\\n"
 					service restart_vpnclient5 >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
@@ -698,8 +694,8 @@ MainMenu(){
 				break
 			;;
 			vs1)
-				printf "\\n"
 				if nvram get vpn_serverx_start | grep -q 1; then
+					printf "\\n"
 					service restart_vpnserver1 >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
@@ -708,8 +704,8 @@ MainMenu(){
 				break
 			;;
 			vs2)
-				printf "\\n"
 				if nvram get vpn_serverx_start | grep -q 2; then
+					printf "\\n"
 					service restart_vpnserver2 >/dev/null 2>&1
 				else
 					printf "\\n\\e[1mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
