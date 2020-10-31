@@ -483,7 +483,7 @@ MainMenu(){
 	printf "3.    Web Interface (httpd)\\n"
 	printf "4.    WiFi\\n"
 	printf "5.    FTP Server (vsftpd)\\n"
-	printf "6.    SAMBA\\n"
+	printf "6.    Samba\\n"
 	printf "7.    DDNS client\\n"
 	printf "8.    ntpd/chronyd (time service)\\n"
 	vpnclients="$(nvram show 2> /dev/null | grep ^vpn_client._addr)"
