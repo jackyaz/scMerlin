@@ -1084,6 +1084,12 @@ case "$1" in
 		if [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME_LOWER""config" ]; then
 			Conf_FromSettings
 			exit 0
+		elif [ "$2" = "start" ] && echo "$3" | grep "$SCRIPT_NAME_LOWER""servicerestart"; then
+			echo 'var servicestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_service.js"
+			srvname="$(echo "$3" | sed "s/$SCRIPT_NAME_LOWER""servicerestart//")";
+			service restart_"$srvname" >/dev/null 2>&1
+			echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+			exit 0
 		elif [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME_LOWER""checkupdate" ]; then
 			updatecheckresult="$(Update_Check)"
 			exit 0
