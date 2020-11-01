@@ -1117,11 +1117,18 @@ case "$1" in
 					else
 						echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
 					fi
+			elif echo "$srvname" | grep -q "vpnclient"; then
+				vpnno="$(echo "$srvname" | sed "s/vpnclient//")";
+				if [ -n "$(nvram get "vpn_client$vpnno""_addr")" ]; then
+					service restart_"$srvname" >/dev/null 2>&1
+					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				else
+					echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				fi
 			else
 				service restart_"$srvname" >/dev/null 2>&1
 				echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
 			fi
-			
 			exit 0
 		elif [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME_LOWER""checkupdate" ]; then
 			updatecheckresult="$(Update_Check)"

@@ -140,12 +140,16 @@ function initial(){
 	LoadCustomSettings();
 	show_menu();
 	
-	var servicectablehtml="";
+	var vpncleintstablehtml="";
+	for (i = 1; i < 6; i++){
+		vpncleintstablehtml += BuildVPNClientTable(i);
+	}
+	$j("#table_buttons").after(vpncleintstablehtml);
 	
+	var servicectablehtml="";
 	for (i = 0; i < srvnamelist.length; i++){
 		servicectablehtml += BuildServiceTable(srvnamelist[i],srvdesclist[i],srvnamevisiblelist[i],i);
 	}
-	
 	$j("#table_buttons").after(servicectablehtml);
 	
 	get_proclist_file();
@@ -526,6 +530,38 @@ function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
 	return serviceshtml;
 }
 
+function BuildVPNClientTable(loopindex){
+	var vpnclientshtml = '';
+	var vpnclientname = "vpnclient"+loopindex;
+	var vpnclientdesc = eval("document.form.vpnc"+loopindex+"_desc").value;
+	
+	if(loopindex == 1){
+		vpnclientshtml+='<div style="line-height:10px;">&nbsp;</div>';
+		vpnclientshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_vpnclients">';
+		vpnclientshtml+='<thead class="collapsible-jquery" id="vpnclientscontrol">';
+		vpnclientshtml+='<tr><td colspan="2">VPN Clients (click to expand/collapse)</td></tr>';
+		vpnclientshtml+='</thead>';
+	}
+	
+	vpnclientshtml+='<tr>';
+	vpnclientshtml+='<th width="40%">VPN Client '+loopindex;
+	vpnclientshtml+='<br /><span style="color:#FFCC00;">('+vpnclientdesc+')</span></th>';
+	vpnclientshtml+='<td>';
+	vpnclientshtml+='<input type="button" class="button_gen" onclick="RestartService(\''+vpnclientname+'\');" value="Restart" id="btnRestartSrv_'+vpnclientname+'">';
+	vpnclientshtml+='<span id="txtRestartSrv_'+vpnclientname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
+	vpnclientshtml+='<span id="txtRestartSrvError_'+vpnclientname+'" style="display:none;">Invalid - VPN Client not enabled</span>';
+	vpnclientshtml+='<img id="imgRestartSrv_'+vpnclientname+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
+	vpnclientshtml+='&nbsp;&nbsp;&nbsp;';
+	vpnclientshtml+='</td>';
+	vpnclientshtml+='</tr>';
+	
+	if(loopindex == 5){
+		vpnclientshtml+='</table>';
+	}
+	
+	return vpnclientshtml;
+}
+
 /* Taken from firmware WebUI, Tools_SysInfo.asp */
 function update_sysinfo(e){
 	$j.ajax({
@@ -600,6 +636,11 @@ function update_temperatures(){
 <input type="hidden" name="SystemCmd" value="">
 <input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get("preferred_lang"); %>">
 <input type="hidden" name="firmver" value="<% nvram_get("firmver"); %>">
+<input type="hidden" name="vpnc1_desc" value="<% nvram_get("vpn_client1_desc"); %>">
+<input type="hidden" name="vpnc2_desc" value="<% nvram_get("vpn_client2_desc"); %>">
+<input type="hidden" name="vpnc3_desc" value="<% nvram_get("vpn_client3_desc"); %>">
+<input type="hidden" name="vpnc4_desc" value="<% nvram_get("vpn_client4_desc"); %>">
+<input type="hidden" name="vpnc5_desc" value="<% nvram_get("vpn_client5_desc"); %>">
 <input type="hidden" name="amng_custom" id="amng_custom" value="">
 <table class="content" align="center" cellpadding="0" cellspacing="0">
 <tr>
