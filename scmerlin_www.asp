@@ -670,7 +670,7 @@ function update_temperatures(){
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 <thead class="collapsible-jquery" id="routermemory">
 <tr>
-<td colspan="2">Memory</td>
+<td colspan="2">Memory (click to expand/collapse)</td>
 </tr>
 </thead>
 <tr>
@@ -698,7 +698,7 @@ function update_temperatures(){
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 <thead class="collapsible-jquery" id="routerstorage">
 <tr>
-<td colspan="2">Internal Storage</td>
+<td colspan="2">Internal Storage (click to expand/collapse)</td>
 </tr>
 </thead>
 <tr>
@@ -714,7 +714,7 @@ function update_temperatures(){
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 <thead class="collapsible-jquery" id="routertemps">
 <tr>
-<td colspan="2">Router</td>
+<td colspan="2">Router (click to expand/collapse)</td>
 </tr>
 </thead>
 <tr>
