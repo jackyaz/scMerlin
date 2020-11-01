@@ -141,7 +141,7 @@ function initial(){
 	show_menu();
 	
 	var vpnserverstablehtml="";
-	for (i = 1; i < 2; i++){
+	for (i = 1; i < 3; i++){
 		vpnserverstablehtml += BuildVPNServerTable(i);
 	}
 	$j("#table_buttons").after(vpnserverstablehtml);
