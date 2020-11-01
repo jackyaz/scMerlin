@@ -596,7 +596,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_ftpd >/dev/null 2>&1
 				else
-				printf "\\n\\e[1mInvalid selection (FTP not enabled)\\e[0m\\n\\n"
+				printf "\\n\\e[1m\\e[31mInvalid selection (FTP not enabled)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -608,7 +608,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_samba >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (Samba not enabled)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (Samba not enabled)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -620,7 +620,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_ddns >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (DDNS client not enabled)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (DDNS client not enabled)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -638,7 +638,7 @@ MainMenu(){
 					printf "\\n"
 					/opt/etc/init.d/S77chronyd restart
 				else
-					printf "\\n\\e[1mInvalid selection (NTP server not enabled/installed)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (NTP server not enabled/installed)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -648,7 +648,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient1 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -658,7 +658,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient2 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -668,7 +668,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient3 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -678,7 +678,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient4 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -688,7 +688,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient5 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -698,7 +698,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnserver1 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -708,7 +708,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnserver2 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -721,7 +721,7 @@ MainMenu(){
 						Clear_Lock
 					fi
 				else
-					printf "\\n\\e[1mInvalid selection (Diversion not installed)\\e[0m\\n\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (Diversion not installed)\\e[0m\\n\\n"
 				fi
 				PressEnter
 				break
@@ -738,7 +738,7 @@ MainMenu(){
 						Clear_Lock
 					fi
 				else
-					printf "\\n\\e[1mInvalid selection (Skynet not installed)\\e[0m\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (Skynet not installed)\\e[0m\\n"
 				fi
 				PressEnter
 				break
@@ -763,7 +763,7 @@ MainMenu(){
 						Clear_Lock
 					fi
 				else
-					printf "\\n\\e[1mInvalid selection (Entware not installed)\\e[0m\\n"
+					printf "\\n\\e[1m\\e[31mInvalid selection (Entware not installed)\\e[0m\\n"
 				fi
 				PressEnter
 				break
