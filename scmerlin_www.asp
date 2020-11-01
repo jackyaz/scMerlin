@@ -110,7 +110,7 @@ var custom_settings;
 function LoadCustomSettings(){
 	custom_settings = <% get_custom_settings(); %>;
 	for (var prop in custom_settings) {
-		if (Object.prototype.hasOwnProperty.call(custom_settings, prop)) {
+		if(Object.prototype.hasOwnProperty.call(custom_settings, prop)) {
 			if(prop.indexOf("scmerlin") != -1 && prop.indexOf("scmerlin_version") == -1){
 				eval("delete custom_settings."+prop)
 			}
@@ -131,10 +131,23 @@ function SetCurrentPage(){
 	document.form.current_page.value = window.location.pathname.substring(1);
 }
 
+var srvnamelist = ["dnsmasq","wan","httpd","wireless","vsftpd","samba","ddns"];
+var srvdesclist = ["DNS/DHCP Server","Internet Connection","Web Interface","WiFi","FTP Server","Samba","DDNS client"];
+var srvnamevisiblelist = [true,false,true,false,true,false,false];
+
 function initial(){
 	SetCurrentPage();
 	LoadCustomSettings();
 	show_menu();
+	
+	var servicectablehtml="";
+	
+	for (i = 0; i < srvnamelist.length; i++){
+		servicectablehtml += BuildServiceTable(srvnamelist[i],srvdesclist[i],srvnamevisiblelist[i],i);
+	}
+	
+	$j("#table_buttons").after(servicectablehtml);
+	
 	get_proclist_file();
 	ScriptUpdateLayout();
 	AddEventHandlers();
@@ -146,7 +159,7 @@ function ScriptUpdateLayout(){
 	$j("#scripttitle").text($j("#scripttitle").text()+" - "+localver);
 	$j("#scmerlin_version_local").text(localver);
 	
-	if (localver != serverver && serverver != "N/A"){
+	if(localver != serverver && serverver != "N/A"){
 		$j("#scmerlin_version_server").text("Updated version available: "+serverver);
 		showhide("btnChkUpdate", false);
 		showhide("scmerlin_version_server", true);
@@ -167,7 +180,7 @@ function update_status(){
 			setTimeout('update_status();', 1000);
 		},
 		success: function(){
-			if (updatestatus == "InProgress"){
+			if(updatestatus == "InProgress"){
 				setTimeout('update_status();', 1000);
 			}
 			else{
@@ -190,8 +203,8 @@ function update_status(){
 
 function CheckUpdate(){
 	showhide("btnChkUpdate", false);
-	document.formChkVer.action_script.value="start_scmerlincheckupdate"
-	document.formChkVer.submit();
+	document.formScriptActions.action_script.value="start_scmerlincheckupdate";
+	document.formScriptActions.submit();
 	document.getElementById("imgChkUpdate").style.display = "";
 	setTimeout("update_status();", 2000);
 }
@@ -203,6 +216,40 @@ function DoUpdate(){
 	document.form.action_wait.value = restart_time;
 	showLoading();
 	document.form.submit();
+}
+
+function RestartService(servicename){
+	showhide("btnRestartSrv_"+servicename, false);
+	document.formScriptActions.action_script.value="start_scmerlinservicerestart"+servicename;
+	document.formScriptActions.submit();
+	document.getElementById("imgRestartSrv_"+servicename).style.display = "";
+	setTimeout("service_status('"+servicename+"');", 1000);
+}
+
+function service_status(servicename){
+	$j.ajax({
+		url: '/ext/scmerlin/detect_service.js',
+		dataType: 'script',
+		timeout: 3000,
+		error:	function(xhr){
+			setTimeout("service_status('"+servicename+"');", 1000);
+		},
+		success: function(){
+			if(servicestatus == "InProgress"){
+				setTimeout("service_status('"+servicename+"');", 1000);
+			}
+			else{
+				document.getElementById("imgRestartSrv_"+servicename).style.display = "none";
+				if(servicestatus == "Done"){
+					showhide("btnRestartSrv_"+servicename, true);
+					showhide("txtRestartSrv_"+servicename, true);
+				}
+				else{
+					showhide("txtRestartSrvError_"+servicename, true);
+				}
+			}
+		}
+	});
 }
 
 function GetVersionNumber(versiontype){
@@ -308,7 +355,7 @@ function ParseProcList(data){
 
 function GetCookie(cookiename,returntype){
 	var s;
-	if ((s = cookie.get("scm_"+cookiename)) != null){
+	if((s = cookie.get("scm_"+cookiename)) != null){
 		return cookie.get("scm_"+cookiename);
 	}
 	else{
@@ -351,9 +398,9 @@ function AddEventHandlers(){
 
 /* http://www.alistapart.com/articles/zebratables/ */
 function stripedTable() {
-	if (document.getElementById && document.getElementsByTagName) {
+	if(document.getElementById && document.getElementsByTagName) {
 		var allTables = document.getElementsByClassName('procTable');
-		if (!allTables) { return; }
+		if(!allTables) { return; }
 		
 		for (var i = 0; i < allTables.length; i++) {
 			var trs = allTables[i].getElementsByTagName("tr");
@@ -439,6 +486,41 @@ function SortTable(sorttext){
 function ToggleRefresh(){
 	$j("#auto_refresh").prop('checked', function(i, v) { if(v){get_proclist_file();} else{clearTimeout(tout);} });
 }
+
+function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
+	var serviceshtml = '';
+	
+	if(loopindex == 0){
+		serviceshtml+='<div style="line-height:10px;">&nbsp;</div>';
+		serviceshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_services">';
+		serviceshtml+='<thead class="collapsible-jquery" id="servicescontrol">';
+		serviceshtml+='<tr><td colspan="2">Services (click to expand/collapse)</td></tr>';
+		serviceshtml+='</thead>';
+	}
+	
+	serviceshtml+='<tr>';
+	if(srvnamevisible){
+		serviceshtml+='<th width="20%">'+srvdesc+' <span style="color:#FFCC00;">('+srvname+')</span></th>';
+	}
+	else{
+		serviceshtml+='<th width="20%">'+srvdesc+'</th>';
+	}
+	serviceshtml+='<td>';
+	serviceshtml+='<input type="button" class="button_gen" onclick="RestartService(\''+srvname+'\');" value="Restart" id="btnRestartSrv_'+srvname+'">';
+	serviceshtml+='<span id="txtRestartSrv_'+srvname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
+	serviceshtml+='<span id="txtRestartSrvError_'+srvname+'" style="display:none;">Invalid - service not enabled</span>';
+	serviceshtml+='<img id="imgRestartSrv_'+srvname+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
+	serviceshtml+='&nbsp;&nbsp;&nbsp;';
+	serviceshtml+='</td>';
+	serviceshtml+='</tr>';
+	
+	if(loopindex == srvnamelist.length-1){
+		serviceshtml+='</table>';
+	}
+	
+	return serviceshtml;
+}
+
 </script>
 </head>
 <body onload="initial();">
@@ -494,6 +576,11 @@ function ToggleRefresh(){
 </td>
 </tr>
 </table>
+
+
+<!-- Insert service control table here -->
+
+
 <!-- Start Process List -->
 <div style="line-height:10px;">&nbsp;</div>
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_proclist">
@@ -527,7 +614,7 @@ function ToggleRefresh(){
 </tr>
 </table>
 </form>
-<form method="post" name="formChkVer" action="/start_apply.htm" target="hidden_frame">
+<form method="post" name="formScriptActions" action="/start_apply.htm" target="hidden_frame">
 <input type="hidden" name="productid" value="<% nvram_get("productid"); %>">
 <input type="hidden" name="current_page" value="">
 <input type="hidden" name="next_page" value="">
