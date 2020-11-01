@@ -808,12 +808,12 @@ MainMenu(){
 				ScriptHeader
 				printf "\\n"
 				free
+				printf "\\n"
 				PressEnter
 				break
 			;;
 			t)
 				ScriptHeader
-				printf "\\n"
 				printf "\\n\\e[1mTemperatures\\e[0m\\n\\n"
 				if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
 					printf "CPU: %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
