@@ -131,9 +131,9 @@ function SetCurrentPage(){
 	document.form.current_page.value = window.location.pathname.substring(1);
 }
 
-var srvnamelist = ["dnsmasq","wan","httpd","wireless","vsftpd","samba","ddns"];
-var srvdesclist = ["DNS/DHCP Server","Internet Connection","Web Interface","WiFi","FTP Server","Samba","DDNS client"];
-var srvnamevisiblelist = [true,false,true,false,true,false,false];
+var srvnamelist = ["dnsmasq","wan","httpd","wireless","vsftpd","samba","ddns","ntpd/chronyd"];
+var srvdesclist = ["DNS/DHCP Server","Internet Connection","Web Interface","WiFi","FTP Server","Samba","DDNS client","Timeserver"];
+var srvnamevisiblelist = [true,false,true,false,true,false,false,true];
 
 function initial(){
 	SetCurrentPage();
@@ -505,6 +505,7 @@ function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
 	else{
 		serviceshtml+='<th width="20%">'+srvdesc+'</th>';
 	}
+	srvname = srvname.replace('/','');
 	serviceshtml+='<td>';
 	serviceshtml+='<input type="button" class="button_gen" onclick="RestartService(\''+srvname+'\');" value="Restart" id="btnRestartSrv_'+srvname+'">';
 	serviceshtml+='<span id="txtRestartSrv_'+srvname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';

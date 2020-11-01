@@ -1101,6 +1101,21 @@ case "$1" in
 					else
 						echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
 					fi
+				elif [ "$srvname" = "ntpdchronyd" ]; then
+					ENABLED_NTPD="$(nvram get ntpd_enable)"
+					if ! Validate_Number "" "$ENABLED_NTPD" "silent"; then ENABLED_NTPD=0; fi
+					if [ "$ENABLED_NTPD" -eq 1 ]; then
+						service restart_time >/dev/null 2>&1
+						echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+					elif [ -f "/opt/etc/init.d/S77ntpd" ]; then
+						/opt/etc/init.d/S77ntpd restart
+						echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+					elif [ -f "/opt/etc/init.d/S77chronyd" ]; then
+						/opt/etc/init.d/S77chronyd restart
+						echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+					else
+						echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
+					fi
 			else
 				service restart_"$srvname" >/dev/null 2>&1
 				echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
