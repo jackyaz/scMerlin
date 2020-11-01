@@ -149,6 +149,8 @@ function initial(){
 	$j("#table_buttons").after(servicectablehtml);
 	
 	get_proclist_file();
+	update_temperatures();
+	update_sysinfo();
 	ScriptUpdateLayout();
 	AddEventHandlers();
 }
@@ -524,6 +526,63 @@ function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
 	return serviceshtml;
 }
 
+/* Taken from firmware WebUI, Tools_SysInfo.asp */
+function update_sysinfo(e){
+	$j.ajax({
+		url: '/ajax_sysinfo.asp',
+		dataType: 'script',
+		error: function(xhr) {
+		setTimeout("update_sysinfo();", 1000);
+	},
+		success: function(response){
+			show_memcpu();
+			setTimeout("update_sysinfo();", 3000);
+		}
+	});
+}
+
+function show_memcpu(){
+	document.getElementById("mem_total_td").innerHTML = mem_stats_arr[0] + " MB";
+	document.getElementById("mem_free_td").innerHTML = mem_stats_arr[1] + " MB";
+	document.getElementById("mem_buffer_td").innerHTML = mem_stats_arr[2] + " MB";
+	document.getElementById("mem_cache_td").innerHTML = mem_stats_arr[3] + " MB";
+	
+	if(parseInt(mem_stats_arr[5]) == 0){
+		document.getElementById("mem_swap_td").innerHTML = "<span>No swap configured</span>";
+	}
+	else{
+		document.getElementById("mem_swap_td").innerHTML = mem_stats_arr[4] + " / " + mem_stats_arr[5] + " MB";
+		document.getElementById("nvram_td").innerHTML = mem_stats_arr[6] + " / " + <% sysinfo("nvram.total"); %> + " bytes";
+		document.getElementById("jffs_td").innerHTML = mem_stats_arr[7];
+	}
+}
+
+function update_temperatures(){
+	$j.ajax({
+		url: '/ajax_coretmp.asp',
+		dataType: 'script',
+		error: function(xhr){
+		update_temperatures();
+	},
+	success: function(response){
+		code = "<b>2.4 GHz:</b><span> " + curr_coreTmp_2_raw + "</span>";
+		if(wl_info.band5g_2_support){
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>" + curr_coreTmp_5_raw + "</span>";
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
+		}
+		else if (band5g_support){
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
+		}
+		if(curr_cpuTemp != ""){
+			code +="&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>" + parseInt(curr_cpuTemp) +"&deg;C</span>";
+		}
+		document.getElementById("temp_td").innerHTML = code;
+		setTimeout("update_temperatures();", 3000);
+		}
+	});
+}
+/* End firmware functions */
+
 </script>
 </head>
 <body onload="initial();">
@@ -607,6 +666,62 @@ function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
 </tr>
 </table>
 <!-- End Process List -->
+<div style="line-height:10px;">&nbsp;</div>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+<thead class="collapsible-jquery" id="routermemory">
+<tr>
+<td colspan="2">Memory</td>
+</tr>
+</thead>
+<tr>
+<th>Total</th>
+<td id="mem_total_td"></td>
+</tr>
+<tr>
+<th>Free</th>
+<td id="mem_free_td"></td>
+</tr>
+<tr>
+<th>Buffers</th>
+<td id="mem_buffer_td"></td>
+</tr>
+<tr>
+<th>Cache</th>
+<td id="mem_cache_td"></td>
+</tr>
+<tr>
+<th>Swap</th>
+<td id="mem_swap_td"></td>
+</tr>
+</table>
+<div style="line-height:10px;">&nbsp;</div>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+<thead class="collapsible-jquery" id="routerstorage">
+<tr>
+<td colspan="2">Internal Storage</td>
+</tr>
+</thead>
+<tr>
+<th>NVRAM usage</th>
+<td id="nvram_td"></td>
+</tr>
+<tr>
+<th>JFFS</th>
+<td id="jffs_td"></td>
+</tr>
+</table>
+<div style="line-height:10px;">&nbsp;</div>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+<thead class="collapsible-jquery" id="routertemps">
+<tr>
+<td colspan="2">Router</td>
+</tr>
+</thead>
+<tr>
+<th>Temperatures</th>
+<td id="temp_td"></td>
+</tr>
+</table>
 </td>
 </tr>
 </tbody>
