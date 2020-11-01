@@ -717,8 +717,25 @@ function update_temperatures(){
 </table>
 
 
-<!-- Insert service control table here -->
+<!-- Insert service control tables here -->
 
+
+<div style="line-height:10px;">&nbsp;</div>
+<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_entware">
+<thead class="collapsible-jquery" id="entwarecontrol">
+<tr><td colspan="2">Entware (click to expand/collapse)</td></tr>
+</thead>
+<tr>
+<th width="40%">Entware applications</th>
+<td>
+<input type="button" class="button_gen" onclick="RestartService('entware');" value="Restart" id="btnRestartSrv_entware">
+<span id="txtRestartSrv_entware" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>
+<span id="txtRestartSrvError_entware" style="display:none;">Invalid - Entware not running</span>
+<img id="imgRestartSrv_entware" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>
+&nbsp;&nbsp;&nbsp;
+</td>
+</tr>
+</table>
 
 <!-- Start Process List -->
 <div style="line-height:10px;">&nbsp;</div>

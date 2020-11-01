@@ -1133,6 +1133,9 @@ case "$1" in
 				else
 					echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
 				fi
+			elif [ "$srvname" = "entware" ]; then
+				/opt/etc/init.d/rc.unslung restart
+				echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
 			else
 				service restart_"$srvname" >/dev/null 2>&1
 				echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
