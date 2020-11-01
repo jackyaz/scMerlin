@@ -498,9 +498,7 @@ MainMenu(){
 		printf "\\e[1m(selecting an option will restart the VPN Client)\\e[0m\\n\\n"
 		vpnclientnum=1
 		while [ "$vpnclientnum" -lt 6 ]; do
-			if [ -n "$(nvram get vpn_client"$vpnclientnum"_addr)" ]; then
-				printf "vc%s.    VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
-			fi
+			printf "vc%s.    VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
 			vpnclientnum=$((vpnclientnum + 1))
 		done
 	fi
@@ -513,9 +511,12 @@ MainMenu(){
 		printf "\\n\\e[1mVPN Servers\\e[0m\\n"
 		printf "\\e[1m(selecting an option will restart the VPN Server)\\e[0m\\n\\n"
 		vpnservernum=1
-		while [ "$vpnservernum" -le "$vpnservercount" ]; do
-			vpnservernumactual="$(nvram get vpn_serverx_start | awk -v i="$vpnservernum" -F',' '{ print $i }')"
-			printf "vs%s.    VPN Server %s\\n" "$vpnservernumactual" "$vpnservernumactual"
+		while [ "$vpnservernum" -lt "3" ]; do
+			vpnsdesc=""
+			if ! nvram get vpn_serverx_start | grep -q "$vpnservernum"; then
+				vpnsdesc="(Not configured)"
+			fi
+			printf "vs%s.    VPN Server %s %s\\n" "$vpnservernum" "$vpnservernum" "$vpnsdesc"
 			vpnservernum=$((vpnservernum + 1))
 		done
 	fi
