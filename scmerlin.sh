@@ -1094,29 +1094,29 @@ case "$1" in
 					echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
 				fi
 			elif [ "$srvname" = "samba" ]; then
-					ENABLED_SAMBA="$(nvram get enable_samba)"
-					if ! Validate_Number "" "$ENABLED_SAMBA" "silent"; then ENABLED_SAMBA=0; fi
-					if [ "$ENABLED_SAMBA" -eq 1 ]; then
-						service restart_"$srvname" >/dev/null 2>&1
-						echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
-					else
-						echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
-					fi
-				elif [ "$srvname" = "ntpdchronyd" ]; then
-					ENABLED_NTPD="$(nvram get ntpd_enable)"
-					if ! Validate_Number "" "$ENABLED_NTPD" "silent"; then ENABLED_NTPD=0; fi
-					if [ "$ENABLED_NTPD" -eq 1 ]; then
-						service restart_time >/dev/null 2>&1
-						echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
-					elif [ -f "/opt/etc/init.d/S77ntpd" ]; then
-						/opt/etc/init.d/S77ntpd restart
-						echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
-					elif [ -f "/opt/etc/init.d/S77chronyd" ]; then
-						/opt/etc/init.d/S77chronyd restart
-						echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
-					else
-						echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
-					fi
+				ENABLED_SAMBA="$(nvram get enable_samba)"
+				if ! Validate_Number "" "$ENABLED_SAMBA" "silent"; then ENABLED_SAMBA=0; fi
+				if [ "$ENABLED_SAMBA" -eq 1 ]; then
+					service restart_"$srvname" >/dev/null 2>&1
+					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				else
+					echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				fi
+			elif [ "$srvname" = "ntpdchronyd" ]; then
+				ENABLED_NTPD="$(nvram get ntpd_enable)"
+				if ! Validate_Number "" "$ENABLED_NTPD" "silent"; then ENABLED_NTPD=0; fi
+				if [ "$ENABLED_NTPD" -eq 1 ]; then
+					service restart_time >/dev/null 2>&1
+					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				elif [ -f "/opt/etc/init.d/S77ntpd" ]; then
+					/opt/etc/init.d/S77ntpd restart
+					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				elif [ -f "/opt/etc/init.d/S77chronyd" ]; then
+					/opt/etc/init.d/S77chronyd restart
+					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				else
+					echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				fi
 			elif echo "$srvname" | grep -q "vpnclient"; then
 				vpnno="$(echo "$srvname" | sed "s/vpnclient//")";
 				if [ -n "$(nvram get "vpn_client$vpnno""_addr")" ]; then
