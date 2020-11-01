@@ -1083,8 +1083,29 @@ case "$1" in
 		elif [ "$2" = "start" ] && echo "$3" | grep "$SCRIPT_NAME_LOWER""servicerestart"; then
 			echo 'var servicestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_service.js"
 			srvname="$(echo "$3" | sed "s/$SCRIPT_NAME_LOWER""servicerestart//")";
-			service restart_"$srvname" >/dev/null 2>&1
-			echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+			if [ "$srvname" = "vsftpd" ]; then
+				ENABLED_FTP="$(nvram get enable_ftp)"
+				if ! Validate_Number "" "$ENABLED_FTP" "silent"; then ENABLED_FTP=0; fi
+				if [ "$ENABLED_FTP" -eq 1 ]; then
+					service restart_"$srvname" >/dev/null 2>&1
+					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				else
+					echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				fi
+			elif [ "$srvname" = "samba" ]; then
+					ENABLED_SAMBA="$(nvram get enable_samba)"
+					if ! Validate_Number "" "$ENABLED_SAMBA" "silent"; then ENABLED_SAMBA=0; fi
+					if [ "$ENABLED_SAMBA" -eq 1 ]; then
+						service restart_"$srvname" >/dev/null 2>&1
+						echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+					else
+						echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
+					fi
+			else
+				service restart_"$srvname" >/dev/null 2>&1
+				echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+			fi
+			
 			exit 0
 		elif [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME_LOWER""checkupdate" ]; then
 			updatecheckresult="$(Update_Check)"
