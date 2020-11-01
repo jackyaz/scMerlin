@@ -1125,6 +1125,14 @@ case "$1" in
 				else
 					echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
 				fi
+			elif echo "$srvname" | grep -q "vpnserver"; then
+				vpnno="$(echo "$srvname" | sed "s/vpnserver//")";
+				if nvram get vpn_serverx_start | grep -q "$vpnno"; then
+					service restart_"$srvname" >/dev/null 2>&1
+					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				else
+					echo 'var servicestatus = "Invalid";' > "$SCRIPT_WEB_DIR/detect_service.js"
+				fi
 			else
 				service restart_"$srvname" >/dev/null 2>&1
 				echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"

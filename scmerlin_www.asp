@@ -140,11 +140,17 @@ function initial(){
 	LoadCustomSettings();
 	show_menu();
 	
-	var vpncleintstablehtml="";
-	for (i = 1; i < 6; i++){
-		vpncleintstablehtml += BuildVPNClientTable(i);
+	var vpnserverstablehtml="";
+	for (i = 1; i < 2; i++){
+		vpnserverstablehtml += BuildVPNServerTable(i);
 	}
-	$j("#table_buttons").after(vpncleintstablehtml);
+	$j("#table_buttons").after(vpnserverstablehtml);
+	
+	var vpnclientstablehtml="";
+	for (i = 1; i < 6; i++){
+		vpnclientstablehtml += BuildVPNClientTable(i);
+	}
+	$j("#table_buttons").after(vpnclientstablehtml);
 	
 	var servicectablehtml="";
 	for (i = 0; i < srvnamelist.length; i++){
@@ -560,6 +566,36 @@ function BuildVPNClientTable(loopindex){
 	}
 	
 	return vpnclientshtml;
+}
+
+function BuildVPNServerTable(loopindex){
+	var vpnservershtml = '';
+	var vpnservername = "vpnserver"+loopindex;
+	
+	if(loopindex == 1){
+		vpnservershtml+='<div style="line-height:10px;">&nbsp;</div>';
+		vpnservershtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_vpnservers">';
+		vpnservershtml+='<thead class="collapsible-jquery" id="vpnserverscontrol">';
+		vpnservershtml+='<tr><td colspan="2">VPN Servers (click to expand/collapse)</td></tr>';
+		vpnservershtml+='</thead>';
+	}
+	
+	vpnservershtml+='<tr>';
+	vpnservershtml+='<th width="40%">VPN Server '+loopindex+'</th>';
+	vpnservershtml+='<td>';
+	vpnservershtml+='<input type="button" class="button_gen" onclick="RestartService(\''+vpnservername+'\');" value="Restart" id="btnRestartSrv_'+vpnservername+'">';
+	vpnservershtml+='<span id="txtRestartSrv_'+vpnservername+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
+	vpnservershtml+='<span id="txtRestartSrvError_'+vpnservername+'" style="display:none;">Invalid - VPN Server not enabled</span>';
+	vpnservershtml+='<img id="imgRestartSrv_'+vpnservername+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
+	vpnservershtml+='&nbsp;&nbsp;&nbsp;';
+	vpnservershtml+='</td>';
+	vpnservershtml+='</tr>';
+	
+	if(loopindex == 2){
+		vpnservershtml+='</table>';
+	}
+	
+	return vpnservershtml;
 }
 
 /* Taken from firmware WebUI, Tools_SysInfo.asp */
