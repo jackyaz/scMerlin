@@ -220,6 +220,7 @@ function DoUpdate(){
 
 function RestartService(servicename){
 	showhide("btnRestartSrv_"+servicename, false);
+	showhide("txtRestartSrv_"+servicename, false);
 	document.formScriptActions.action_script.value="start_scmerlinservicerestart"+servicename;
 	document.formScriptActions.submit();
 	document.getElementById("imgRestartSrv_"+servicename).style.display = "";
@@ -243,6 +244,7 @@ function service_status(servicename){
 				if(servicestatus == "Done"){
 					showhide("btnRestartSrv_"+servicename, true);
 					showhide("txtRestartSrv_"+servicename, true);
+					setTimeout("showhide('txtRestartSrv_"+servicename+"',false);", 3000);
 				}
 				else{
 					showhide("txtRestartSrvError_"+servicename, true);
