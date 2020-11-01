@@ -485,7 +485,7 @@ MainMenu(){
 	printf "5.    FTP Server (vsftpd)\\n"
 	printf "6.    Samba\\n"
 	printf "7.    DDNS client\\n"
-	printf "8.    ntpd/chronyd (time service)\\n"
+	printf "8.    Timeserver (ntpd/chronyd)\\n"
 	vpnclients="$(nvram show 2> /dev/null | grep ^vpn_client._addr)"
 	vpnclientenabled="false"
 	for vpnclient in $vpnclients; do
