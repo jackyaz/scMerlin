@@ -96,6 +96,8 @@ th.sortable {
 </style>
 <script language="JavaScript" type="text/javascript" src="/ext/shared-jy/jquery.js"></script>
 <script language="JavaScript" type="text/javascript" src="/ext/shared-jy/moment.js"></script>
+<script language="JavaScript" type="text/javascript" src="/ext/shared-jy/chart.js"></script>
+<script language="JavaScript" type="text/javascript" src="/ext/shared-jy/hammerjs.js"></script>
 <script language="JavaScript" type="text/javascript" src="/state.js"></script>
 <script language="JavaScript" type="text/javascript" src="/general.js"></script>
 <script language="JavaScript" type="text/javascript" src="/popup.js"></script>
@@ -613,6 +615,8 @@ function update_sysinfo(e){
 	},
 		success: function(response){
 			show_memcpu();
+			Draw_Chart("MemoryUsage");
+			Draw_Chart("SwapUsage");
 			setTimeout("update_sysinfo();", 3000);
 		}
 	});
@@ -668,6 +672,120 @@ function update_temperatures(){
 	});
 }
 /* End firmware functions */
+
+function round(value, decimals){
+	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+
+Chart.defaults.global.defaultFontColor = "#CCC";
+Chart.Tooltip.positioners.cursor = function(chartElements, coordinates){
+	return coordinates;
+};
+
+function Draw_Chart(txtchartname){
+	var chartData = [];
+	var chartLabels = [];
+	var chartColours = [];
+	var chartTitle = "";
+	
+	if(txtchartname == "MemoryUsage"){
+		chartData = [mem_stats_arr[0]*1-mem_stats_arr[1]*1-mem_stats_arr[2]*1-mem_stats_arr[3]*1,mem_stats_arr[1],mem_stats_arr[2],mem_stats_arr[3]];
+		chartLabels = ["Used","Free","Buffers","Cache"];
+		chartColours = ["#5eaec0","#12cf80","#ceca09","#9d12c4"];
+		chartTitle = "Memory Usage";
+	}
+	else if(txtchartname == "SwapUsage"){
+		chartData = [mem_stats_arr[4],mem_stats_arr[5]*1-mem_stats_arr[4]*1];
+		chartLabels = ["Used","Free"];
+		chartColours = ["#135fee","#1aa658"];
+		chartTitle = "Swap Usage";
+	}
+	
+	var objchartname = window["Chart" + txtchartname];
+	
+	if (objchartname != undefined) objchartname.destroy();
+	var ctx = document.getElementById("canvasChart" + txtchartname).getContext("2d");
+	var chartOptions = {
+		segmentShowStroke: false,
+		segmentStrokeColor: "#000",
+		maintainAspectRatio: false,
+		animation: {
+			duration: 0 // general animation time
+		},
+		hover: {
+			animationDuration: 0 // duration of animations when hovering an item
+		},
+		responsiveAnimationDuration: 0,
+		legend: {
+			onClick: null,
+			display: true,
+			position: "left",
+			labels: {
+				fontColor: "#ffffff"
+			}
+		},
+		title: {
+			display: true,
+			text: chartTitle,
+			position: "top"
+		},
+		tooltips: {
+			callbacks: {
+				title: function(tooltipItem, data){
+					return data.labels[tooltipItem[0].index];
+				},
+				label: function(tooltipItem, data){
+					return round(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index],2).toFixed(2) + " MB";
+				}
+			},
+			mode: 'point',
+			position: 'cursor',
+			intersect: true
+		},
+		scales: {
+			xAxes: [{
+				display: false,
+				gridLines: {
+					display: false
+				},
+				scaleLabel: {
+					display: false
+				},
+				ticks: {
+					display: false
+				}
+			}],
+			yAxes: [{
+				display: false,
+				gridLines: {
+					display: false
+				},
+				scaleLabel: {
+					display: false
+				},
+				ticks: {
+					display: false
+				}
+			}]
+		},
+	};
+	var chartDataset = {
+		labels: chartLabels,
+		datasets: [{
+			data: chartData,
+			borderWidth: 1,
+			backgroundColor: chartColours,
+			borderColor: "#000000"
+		}]
+	};
+	objchartname = new Chart(ctx, {
+		type: "pie",
+		options: chartOptions,
+		data: chartDataset
+	});
+	window["Chart" + txtchartname] = objchartname;
+}
+
 
 </script>
 </head>
@@ -778,28 +896,38 @@ function update_temperatures(){
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 <thead class="collapsible-jquery" id="routermemory">
 <tr>
-<td colspan="2">Memory (click to expand/collapse)</td>
+<td colspan="4">Memory (click to expand/collapse)</td>
 </tr>
 </thead>
 <tr>
-<th>Total</th>
-<td id="mem_total_td"></td>
+<th width="65px" style="width:65px;">Total</th>
+<td id="mem_total_td" width="125px" style="width:125px;"></td>
+<td id="ram_chart" rowspan="5" style="padding-left:4px;width:270px;" width="270px">
+<div style="background-color:#2f3e44;border-radius:10px;width:270px;" id="divChartMemoryUsage">
+<canvas id="canvasChartMemoryUsage" height="250" />
+</div>
+</td>
+<td id="swap_chart" rowspan="5" style="padding-left:4px;width:270px;" width="270px">
+<div style="background-color:#2f3e44;border-radius:10px;width:270px;" id="divChartSwapUsage">
+<canvas id="canvasChartSwapUsage" height="250" />
+</div>
+</td>
 </tr>
 <tr>
-<th>Free</th>
-<td id="mem_free_td"></td>
+<th width="65px" style="width:65px;">Free</th>
+<td id="mem_free_td" width="125px" style="width:125px;"></td>
 </tr>
 <tr>
-<th>Buffers</th>
-<td id="mem_buffer_td"></td>
+<th width="65px" style="width:65px;">Buffers</th>
+<td id="mem_buffer_td" width="125px" style="width:125px;"></td>
 </tr>
 <tr>
-<th>Cache</th>
-<td id="mem_cache_td"></td>
+<th width="65px" style="width:65px;">Cache</th>
+<td id="mem_cache_td" width="125px" style="width:125px;"></td>
 </tr>
 <tr>
-<th>Swap</th>
-<td id="mem_swap_td"></td>
+<th width="65px" style="width:65px;">Swap</th>
+<td id="mem_swap_td" width="125px" style="width:125px;"></td>
 </tr>
 </table>
 <div style="line-height:10px;">&nbsp;</div>
