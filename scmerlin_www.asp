@@ -350,18 +350,23 @@ function ParseProcList(data){
 	arrayproclines = arrayproclines.filter(Boolean);
 	arrayproclistlines = [];
 	for(var i = 0; i < arrayproclines.length; i++){
-		var procfields = arrayproclines[i].split(",");
-		var parsedprocline = new Object();
-		parsedprocline.PID =  procfields[0].trim();
-		parsedprocline.PPID = procfields[1].trim();
-		parsedprocline.USER = procfields[2].trim();
-		parsedprocline.STAT = procfields[3].trim();
-		parsedprocline.VSZ = procfields[4].trim();
-		parsedprocline.VSZP = procfields[5].trim();
-		parsedprocline.CPU = procfields[6].trim();
-		parsedprocline.CPUP = procfields[7].trim();
-		parsedprocline.COMMAND = procfields[8].trim();
-		arrayproclistlines.push(parsedprocline);
+		try{
+			var procfields = arrayproclines[i].split(",");
+			var parsedprocline = new Object();
+			parsedprocline.PID =  procfields[0].trim();
+			parsedprocline.PPID = procfields[1].trim();
+			parsedprocline.USER = procfields[2].trim();
+			parsedprocline.STAT = procfields[3].trim();
+			parsedprocline.VSZ = procfields[4].trim();
+			parsedprocline.VSZP = procfields[5].trim();
+			parsedprocline.CPU = procfields[6].trim();
+			parsedprocline.CPUP = procfields[7].trim();
+			parsedprocline.COMMAND = procfields[8].trim();
+			arrayproclistlines.push(parsedprocline);
+		}
+		catch{
+			//do nothing, continue
+		}
 	}
 	originalarrayproclistlines = arrayproclistlines;
 	SortTable(sortname+" "+sortdir.replace("desc","↑").replace("asc","↓").trim());
