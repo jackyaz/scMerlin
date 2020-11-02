@@ -520,19 +520,6 @@ MainMenu(){
 			vpnservernum=$((vpnservernum + 1))
 		done
 	fi
-	if [ -f /opt/bin/diversion ] || [ -f /jffs/scripts/firewall ]; then
-		printf "\\n\\e[1mScripts\\e[0m\\n\\n"
-	fi
-	if [ -f /opt/bin/diversion ]; then
-		DIVERSION_STATUS="$(grep "adblocking" /opt/share/diversion/.conf/diversion.conf | cut -f2 -d"=")"
-		if [ "$DIVERSION_STATUS" = "on" ]; then DIVERSION_STATUS="Disable"; else DIVERSION_STATUS="Enable"; fi
-		printf "d.    %s Diversion ad-blocking\\n" "$DIVERSION_STATUS"
-	fi
-	if [ -f /jffs/scripts/firewall ]; then
-		SKYNET_STATUS=""
-		if iptables -t raw -S | grep -q Skynet; then SKYNET_STATUS="Disable"; else SKYNET_STATUS="Enable"; fi
-		printf "s.    %s Skynet firewall\\n" "$SKYNET_STATUS"
-	fi
 	if [ -f /opt/bin/opkg ]; then
 		printf "\\n\\e[1mEntware\\e[0m\\n\\n"
 		printf "et.    Restart all Entware scripts\\n"
@@ -710,36 +697,6 @@ MainMenu(){
 					service restart_vpnserver2 >/dev/null 2>&1
 				else
 					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
-				fi
-				PressEnter
-				break
-			;;
-			d)
-				printf "\\n"
-				if [ -f /opt/bin/diversion ]; then
-					if Check_Lock "menu"; then
-						/opt/bin/diversion a
-						Clear_Lock
-					fi
-				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (Diversion not installed)\\e[0m\\n\\n"
-				fi
-				PressEnter
-				break
-			;;
-			s)
-				printf "\\n"
-				if [ -f /jffs/scripts/firewall ]; then
-					if Check_Lock "menu"; then
-						if [ "$SKYNET_STATUS" = "Enable" ]; then
-							/jffs/scripts/firewall restart
-						else
-							/jffs/scripts/firewall disable
-						fi
-						Clear_Lock
-					fi
-				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (Skynet not installed)\\e[0m\\n"
 				fi
 				PressEnter
 				break
