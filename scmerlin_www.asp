@@ -119,12 +119,94 @@ function LoadCustomSettings(){
 		}
 	}
 }
+
+/* Taken from firmware WebUI, Tools_SysInfo.asp */
+function update_sysinfo(e){
+	$j.ajax({
+		url: '/ajax_sysinfo.asp',
+		dataType: 'script',
+		error: function(xhr) {
+		setTimeout("update_sysinfo();", 1000);
+	},
+		success: function(response){
+			show_memcpu();
+			nvramtotal = <% sysinfo("nvram.total"); %>;
+			Draw_Chart("MemoryUsage");
+			if(parseInt(mem_stats_arr[5]) != 0){
+				Draw_Chart("SwapUsage");
+			}
+			else{
+				Draw_Chart_NoData("SwapUsage");
+			}
+			setTimeout("update_sysinfo();", 3000);
+		}
+	});
+}
+
+function show_memcpu(){
+	document.getElementById("mem_total_td").innerHTML = mem_stats_arr[0] + " MB";
+	document.getElementById("mem_free_td").innerHTML = mem_stats_arr[1] + " MB";
+	document.getElementById("mem_buffer_td").innerHTML = mem_stats_arr[2] + " MB";
+	document.getElementById("mem_cache_td").innerHTML = mem_stats_arr[3] + " MB";
+	
+	if(parseInt(mem_stats_arr[5]) == 0){
+		document.getElementById("mem_swap_td").innerHTML = "<span>No swap configured</span>";
+	}
+	else{
+		document.getElementById("mem_swap_td").innerHTML = mem_stats_arr[4] + " / " + mem_stats_arr[5] + " MB";
+		document.getElementById("nvram_td").innerHTML = mem_stats_arr[6] + " / " + nvramtotal + " bytes";
+		document.getElementById("jffs_td").innerHTML = mem_stats_arr[7];
+	}
+}
+
+function update_temperatures(){
+	$j.ajax({
+		url: '/ajax_coretmp.asp',
+		dataType: 'script',
+		error: function(xhr){
+		update_temperatures();
+	},
+	success: function(response){
+		code = "<b>2.4 GHz:</b><span> " + curr_coreTmp_2_raw + "</span>";
+		if(wl_info.band5g_2_support){
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>" + curr_coreTmp_5_raw + "</span>";
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
+		}
+		else if (band5g_support){
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
+		}
+		
+		var CPUTemp = "";
+		if(typeof curr_cpuTemp === 'undefined' || curr_cpuTemp === null){
+			CPUTemp = curr_coreTmp_cpu;
+		}
+		else{
+			CPUTemp = curr_cpuTemp;
+		}
+		
+		if(CPUTemp != ""){
+			code +="&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>" + parseInt(CPUTemp) +"&deg;C</span>";
+		}
+		document.getElementById("temp_td").innerHTML = code;
+		setTimeout("update_temperatures();", 3000);
+		}
+	});
+}
+/* End firmware functions */
+
 var arrayproclistlines = [];
 var originalarrayproclistlines = [];
 var sortfield = "CPU%";
 var sortname = "CPU%";
 var sortdir = "desc";
 var tout;
+
+Chart.defaults.global.defaultFontColor = "#CCC";
+Chart.Tooltip.positioners.cursor = function(chartElements, coordinates){
+	return coordinates;
+};
+
+var nvramtotal = 0;
 
 var $j = jQuery.noConflict(); //avoid conflicts on John's fork (state.js)
 
@@ -605,82 +687,24 @@ function BuildVPNServerTable(loopindex){
 	return vpnservershtml;
 }
 
-/* Taken from firmware WebUI, Tools_SysInfo.asp */
-function update_sysinfo(e){
-	$j.ajax({
-		url: '/ajax_sysinfo.asp',
-		dataType: 'script',
-		error: function(xhr) {
-		setTimeout("update_sysinfo();", 1000);
-	},
-		success: function(response){
-			show_memcpu();
-			Draw_Chart("MemoryUsage");
-			Draw_Chart("SwapUsage");
-			setTimeout("update_sysinfo();", 3000);
-		}
-	});
-}
-
-function show_memcpu(){
-	document.getElementById("mem_total_td").innerHTML = mem_stats_arr[0] + " MB";
-	document.getElementById("mem_free_td").innerHTML = mem_stats_arr[1] + " MB";
-	document.getElementById("mem_buffer_td").innerHTML = mem_stats_arr[2] + " MB";
-	document.getElementById("mem_cache_td").innerHTML = mem_stats_arr[3] + " MB";
-	
-	if(parseInt(mem_stats_arr[5]) == 0){
-		document.getElementById("mem_swap_td").innerHTML = "<span>No swap configured</span>";
-	}
-	else{
-		document.getElementById("mem_swap_td").innerHTML = mem_stats_arr[4] + " / " + mem_stats_arr[5] + " MB";
-		document.getElementById("nvram_td").innerHTML = mem_stats_arr[6] + " / " + <% sysinfo("nvram.total"); %> + " bytes";
-		document.getElementById("jffs_td").innerHTML = mem_stats_arr[7];
-	}
-}
-
-function update_temperatures(){
-	$j.ajax({
-		url: '/ajax_coretmp.asp',
-		dataType: 'script',
-		error: function(xhr){
-		update_temperatures();
-	},
-	success: function(response){
-		code = "<b>2.4 GHz:</b><span> " + curr_coreTmp_2_raw + "</span>";
-		if(wl_info.band5g_2_support){
-			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>" + curr_coreTmp_5_raw + "</span>";
-			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
-		}
-		else if (band5g_support){
-			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
-		}
-		
-		var CPUTemp = "";
-		if(typeof curr_cpuTemp === 'undefined' || curr_cpuTemp === null){
-			CPUTemp = curr_coreTmp_cpu;
-		}
-		else{
-			CPUTemp = curr_cpuTemp;
-		}
-		
-		if(CPUTemp != ""){
-			code +="&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>" + parseInt(CPUTemp) +"&deg;C</span>";
-		}
-		document.getElementById("temp_td").innerHTML = code;
-		setTimeout("update_temperatures();", 3000);
-		}
-	});
-}
-/* End firmware functions */
-
 function round(value, decimals){
 	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
 
-Chart.defaults.global.defaultFontColor = "#CCC";
-Chart.Tooltip.positioners.cursor = function(chartElements, coordinates){
-	return coordinates;
-};
+function Draw_Chart_NoData(txtchartname){
+	document.getElementById("canvasChart" + txtchartname).width = "270";
+	document.getElementById("canvasChart" + txtchartname).height = "250";
+	document.getElementById("canvasChart" + txtchartname).style.width = "270px";
+	document.getElementById("canvasChart" + txtchartname).style.height = "250px";
+	var ctx = document.getElementById("canvasChart" + txtchartname).getContext("2d");
+	ctx.save();
+	ctx.textAlign = 'center';
+	ctx.textBaseline = 'middle';
+	ctx.font = "normal normal bolder 22px Arial";
+	ctx.fillStyle = 'white';
+	ctx.fillText('No swap file configured', 135, 125);
+	ctx.restore();
+}
 
 function Draw_Chart(txtchartname){
 	var chartData = [];
@@ -938,7 +962,7 @@ function Draw_Chart(txtchartname){
 </tr>
 </thead>
 <tr>
-<th>NVRAM usage</th>
+<th>NVRAM</th>
 <td id="nvram_td"></td>
 </tr>
 <tr>
