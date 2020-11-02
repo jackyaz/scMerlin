@@ -130,7 +130,7 @@ function update_sysinfo(e){
 	},
 		success: function(response){
 			show_memcpu();
-			nvramtotal = <% sysinfo("nvram.total"); %>;
+			nvramtotal = <% sysinfo("nvram.total"); %> / 1024;
 			Draw_Chart("MemoryUsage");
 			if(parseInt(mem_stats_arr[5]) != 0){
 				Draw_Chart("SwapUsage");
@@ -138,6 +138,8 @@ function update_sysinfo(e){
 			else{
 				Draw_Chart_NoData("SwapUsage");
 			}
+			Draw_Chart("nvramUsage");
+			Draw_Chart("jffsUsage");
 			setTimeout("update_sysinfo();", 3000);
 		}
 	});
@@ -154,7 +156,7 @@ function show_memcpu(){
 	}
 	else{
 		document.getElementById("mem_swap_td").innerHTML = mem_stats_arr[4] + " / " + mem_stats_arr[5] + " MB";
-		document.getElementById("nvram_td").innerHTML = mem_stats_arr[6] + " / " + nvramtotal + " bytes";
+		document.getElementById("nvram_td").innerHTML = round(mem_stats_arr[6]/1024,2).toFixed(2) + " / " + nvramtotal + " KB";
 		document.getElementById("jffs_td").innerHTML = mem_stats_arr[7];
 	}
 }
@@ -206,7 +208,7 @@ Chart.Tooltip.positioners.cursor = function(chartElements, coordinates){
 	return coordinates;
 };
 
-var nvramtotal = 0;
+var nvramtotal = <% sysinfo("nvram.total"); %> / 1024;
 
 var $j = jQuery.noConflict(); //avoid conflicts on John's fork (state.js)
 
@@ -483,6 +485,19 @@ function AddEventHandlers(){
 			}
 			else{
 				SetCookie($j(this).siblings()[0].id,"expanded");
+				if($j(this).siblings()[0].id == "routermemory"){
+					Draw_Chart("MemoryUsage");
+					if(parseInt(mem_stats_arr[5]) != 0){
+						Draw_Chart("SwapUsage");
+					}
+					else{
+						Draw_Chart_NoData("SwapUsage");
+					}
+				}
+				else if($j(this).siblings()[0].id == "routerstorage"){
+					Draw_Chart("nvramUsage");
+					Draw_Chart("jffsUsage");
+				}
 			}
 		})
 	});
@@ -711,18 +726,36 @@ function Draw_Chart(txtchartname){
 	var chartLabels = [];
 	var chartColours = [];
 	var chartTitle = "";
+	var chartUnit = "";
 	
 	if(txtchartname == "MemoryUsage"){
 		chartData = [mem_stats_arr[0]*1-mem_stats_arr[1]*1-mem_stats_arr[2]*1-mem_stats_arr[3]*1,mem_stats_arr[1],mem_stats_arr[2],mem_stats_arr[3]];
 		chartLabels = ["Used","Free","Buffers","Cache"];
 		chartColours = ["#5eaec0","#12cf80","#ceca09","#9d12c4"];
 		chartTitle = "Memory Usage";
+		chartUnit = "MB";
 	}
 	else if(txtchartname == "SwapUsage"){
 		chartData = [mem_stats_arr[4],mem_stats_arr[5]*1-mem_stats_arr[4]*1];
 		chartLabels = ["Used","Free"];
 		chartColours = ["#135fee","#1aa658"];
 		chartTitle = "Swap Usage";
+		chartUnit = "MB";
+	}
+	else if(txtchartname == "nvramUsage"){
+		chartData = [round(mem_stats_arr[6]/1024,2).toFixed(2),round(nvramtotal*1-mem_stats_arr[6]*1/1024,2).toFixed(2)];
+		chartLabels = ["Used","Free"];
+		chartColours = ["#5eaec0","#12cf80"];
+		chartTitle = "NVRAM Usage";
+		chartUnit = "KB";
+	}
+	else if(txtchartname == "jffsUsage"){
+		var jffs_usage = mem_stats_arr[7].split(" ");
+		chartData = [jffs_usage[0]*1,jffs_usage[2]*1-jffs_usage[0]*1];
+		chartLabels = ["Used","Free"];
+		chartColours = ["#135fee","#1aa658"];
+		chartTitle = "JFFS Usage";
+		chartUnit = "MB";
 	}
 	
 	var objchartname = window["Chart" + txtchartname];
@@ -759,7 +792,7 @@ function Draw_Chart(txtchartname){
 					return data.labels[tooltipItem[0].index];
 				},
 				label: function(tooltipItem, data){
-					return round(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index],2).toFixed(2) + " MB";
+					return round(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index],2).toFixed(2) + " " + chartUnit;
 				}
 			},
 			mode: 'point',
@@ -958,15 +991,25 @@ function Draw_Chart(txtchartname){
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 <thead class="collapsible-jquery" id="routerstorage">
 <tr>
-<td colspan="2">Internal Storage (click to expand/collapse)</td>
+<td colspan="4">Internal Storage (click to expand/collapse)</td>
 </tr>
 </thead>
 <tr>
-<th>NVRAM</th>
+<th width="65px" style="width:65px;">NVRAM</th>
 <td id="nvram_td"></td>
+<td id="nvram_chart" rowspan="2" style="padding-left:4px;width:270px;" width="270px">
+<div style="background-color:#2f3e44;border-radius:10px;width:270px;" id="divChartnvramUsage">
+<canvas id="canvasChartnvramUsage" height="250" />
+</div>
+</td>
+<td id="jffs_chart" rowspan="2" style="padding-left:4px;width:270px;" width="270px">
+<div style="background-color:#2f3e44;border-radius:10px;width:270px;" id="divChartjffsUsage">
+<canvas id="canvasChartjffsUsage" height="250" />
+</div>
+</td>
 </tr>
 <tr>
-<th>JFFS</th>
+<th width="65px" style="width:65px;">JFFS</th>
 <td id="jffs_td"></td>
 </tr>
 </table>
