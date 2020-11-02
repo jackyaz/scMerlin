@@ -645,8 +645,17 @@ function update_temperatures(){
 		else if (band5g_support){
 			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
 		}
-		if(curr_cpuTemp != ""){
-			code +="&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>" + parseInt(curr_cpuTemp) +"&deg;C</span>";
+		
+		var CPUTemp = "";
+		if(typeof curr_cpuTemp === 'undefined' || curr_cpuTemp === null){
+			CPUTemp = curr_coreTmp_cpu;
+		}
+		else{
+			CPUTemp = curr_cpuTemp;
+		}
+		
+		if(CPUTemp != ""){
+			code +="&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>" + parseInt(CPUTemp) +"&deg;C</span>";
 		}
 		document.getElementById("temp_td").innerHTML = code;
 		setTimeout("update_temperatures();", 3000);
