@@ -32,6 +32,7 @@ readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
 ### End of script variables ###
 
 ### Start of output format variables ###
+#shellcheck disable=SC2034
 readonly CRIT="\\e[41m"
 readonly ERR="\\e[31m"
 readonly WARN="\\e[33m"
