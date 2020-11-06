@@ -41,7 +41,7 @@ If this does not work, you will need to use the full path:
 ## Screenshots
 
 ![WebUI](https://puu.sh/GJrCb/a55ad1a913.png)
-![CLI UI](https://puu.sh/GKEBA/04439c7275.png)
+![CLI UI](https://puu.sh/GKEK4/015c2c0108.png)
 
 ## Help
 Please post about any issues and problems here: [scMerlin on SNBForums](https://www.snbforums.com/threads/scmerlin-service-and-script-control-menu-for-asuswrt-merlin.56277/)
