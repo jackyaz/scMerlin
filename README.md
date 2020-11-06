@@ -40,8 +40,8 @@ If this does not work, you will need to use the full path:
 
 ## Screenshots
 Example menu:
-![WebUI](https://puu.sh/GKEBA/04439c7275.png)
-![CLI UI](https://puu.sh/GJrA7/cc979ed1e3.png)
+![WebUI](https://puu.sh/GJrCb/a55ad1a913.png)
+![CLI UI](https://puu.sh/GKEBA/04439c7275.png)
 
 ## Help
 Please post about any issues and problems here: [scMerlin on SNBForums](https://www.snbforums.com/threads/scmerlin-service-and-script-control-menu-for-asuswrt-merlin.56277/)
