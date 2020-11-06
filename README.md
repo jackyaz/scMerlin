@@ -1,16 +1,13 @@
-# scMerlin - service and script control menu for AsusWRT-Merlin
+# scMerlin
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/bfd397624cdf4803a465d4ae1530e7fe)](https://www.codacy.com/app/jackyaz/scMerlin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jackyaz/scMerlin&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.com/jackyaz/scMerlin.svg?branch=master)](https://travis-ci.com/jackyaz/scMerlin)
 
-## v1.1.3
-### Updated on 2020-08-29
+## v2.0.0
+### Updated on 2020-11-06
 ## About
-Quick access to controlling services and scripts on your router
+scMerlin allows you to use easily control the most common services/scripts on your router.
 
 scMerlin is free to use under the [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0) (GPL 3.0).
-
-Example menu (options added/removed dynamically depending on which service(s) you have enabled on your router)
-![Menu UI](https://puu.sh/DjmJr/15b3000866.png)
 
 ### Supporting development
 Love the script and want to support future development? Any and all donations gratefully received!
@@ -27,6 +24,10 @@ Using your preferred SSH client/terminal, copy and paste the following command, 
 ```
 
 ## Usage
+### WebUI
+scMerlin can be used via the WebUI, in the Addons section.
+
+### Command Line
 To launch the scMerlin menu after installation, use:
 ```sh
 scmerlin
@@ -37,8 +38,10 @@ If this does not work, you will need to use the full path:
 /jffs/scripts/scmerlin
 ```
 
-## Updating
-Launch scMerlin and select option u
+## Screenshots
+Example menu:
+![WebUI](https://puu.sh/GJrCb/a55ad1a913.png)
+![CLI UI](https://puu.sh/GJrA7/cc979ed1e3.png)
 
 ## Help
 Please post about any issues and problems here: [scMerlin on SNBForums](https://www.snbforums.com/threads/scmerlin-service-and-script-control-menu-for-asuswrt-merlin.56277/)

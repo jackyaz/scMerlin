@@ -1,0 +1,15 @@
+#!/bin/sh
+#shellcheck disable=SC2039
+trap '' SIGHUP
+
+while true; do
+	top -b -n 1 > /tmp/scmerlin-top.tmp
+	tail -n +5 /tmp/scmerlin-top.tmp | head -n -1 > /tmp/scmerlin-top.tmp2
+	sed -i 's/S </S</g' /tmp/scmerlin-top.tmp2
+	rm -f /tmp/scmerlin-top.tmp
+	
+	awk -F" " -v OFS=',' '{printf "%s,%s,%s,%s,%s,%s,%s,%s,", $1,$2,$3,$4,$5,$6,$7,$8;for(i=9; i<=NF; ++i) printf "%s ", $i; print ""}' /tmp/scmerlin-top.tmp2 > /tmp/scmerlin-top
+	sed -i 's/S</S </g' /tmp/scmerlin-top
+	rm -f /tmp/scmerlin-top.tmp2
+	sleep 3
+done
