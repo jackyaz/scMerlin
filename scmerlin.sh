@@ -900,6 +900,13 @@ Menu_Install(){
 	Create_Symlinks
 	Auto_Startup create 2>/dev/null
 	Auto_ServiceEvent create 2>/dev/null
+	
+	Update_File "scmerlin_www.asp"
+	Update_File "shared-jy.tar.gz"
+	Update_File "tailtop"
+	Update_File "tailtopd"
+	Update_File "S99tailtop"
+	
 	Clear_Lock
 	ScriptHeader
 	MainMenu
