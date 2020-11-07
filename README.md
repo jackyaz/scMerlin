@@ -5,7 +5,7 @@
 ## v2.0.0
 ### Updated on 2020-11-06
 ## About
-scMerlin allows you to use easily control the most common services/scripts on your router.
+scMerlin allows you to easily control the most common services/scripts on your router.
 
 scMerlin is free to use under the [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0) (GPL 3.0).
 
