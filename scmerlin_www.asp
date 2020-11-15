@@ -170,19 +170,15 @@ function update_temperatures(){
 	},
 	success: function(response){
 		code = "<b>2.4 GHz:</b><span> " + curr_coreTmp_2_raw + "</span>";
-		if(typeof wl_info.band5g_2_support == 'undefined' || wl_info.band5g_2_support == null){
-			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
+		if(wl_info.band5g_2_support){
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>" + curr_coreTmp_5_raw + "</span>";
+			if(typeof curr_coreTmp_52_raw == 'undefined' || curr_coreTmp_52_raw == null){
+				curr_coreTmp_52_raw = "N/A"
+			}
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
 		}
-		else{
-			if(wl_info.band5g_2_support){
-				code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>" + curr_coreTmp_5_raw + "</span>";
-				if(typeof curr_coreTmp_52_raw != 'undefined' && curr_coreTmp_52_raw != null){
-					code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
-				}
-			}
-			else if (band5g_support){
-				code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
-			}
+		else if (band5g_support){
+			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
 		}
 		
 		var CPUTemp = "";
