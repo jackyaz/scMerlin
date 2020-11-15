@@ -176,7 +176,9 @@ function update_temperatures(){
 		else{
 			if(wl_info.band5g_2_support){
 				code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>" + curr_coreTmp_5_raw + "</span>";
-				code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
+				if(typeof curr_coreTmp_52_raw != 'undefined' && curr_coreTmp_52_raw== null){
+					code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
+				}
 			}
 			else if (band5g_support){
 				code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
