@@ -28,6 +28,7 @@ readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME_LOWER"
 readonly SHARED_DIR="/jffs/addons/shared-jy"
 readonly SHARED_REPO="https://raw.githubusercontent.com/jackyaz/shared-jy/master"
 readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
+readonly DISABLE_USB_FEATURES_FILE="$SCRIPT_DIR/.usbdisabled"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
 
@@ -150,11 +151,14 @@ Update_Version(){
 			Print_Output "true" "MD5 hash of $SCRIPT_NAME does not match - downloading updated $serverver" "$PASS"
 		fi
 		
-		Update_File "scmerlin_www.asp"
-		Update_File "shared-jy.tar.gz"
-		Update_File "tailtop"
-		Update_File "tailtopd"
-		Update_File "S99tailtop"
+		Update_File scmerlin_www.asp
+		Update_File shared-jy.tar.gz
+		
+		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+			Update_File tailtop
+			Update_File tailtopd
+			Update_File S99tailtop
+		fi
 		
 		if [ "$isupdate" != "false" ]; then
 			/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output "true" "$SCRIPT_NAME successfully updated"
@@ -174,13 +178,15 @@ Update_Version(){
 	
 	if [ "$1" = "force" ]; then
 		serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
-		Print_Output "true" "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
-		Update_File "scmerlin_www.asp"
-		Update_File "shared-jy.tar.gz"
-		Update_File "tailtop"
-		Update_File "tailtopd"
-		Update_File "S99tailtop"
-		/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output "true" "$SCRIPT_NAME successfully updated"
+		Print_Output true "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
+		Update_File scmerlin_www.asp
+		Update_File shared-jy.tar.gz
+		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+			Update_File tailtop
+			Update_File tailtopd
+			Update_File S99tailtop
+		fi
+		/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 		chmod 0755 /jffs/scripts/"$SCRIPT_NAME_LOWER"
 		Clear_Lock
 		if [ -z "$2" ]; then
@@ -292,6 +298,7 @@ Create_Symlinks(){
 	rm -rf "${SCRIPT_WEB_DIR:?}/"* 2>/dev/null
 	
 	ln -s /tmp/scmerlin-top "$SCRIPT_WEB_DIR/top.htm" 2>/dev/null
+	ln -s "$DISABLE_USB_FEATURES_FILE" "$SCRIPT_WEB_DIR/usbdisabled.htm" 2>/dev/null
 	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
 		ln -s "$SHARED_DIR" "$SHARED_WEB_DIR" 2>/dev/null
@@ -339,23 +346,84 @@ Auto_Startup(){
 		create)
 			if [ -f /jffs/scripts/services-start ]; then
 				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
-				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER startup &"' # '"$SCRIPT_NAME" /jffs/scripts/services-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
+				fi
+			fi
+			if [ -f /jffs/scripts/post-mount ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
+				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" /jffs/scripts/post-mount)
+				
+				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
+				fi
+				
+				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
+					echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" >> /jffs/scripts/post-mount
+				fi
+			else
+				echo "#!/bin/sh" > /jffs/scripts/post-mount
+				echo "" >> /jffs/scripts/post-mount
+				echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" >> /jffs/scripts/post-mount
+				chmod 0755 /jffs/scripts/post-mount
+			fi
+		;;
+		delete)
+			if [ -f /jffs/scripts/services-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
+				fi
+			fi
+			if [ -f /jffs/scripts/post-mount ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
+				fi
+			fi
+		;;
+	esac
+}
+
+Auto_Startup_NoUSB(){
+	case $1 in
+		create)
+			if [ -f /jffs/scripts/post-mount ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
+				fi
+			fi
+			if [ -f /jffs/scripts/services-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
+				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' & # '"$SCRIPT_NAME" /jffs/scripts/services-start)
 				
 				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
 					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
 				fi
 				
 				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
-					echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup &"' # '"$SCRIPT_NAME" >> /jffs/scripts/services-start
+					echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' & # '"$SCRIPT_NAME" >> /jffs/scripts/services-start
 				fi
 			else
 				echo "#!/bin/sh" > /jffs/scripts/services-start
 				echo "" >> /jffs/scripts/services-start
-				echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup &"' # '"$SCRIPT_NAME" >> /jffs/scripts/services-start
+				echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' & # '"$SCRIPT_NAME" >> /jffs/scripts/services-start
 				chmod 0755 /jffs/scripts/services-start
 			fi
 		;;
 		delete)
+			if [ -f /jffs/scripts/post-mount ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
+				fi
+			fi
 			if [ -f /jffs/scripts/services-start ]; then
 				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
 				
@@ -870,7 +938,20 @@ Check_Requirements(){
 	if [ "$(nvram get jffs2_scripts)" -ne 1 ]; then
 		nvram set jffs2_scripts=1
 		nvram commit
-		Print_Output "true" "Custom JFFS Scripts enabled" "$WARN"
+		Print_Output true "Custom JFFS Scripts enabled" "$WARN"
+	fi
+	
+	if ! Firmware_Version_Check; then
+		Print_Output true "Unsupported firmware version detected" "$ERR"
+		Print_Output true "$SCRIPT_NAME requires Merlin 384.15/384.13_4 or Fork 43E5 (or later)" "$ERR"
+		CHECKSFAILED="true"
+	fi
+	
+	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		if [ ! -f /opt/bin/opkg ]; then
+			Print_Output true "Entware not detected!" "$ERR"
+			CHECKSFAILED="true"
+		fi
 	fi
 	
 	if [ "$CHECKSFAILED" = "false" ]; then
@@ -898,14 +979,20 @@ Menu_Install(){
 	Shortcut_SCM create
 	Set_Version_Custom_Settings "local"
 	Create_Symlinks
-	Auto_Startup create 2>/dev/null
+	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		Auto_Startup create 2>/dev/null
+	else
+		Auto_Startup_NoUSB create 2>/dev/null
+	fi
 	Auto_ServiceEvent create 2>/dev/null
 	
-	Update_File "scmerlin_www.asp"
-	Update_File "shared-jy.tar.gz"
-	Update_File "tailtop"
-	Update_File "tailtopd"
-	Update_File "S99tailtop"
+	Update_File scmerlin_www.asp
+	Update_File shared-jy.tar.gz
+	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		Update_File tailtop
+		Update_File tailtopd
+		Update_File S99tailtop
+	fi
 	
 	Clear_Lock
 	ScriptHeader
@@ -916,11 +1003,34 @@ Menu_Startup(){
 	Create_Dirs
 	Set_Version_Custom_Settings "local"
 	Create_Symlinks
-	Auto_Startup create 2>/dev/null
+	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		Auto_Startup create 2>/dev/null
+	else
+		Auto_Startup_NoUSB create 2>/dev/null
+	fi
 	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_SCM create
 	Mount_WebUI
 	Clear_Lock
+}
+
+Menu_ToggleUSBFeatures(){
+	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		touch "$DISABLE_USB_FEATURES_FILE"
+		Auto_Startup delete 2>/dev/null
+		Auto_Startup_NoUSB create 2>/dev/null
+		rm -f "$SCRIPT_DIR/tailtop"
+		rm -f "$SCRIPT_DIR/tailtopd"
+		/opt/etc/init.d/S99tailtop stop
+		rm -f /opt/etc/init.d/S99tailtop
+	else
+		rm -f "$DISABLE_USB_FEATURES_FILE"
+		Auto_Startup_NoUSB delete 2>/dev/null
+		Auto_Startup create 2>/dev/null
+		Update_File tailtop
+		Update_File tailtopd
+		Update_File S99tailtop
+	fi
 }
 
 Menu_Update(){
@@ -934,9 +1044,13 @@ Menu_ForceUpdate(){
 }
 
 Menu_Uninstall(){
-	Print_Output "true" "Removing $SCRIPT_NAME..." "$PASS"
-	Shortcut_SCM delete
-	Auto_Startup delete 2>/dev/null
+	Print_Output true "Removing $SCRIPT_NAME..." "$PASS"
+	Shortcut_Script delete
+	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		Auto_Startup delete 2>/dev/null
+	else
+		Auto_Startup_NoUSB delete 2>/dev/null
+	fi
 	Auto_ServiceEvent delete 2>/dev/null
 	
 	Get_WebUI_Page "$SCRIPT_DIR/scmerlin_www.asp"
@@ -962,27 +1076,22 @@ Menu_Uninstall(){
 }
 
 NTP_Ready(){
-	if [ "$1" = "service_event" ]; then
-		if [ -n "$2" ] && [ "$(echo "$3" | grep -c "$SCRIPT_NAME_LOWER")" -eq 0 ]; then
-			exit 0
-		fi
-	fi
-	if [ "$(nvram get ntp_ready)" = "0" ]; then
-		ntpwaitcount="0"
+	if [ "$(nvram get ntp_ready)" -eq 0 ]; then
 		Check_Lock
-		while [ "$(nvram get ntp_ready)" = "0" ] && [ "$ntpwaitcount" -lt "300" ]; do
+		ntpwaitcount="0"
+		while [ "$(nvram get ntp_ready)" -eq 0 ] && [ "$ntpwaitcount" -lt 300 ]; do
 			ntpwaitcount="$((ntpwaitcount + 1))"
-			if [ "$ntpwaitcount" = "60" ]; then
-				Print_Output "true" "Waiting for NTP to sync..." "$WARN"
+			if [ "$ntpwaitcount" -eq 60 ]; then
+				Print_Output true "Waiting for NTP to sync..." "$WARN"
 			fi
 			sleep 1
 		done
-		if [ "$ntpwaitcount" -ge "300" ]; then
-			Print_Output "true" "NTP failed to sync after 5 minutes. Please resolve!" "$CRIT"
+		if [ "$ntpwaitcount" -ge 300 ]; then
+			Print_Output true "NTP failed to sync after 5 minutes. Please resolve!" "$CRIT"
 			Clear_Lock
 			exit 1
 		else
-			Print_Output "true" "NTP synced, $SCRIPT_NAME will now continue" "$PASS"
+			Print_Output true "NTP synced, $SCRIPT_NAME will now continue" "$PASS"
 			Clear_Lock
 		fi
 	fi
@@ -990,41 +1099,41 @@ NTP_Ready(){
 
 ### function based on @Adamm00's Skynet USB wait function ###
 Entware_Ready(){
-	if [ "$1" = "service_event" ]; then
-		if [ -n "$2" ] && [ "$(echo "$3" | grep -c "$SCRIPT_NAME_LOWER")" -eq 0 ]; then
-			exit 0
-		fi
-	fi
-	
-	if [ ! -f "/opt/bin/opkg" ] && ! echo "$@" | grep -wqE "(install|uninstall|update|forceupdate)"; then
+	if [ ! -f /opt/bin/opkg ]; then
 		Check_Lock
 		sleepcount=1
-		while [ ! -f "/opt/bin/opkg" ] && [ "$sleepcount" -le 10 ]; do
-			Print_Output "true" "Entware not found, sleeping for 10s (attempt $sleepcount of 10)" "$ERR"
+		while [ ! -f /opt/bin/opkg ] && [ "$sleepcount" -le 10 ]; do
+			Print_Output true "Entware not found, sleeping for 10s (attempt $sleepcount of 10)" "$ERR"
 			sleepcount="$((sleepcount + 1))"
 			sleep 10
 		done
-		if [ ! -f "/opt/bin/opkg" ]; then
-			Print_Output "true" "Entware not found and is required for $SCRIPT_NAME to run, please resolve" "$CRIT"
+		if [ ! -f /opt/bin/opkg ]; then
+			Print_Output true "Entware not found and is required for $SCRIPT_NAME to run, please resolve" "$CRIT"
 			Clear_Lock
 			exit 1
 		else
-			Print_Output "true" "Entware found, $SCRIPT_NAME will now continue" "$PASS"
+			Print_Output true "Entware found, $SCRIPT_NAME will now continue" "$PASS"
 			Clear_Lock
 		fi
 	fi
 }
 ### ###
 
-NTP_Ready "$@"
-Entware_Ready "$@"
-
 if [ -z "$1" ]; then
+	NTP_Ready
+	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		Entware_Ready
+	fi
 	Create_Dirs
-	Shortcut_SCM create
-	Set_Version_Custom_Settings "local"
+	Shortcut_Script create
+	Set_Version_Custom_Settings local
 	Create_Symlinks
-	Auto_Startup create 2>/dev/null
+	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		Auto_Startup create 2>/dev/null
+	else
+		Auto_Startup_NoUSB create 2>/dev/null
+	fi
+	
 	Auto_ServiceEvent create 2>/dev/null
 	ScriptHeader
 	MainMenu
@@ -1038,9 +1147,7 @@ case "$1" in
 		exit 0
 	;;
 	startup)
-		Check_Lock
-		sleep 20
-		Menu_Startup
+		Menu_Startup "$2"
 		exit 0
 	;;
 	service_event)
