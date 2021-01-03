@@ -604,7 +604,7 @@ MainMenu(){
 		printf "\\e[1m(selecting an option will restart the VPN Client)\\e[0m\\n\\n"
 		vpnclientnum=1
 		while [ "$vpnclientnum" -lt 6 ]; do
-			printf "vc%s.    VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
+			printf "vc%s.  VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
 			vpnclientnum=$((vpnclientnum + 1))
 		done
 	fi
@@ -622,7 +622,7 @@ MainMenu(){
 			if ! nvram get vpn_serverx_start | grep -q "$vpnservernum"; then
 				vpnsdesc="(Not configured)"
 			fi
-			printf "vs%s.    VPN Server %s %s\\n" "$vpnservernum" "$vpnservernum" "$vpnsdesc"
+			printf "vs%s.  VPN Server %s %s\\n" "$vpnservernum" "$vpnservernum" "$vpnsdesc"
 			vpnservernum=$((vpnservernum + 1))
 		done
 	fi
@@ -636,7 +636,7 @@ MainMenu(){
 	printf "t.    View router temperatures\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
-	printf "usb.    Toggle USB features (running processes in WebUI)\\n        Currently: \\e[1m%s\\e[0m\\n" "$(ToggleUSBFeatures check)"
+	printf "usb.  Toggle USB features (running processes in WebUI)\\n        Currently: \\e[1m%s\\e[0m\\n" "$(ToggleUSBFeatures check)"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
