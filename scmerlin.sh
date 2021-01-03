@@ -636,7 +636,7 @@ MainMenu(){
 	printf "t.    View router temperatures\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
-	printf "usb.  Toggle USB features (running processes in WebUI)\\n        Currently: \\e[1m%s\\e[0m\\n" "$(ToggleUSBFeatures check)"
+	printf "usb.  Toggle USB features (running processes in WebUI)\\n      Currently: \\e[1m%s\\e[0m\\n\\n" "$(ToggleUSBFeatures check)"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
