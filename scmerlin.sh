@@ -21,7 +21,7 @@ readonly SCRIPT_NAME_LOWER=$(echo $SCRIPT_NAME | tr 'A-Z' 'a-z' | sed 's/d//')
 readonly SCM_VERSION="v2.1.0"
 readonly SCRIPT_VERSION="v2.1.0"
 readonly SCRIPT_BRANCH="develop"
-readonly SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/""$SCRIPT_NAME""/""$SCRIPT_BRANCH"
+readonly SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME_LOWER.d"
 readonly SCRIPT_WEBPAGE_DIR="$(readlink /www/user)"
 readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME_LOWER"
@@ -63,13 +63,13 @@ Check_Lock(){
 	if [ -f "/tmp/$SCRIPT_NAME_LOWER.lock" ]; then
 		ageoflock=$(($(date +%s) - $(date +%s -r "/tmp/$SCRIPT_NAME_LOWER.lock")))
 		if [ "$ageoflock" -gt 60 ]; then
-			Print_Output "true" "Stale lock file found (>60 seconds old) - purging lock" "$ERR"
+			Print_Output true "Stale lock file found (>60 seconds old) - purging lock" "$ERR"
 			kill "$(sed -n '1p' "/tmp/$SCRIPT_NAME_LOWER.lock")" >/dev/null 2>&1
 			Clear_Lock
 			echo "$$" > "/tmp/$SCRIPT_NAME_LOWER.lock"
 			return 0
 		else
-			Print_Output "true" "Lock file found (age: $ageoflock seconds)" "$ERR"
+			Print_Output true "Lock file found (age: $ageoflock seconds)" "$ERR"
 			if [ -z "$1" ]; then
 				exit 1
 			else
@@ -90,7 +90,7 @@ Clear_Lock(){
 ##############################################
 
 Set_Version_Custom_Settings(){
-	SETTINGSFILE="/jffs/addons/custom_settings.txt"
+	SETTINGSFILE=/jffs/addons/custom_settings.txt
 	case "$1" in
 		local)
 			if [ -f "$SETTINGSFILE" ]; then
@@ -125,11 +125,11 @@ Update_Check(){
 	echo 'var updatestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_update.js"
 	doupdate="false"
 	localver=$(grep "SCRIPT_VERSION=" /jffs/scripts/"$SCRIPT_NAME_LOWER" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
-	/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" | grep -qF "jackyaz" || { Print_Output "true" "404 error detected - stopping update" "$ERR"; return 1; }
+	/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" | grep -qF "jackyaz" || { Print_Output true "404 error detected - stopping update" "$ERR"; return 1; }
 	serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
 	if [ "$localver" != "$serverver" ]; then
 		doupdate="version"
-		Set_Version_Custom_Settings "server" "$serverver"
+		Set_Version_Custom_Settings server "$serverver"
 		echo 'var updatestatus = "'"$serverver"'";'  > "$SCRIPT_WEB_DIR/detect_update.js"
 	else
 		localmd5="$(md5sum "/jffs/scripts/$SCRIPT_NAME_LOWER" | awk '{print $1}')"
@@ -141,7 +141,7 @@ Update_Check(){
 		fi
 	fi
 	if [ "$doupdate" = "false" ]; then
-		echo 'var updatestatus = "None";'  > "$SCRIPT_WEB_DIR/detect_update.js"
+		echo 'var updatestatus = "None";' > "$SCRIPT_WEB_DIR/detect_update.js"
 	fi
 	echo "$doupdate,$localver,$serverver"
 }
@@ -154,9 +154,9 @@ Update_Version(){
 		serverver="$(echo "$updatecheckresult" | cut -f3 -d',')"
 		
 		if [ "$isupdate" = "version" ]; then
-			Print_Output "true" "New version of $SCRIPT_NAME available - updating to $serverver" "$PASS"
+			Print_Output true "New version of $SCRIPT_NAME available - updating to $serverver" "$PASS"
 		elif [ "$isupdate" = "md5" ]; then
-			Print_Output "true" "MD5 hash of $SCRIPT_NAME does not match - downloading updated $serverver" "$PASS"
+			Print_Output true "MD5 hash of $SCRIPT_NAME does not match - downloading updated $serverver" "$PASS"
 		fi
 		
 		Update_File scmerlin_www.asp
@@ -169,17 +169,17 @@ Update_Version(){
 		fi
 		
 		if [ "$isupdate" != "false" ]; then
-			/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output "true" "$SCRIPT_NAME successfully updated"
+			/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 			chmod 0755 /jffs/scripts/"$SCRIPT_NAME_LOWER"
 			Clear_Lock
 			if [ -z "$1" ]; then
-				exec "$0" "setversion"
+				exec "$0" setversion
 			elif [ "$1" = "unattended" ]; then
-				exec "$0" "setversion" "unattended"
+				exec "$0" setversion unattended
 			fi
 			exit 0
 		else
-			Print_Output "true" "No new version - latest is $localver" "$WARN"
+			Print_Output true "No new version - latest is $localver" "$WARN"
 			Clear_Lock
 		fi
 	fi
@@ -198,9 +198,9 @@ Update_Version(){
 		chmod 0755 /jffs/scripts/"$SCRIPT_NAME_LOWER"
 		Clear_Lock
 		if [ -z "$2" ]; then
-			exec "$0" "setversion"
+			exec "$0" setversion
 		elif [ "$2" = "unattended" ]; then
-			exec "$0" "setversion" "unattended"
+			exec "$0" setversion unattended
 		fi
 		exit 0
 	fi
@@ -217,7 +217,7 @@ Update_File(){
 				rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage" 2>/dev/null
 			fi
 			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
-			Print_Output "true" "New version of $1 downloaded" "$PASS"
+			Print_Output true "New version of $1 downloaded" "$PASS"
 			Mount_WebUI
 		fi
 		rm -f "$tmpfile"
@@ -227,7 +227,7 @@ Update_File(){
 			Download_File "$SHARED_REPO/$1.md5" "$SHARED_DIR/$1.md5"
 			tar -xzf "$SHARED_DIR/$1" -C "$SHARED_DIR"
 			rm -f "$SHARED_DIR/$1"
-			Print_Output "true" "New version of $1 downloaded" "$PASS"
+			Print_Output true "New version of $1 downloaded" "$PASS"
 		else
 			localmd5="$(cat "$SHARED_DIR/$1.md5")"
 			remotemd5="$(curl -fsL --retry 3 "$SHARED_REPO/$1.md5")"
@@ -236,7 +236,7 @@ Update_File(){
 				Download_File "$SHARED_REPO/$1.md5" "$SHARED_DIR/$1.md5"
 				tar -xzf "$SHARED_DIR/$1" -C "$SHARED_DIR"
 				rm -f "$SHARED_DIR/$1"
-				Print_Output "true" "New version of $1 downloaded" "$PASS"
+				Print_Output true "New version of $1 downloaded" "$PASS"
 			fi
 		fi
 	elif [ "$1" = "S99tailtop" ]; then
@@ -250,7 +250,7 @@ Update_File(){
 				Download_File "$SCRIPT_REPO/$1" "/opt/etc/init.d/$1"
 				chmod 0755 "/opt/etc/init.d/$1"
 				/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
-				Print_Output "true" "New version of $1 downloaded" "$PASS"
+				Print_Output true "New version of $1 downloaded" "$PASS"
 			fi
 			rm -f "$tmpfile"
 	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ]; then
@@ -263,7 +263,7 @@ Update_File(){
 				fi
 				Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
 				chmod 0755 "$SCRIPT_DIR/$1"
-				Print_Output "true" "New version of $1 downloaded" "$PASS"
+				Print_Output true "New version of $1 downloaded" "$PASS"
 				/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
 			fi
 			rm -f "$tmpfile"
@@ -278,7 +278,7 @@ Validate_Number(){
 	else
 		formatted="$(echo "$1" | sed -e 's/|/ /g')"
 		if [ -z "$3" ]; then
-			Print_Output "false" "$formatted - $2 is not a number" "$ERR"
+			Print_Output false "$formatted - $2 is not a number" "$ERR"
 		fi
 		return 1
 	fi
@@ -319,7 +319,7 @@ Auto_ServiceEvent(){
 			if [ -f /jffs/scripts/service-event ]; then
 				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/service-event)
 				# shellcheck disable=SC2016
-				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER service_event"' "$1" "$2" &'' # '"$SCRIPT_NAME" /jffs/scripts/service-event)
+				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER service_event"' "$@" & # '"$SCRIPT_NAME" /jffs/scripts/service-event)
 				
 				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
 					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/service-event
@@ -327,13 +327,13 @@ Auto_ServiceEvent(){
 				
 				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
 					# shellcheck disable=SC2016
-					echo "/jffs/scripts/$SCRIPT_NAME_LOWER service_event"' "$1" "$2" &'' # '"$SCRIPT_NAME" >> /jffs/scripts/service-event
+					echo "/jffs/scripts/$SCRIPT_NAME_LOWER service_event"' "$@" & # '"$SCRIPT_NAME" >> /jffs/scripts/service-event
 				fi
 			else
 				echo "#!/bin/sh" > /jffs/scripts/service-event
 				echo "" >> /jffs/scripts/service-event
 				# shellcheck disable=SC2016
-				echo "/jffs/scripts/$SCRIPT_NAME_LOWER service_event"' "$1" "$2" &'' # '"$SCRIPT_NAME" >> /jffs/scripts/service-event
+				echo "/jffs/scripts/$SCRIPT_NAME_LOWER service_event"' "$@" & # '"$SCRIPT_NAME" >> /jffs/scripts/service-event
 				chmod 0755 /jffs/scripts/service-event
 			fi
 		;;
@@ -443,7 +443,6 @@ Auto_Startup_NoUSB(){
 	esac
 }
 
-
 Download_File(){
 	/usr/sbin/curl -fsL --retry 3 "$1" -o "$2"
 }
@@ -464,17 +463,17 @@ Get_WebUI_Page(){
 Mount_WebUI(){
 	Get_WebUI_Page "$SCRIPT_DIR/scmerlin_www.asp"
 	if [ "$MyPage" = "none" ]; then
-		Print_Output "true" "Unable to mount $SCRIPT_NAME WebUI page, exiting" "$CRIT"
+		Print_Output true "Unable to mount $SCRIPT_NAME WebUI page, exiting" "$CRIT"
 		Clear_Lock
 		exit 1
 	fi
-	Print_Output "true" "Mounting $SCRIPT_NAME WebUI page as $MyPage" "$PASS"
+	Print_Output true "Mounting $SCRIPT_NAME WebUI page as $MyPage" "$PASS"
 	cp -f "$SCRIPT_DIR/scmerlin_www.asp" "$SCRIPT_WEBPAGE_DIR/$MyPage"
 	echo "scMerlin" > "$SCRIPT_WEBPAGE_DIR/$(echo $MyPage | cut -f1 -d'.').title"
 	
 	if [ "$(uname -o)" = "ASUSWRT-Merlin" ]; then
-		if [ ! -f "/tmp/index_style.css" ]; then
-			cp -f "/www/index_style.css" "/tmp/"
+		if [ ! -f /tmp/index_style.css ]; then
+			cp -f /www/index_style.css /tmp/
 		fi
 		
 		if ! grep -q '.menu_Addons' /tmp/index_style.css ; then
@@ -484,8 +483,8 @@ Mount_WebUI(){
 		umount /www/index_style.css 2>/dev/null
 		mount -o bind /tmp/index_style.css /www/index_style.css
 		
-		if [ ! -f "/tmp/menuTree.js" ]; then
-			cp -f "/www/require/modules/menuTree.js" "/tmp/"
+		if [ ! -f /tmp/menuTree.js ]; then
+			cp -f /www/require/modules/menuTree.js /tmp/
 		fi
 		
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
@@ -505,10 +504,10 @@ Mount_WebUI(){
 	fi
 }
 
-Shortcut_SCM(){
+Shortcut_Script(){
 	case $1 in
 		create)
-			if [ -d "/opt/bin" ] && [ ! -f "/opt/bin/$SCRIPT_NAME_LOWER" ] && [ -f "/jffs/scripts/$SCRIPT_NAME_LOWER" ]; then
+			if [ -d /opt/bin ] && [ ! -f "/opt/bin/$SCRIPT_NAME_LOWER" ] && [ -f "/jffs/scripts/$SCRIPT_NAME_LOWER" ]; then
 				ln -s /jffs/scripts/"$SCRIPT_NAME_LOWER" /opt/bin
 				chmod 0755 /opt/bin/"$SCRIPT_NAME_LOWER"
 			fi
@@ -524,7 +523,7 @@ Shortcut_SCM(){
 PressEnter(){
 	while true; do
 		printf "Press enter to continue..."
-		read -r "key"
+		read -r key
 		case "$key" in
 			*)
 				break
@@ -589,7 +588,7 @@ MainMenu(){
 		printf "\\n\\e[1mVPN Servers\\e[0m\\n"
 		printf "\\e[1m(selecting an option will restart the VPN Server)\\e[0m\\n\\n"
 		vpnservernum=1
-		while [ "$vpnservernum" -lt "3" ]; do
+		while [ "$vpnservernum" -lt 3 ]; do
 			vpnsdesc=""
 			if ! nvram get vpn_serverx_start | grep -q "$vpnservernum"; then
 				vpnsdesc="(Not configured)"
@@ -617,7 +616,7 @@ MainMenu(){
 	printf "\\n"
 	while true; do
 		printf "Choose an option:    "
-		read -r "menu"
+		read -r menu
 		case "$menu" in
 			1)
 				printf "\\n"
@@ -629,7 +628,7 @@ MainMenu(){
 				printf "\\n"
 				while true; do
 					printf "\\n\\e[1mInternet connection will take 30s-60s to reconnect. Continue? (y/n)\\e[0m\\n"
-					read -r "confirm"
+					read -r confirm
 					case "$confirm" in
 						y|Y)
 							service restart_wan >/dev/null 2>&1
@@ -657,7 +656,7 @@ MainMenu(){
 			;;
 			5)
 				ENABLED_FTP="$(nvram get enable_ftp)"
-				if ! Validate_Number "" "$ENABLED_FTP" "silent"; then ENABLED_FTP=0; fi
+				if ! Validate_Number "" "$ENABLED_FTP" silent; then ENABLED_FTP=0; fi
 				if [ "$ENABLED_FTP" -eq 1 ]; then
 					printf "\\n"
 					service restart_ftpd >/dev/null 2>&1
@@ -669,7 +668,7 @@ MainMenu(){
 			;;
 			6)
 				ENABLED_SAMBA="$(nvram get enable_samba)"
-				if ! Validate_Number "" "$ENABLED_SAMBA" "silent"; then ENABLED_SAMBA=0; fi
+				if ! Validate_Number "" "$ENABLED_SAMBA" silent; then ENABLED_SAMBA=0; fi
 				if [ "$ENABLED_SAMBA" -eq 1 ]; then
 					printf "\\n"
 					service restart_samba >/dev/null 2>&1
@@ -681,7 +680,7 @@ MainMenu(){
 			;;
 			7)
 				ENABLED_DDNS="$(nvram get ddns_enable_x)"
-				if ! Validate_Number "" "$ENABLED_DDNS" "silent"; then ENABLED_DDNS=0; fi
+				if ! Validate_Number "" "$ENABLED_DDNS" silent; then ENABLED_DDNS=0; fi
 				if [ "$ENABLED_DDNS" -eq 1 ]; then
 					printf "\\n"
 					service restart_ddns >/dev/null 2>&1
@@ -693,14 +692,14 @@ MainMenu(){
 			;;
 			8)
 				ENABLED_NTPD="$(nvram get ntpd_enable)"
-				if ! Validate_Number "" "$ENABLED_NTPD" "silent"; then ENABLED_NTPD=0; fi
+				if ! Validate_Number "" "$ENABLED_NTPD" silent; then ENABLED_NTPD=0; fi
 				if [ "$ENABLED_NTPD" -eq 1 ]; then
 					printf "\\n"
 					service restart_time >/dev/null 2>&1
-				elif [ -f "/opt/etc/init.d/S77ntpd" ]; then
+				elif [ -f /opt/etc/init.d/S77ntpd ]; then
 					printf "\\n"
 					/opt/etc/init.d/S77ntpd restart
-				elif [ -f "/opt/etc/init.d/S77chronyd" ]; then
+				elif [ -f /opt/etc/init.d/S77chronyd ]; then
 					printf "\\n"
 					/opt/etc/init.d/S77chronyd restart
 				else
@@ -782,10 +781,10 @@ MainMenu(){
 			et)
 				printf "\\n"
 				if [ -f /opt/bin/opkg ]; then
-					if Check_Lock "menu"; then
+					if Check_Lock menu; then
 						while true; do
 							printf "\\n\\e[1mAre you sure you want to restart all Entware scripts? (y/n)\\e[0m\\n"
-							read -r "confirm"
+							read -r confirm
 							case "$confirm" in
 								y|Y)
 									/opt/etc/init.d/rc.unslung restart
@@ -814,7 +813,7 @@ MainMenu(){
 						program=""
 						while true; do
 							printf "\\n\\e[1mWould you like to install htop (enhanced version of top)? (y/n)\\e[0m\\n"
-							read -r "confirm"
+							read -r confirm
 							case "$confirm" in
 								y|Y)
 									program="htop"
@@ -871,14 +870,14 @@ MainMenu(){
 			;;
 			r)
 				printf "\\n"
-				if Check_Lock "menu"; then
+				if Check_Lock menu; then
 					while true; do
 						if [ "$ROUTER_MODEL" = "RT-AC86U" ]; then
 							printf "\\n\\e[1m\\e[33mRemote reboots are not recommend for %s\\e[0m" "$ROUTER_MODEL"
 							printf "\\n\\e[1m\\e[33mSome %s fail to reboot correctly and require a manual power cycle\\e[0m\\n" "$ROUTER_MODEL"
 						fi
 						printf "\\n\\e[1mAre you sure you want to reboot? (y/n)\\e[0m\\n"
-						read -r "confirm"
+						read -r confirm
 						case "$confirm" in
 							y|Y)
 								service reboot >/dev/null 2>&1
@@ -896,7 +895,7 @@ MainMenu(){
 			;;
 			u)
 				printf "\\n"
-				if Check_Lock "menu"; then
+				if Check_Lock menu; then
 					Menu_Update
 				fi
 				PressEnter
@@ -904,7 +903,7 @@ MainMenu(){
 			;;
 			uf)
 				printf "\\n"
-				if Check_Lock "menu"; then
+				if Check_Lock menu; then
 					Menu_ForceUpdate
 				fi
 				PressEnter
@@ -918,7 +917,7 @@ MainMenu(){
 			z)
 				while true; do
 					printf "\\n\\e[1mAre you sure you want to uninstall %s? (y/n)\\e[0m\\n" "$SCRIPT_NAME"
-					read -r "confirm"
+					read -r confirm
 					case "$confirm" in
 						y|Y)
 							Menu_Uninstall
@@ -970,22 +969,23 @@ Check_Requirements(){
 }
 
 Menu_Install(){
-	Print_Output "true" "Welcome to $SCRIPT_NAME $SCRIPT_VERSION, a script by JackYaz"
+	Print_Output true "Welcome to $SCRIPT_NAME $SCRIPT_VERSION, a script by JackYaz"
 	sleep 1
 	
-	Print_Output "true" "Checking your router meets the requirements for $SCRIPT_NAME"
+	Print_Output true "Checking your router meets the requirements for $SCRIPT_NAME"
 	
 	if ! Check_Requirements; then
-		Print_Output "true" "Requirements for $SCRIPT_NAME not met, please see above for the reason(s)" "$CRIT"
+		Print_Output true "Requirements for $SCRIPT_NAME not met, please see above for the reason(s)" "$CRIT"
 		PressEnter
 		Clear_Lock
 		rm -f "/jffs/scripts/$SCRIPT_NAME_LOWER" 2>/dev/null
+		rm -rf "$SCRIPT_DIR" 2>/dev/null
 		exit 1
 	fi
 	
 	Create_Dirs
-	Shortcut_SCM create
-	Set_Version_Custom_Settings "local"
+	Shortcut_Script create
+	Set_Version_Custom_Settings local
 	Create_Symlinks
 	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
 		Auto_Startup create 2>/dev/null
@@ -1009,7 +1009,7 @@ Menu_Install(){
 
 Menu_Startup(){
 	Create_Dirs
-	Set_Version_Custom_Settings "local"
+	Set_Version_Custom_Settings local
 	Create_Symlinks
 	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
 		Auto_Startup create 2>/dev/null
@@ -1017,7 +1017,7 @@ Menu_Startup(){
 		Auto_Startup_NoUSB create 2>/dev/null
 	fi
 	Auto_ServiceEvent create 2>/dev/null
-	Shortcut_SCM create
+	Shortcut_Script create
 	Mount_WebUI
 	Clear_Lock
 }
@@ -1062,7 +1062,7 @@ Menu_Uninstall(){
 	Auto_ServiceEvent delete 2>/dev/null
 	
 	Get_WebUI_Page "$SCRIPT_DIR/scmerlin_www.asp"
-	if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f "/tmp/menuTree.js" ]; then
+	if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]; then
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
 		umount /www/require/modules/menuTree.js
 		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
@@ -1073,14 +1073,14 @@ Menu_Uninstall(){
 	
 	/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
 	sleep 5
-	rm -f "/opt/etc/init.d/S99tailtop" 2>/dev/null
+	rm -f /opt/etc/init.d/S99tailtop 2>/dev/null
 	rm -f "$SCRIPT_DIR/tailtop"* 2>/dev/null
 	
 	rm -rf "$SCRIPT_DIR"
 	
 	rm -f "/jffs/scripts/$SCRIPT_NAME_LOWER" 2>/dev/null
 	Clear_Lock
-	Print_Output "true" "Uninstall completed" "$PASS"
+	Print_Output true "Uninstall completed" "$PASS"
 }
 
 NTP_Ready(){
@@ -1159,15 +1159,15 @@ case "$1" in
 		exit 0
 	;;
 	service_event)
-		if [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME_LOWER""config" ]; then
+		if [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}config" ]; then
 			Conf_FromSettings
 			exit 0
-		elif [ "$2" = "start" ] && echo "$3" | grep "$SCRIPT_NAME_LOWER""servicerestart"; then
+		elif [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}servicerestart"; then
 			echo 'var servicestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_service.js"
-			srvname="$(echo "$3" | sed "s/$SCRIPT_NAME_LOWER""servicerestart//")";
+			srvname="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}servicerestart//")";
 			if [ "$srvname" = "vsftpd" ]; then
 				ENABLED_FTP="$(nvram get enable_ftp)"
-				if ! Validate_Number "" "$ENABLED_FTP" "silent"; then ENABLED_FTP=0; fi
+				if ! Validate_Number "" "$ENABLED_FTP" silent; then ENABLED_FTP=0; fi
 				if [ "$ENABLED_FTP" -eq 1 ]; then
 					service restart_"$srvname" >/dev/null 2>&1
 					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
@@ -1176,7 +1176,7 @@ case "$1" in
 				fi
 			elif [ "$srvname" = "samba" ]; then
 				ENABLED_SAMBA="$(nvram get enable_samba)"
-				if ! Validate_Number "" "$ENABLED_SAMBA" "silent"; then ENABLED_SAMBA=0; fi
+				if ! Validate_Number "" "$ENABLED_SAMBA" silent; then ENABLED_SAMBA=0; fi
 				if [ "$ENABLED_SAMBA" -eq 1 ]; then
 					service restart_"$srvname" >/dev/null 2>&1
 					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
@@ -1185,14 +1185,14 @@ case "$1" in
 				fi
 			elif [ "$srvname" = "ntpdchronyd" ]; then
 				ENABLED_NTPD="$(nvram get ntpd_enable)"
-				if ! Validate_Number "" "$ENABLED_NTPD" "silent"; then ENABLED_NTPD=0; fi
+				if ! Validate_Number "" "$ENABLED_NTPD" silent; then ENABLED_NTPD=0; fi
 				if [ "$ENABLED_NTPD" -eq 1 ]; then
 					service restart_time >/dev/null 2>&1
 					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
-				elif [ -f "/opt/etc/init.d/S77ntpd" ]; then
+				elif [ -f /opt/etc/init.d/S77ntpd ]; then
 					/opt/etc/init.d/S77ntpd restart
 					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
-				elif [ -f "/opt/etc/init.d/S77chronyd" ]; then
+				elif [ -f /opt/etc/init.d/S77chronyd ]; then
 					/opt/etc/init.d/S77chronyd restart
 					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
 				else
@@ -1200,7 +1200,7 @@ case "$1" in
 				fi
 			elif echo "$srvname" | grep -q "vpnclient"; then
 				vpnno="$(echo "$srvname" | sed "s/vpnclient//")";
-				if [ -n "$(nvram get "vpn_client$vpnno""_addr")" ]; then
+				if [ -n "$(nvram get "vpn_client${vpnno}_addr")" ]; then
 					service restart_"$srvname" >/dev/null 2>&1
 					echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
 				else
@@ -1222,34 +1222,33 @@ case "$1" in
 				echo 'var servicestatus = "Done";' > "$SCRIPT_WEB_DIR/detect_service.js"
 			fi
 			exit 0
-		elif [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME_LOWER""checkupdate" ]; then
-			updatecheckresult="$(Update_Check)"
+		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}checkupdate" ]; then
+			Update_Check
 			exit 0
-		elif [ "$2" = "start" ] && [ "$3" = "$SCRIPT_NAME_LOWER""doupdate" ]; then
-			Update_Version "force" "unattended"
+		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}doupdate" ]; then
+			Update_Version force unattended
 			exit 0
 		fi
 		exit 0
 	;;
 	update)
-		Update_Version "unattended"
+		Update_Version unattended
 		exit 0
 	;;
 	forceupdate)
-		Update_Version "force" "unattended"
+		Update_Version force unattended
 		exit 0
 	;;
 	setversion)
-		Set_Version_Custom_Settings "local"
-		Set_Version_Custom_Settings "server" "$SCRIPT_VERSION"
+		Set_Version_Custom_Settings local
+		Set_Version_Custom_Settings server "$SCRIPT_VERSION"
 		if [ -z "$2" ]; then
 			exec "$0"
 		fi
 		exit 0
 	;;
 	checkupdate)
-		#shellcheck disable=SC2034
-		updatecheckresult="$(Update_Check)"
+		Update_Check
 		exit 0
 	;;
 	uninstall)
@@ -1259,12 +1258,12 @@ case "$1" in
 	;;
 	develop)
 		sed -i 's/^readonly SCRIPT_BRANCH.*$/readonly SCRIPT_BRANCH="develop"/' "/jffs/scripts/$SCRIPT_NAME_LOWER"
-		exec "$0" "update"
+		Update_Version force
 		exit 0
 	;;
 	stable)
 		sed -i 's/^readonly SCRIPT_BRANCH.*$/readonly SCRIPT_BRANCH="master"/' "/jffs/scripts/$SCRIPT_NAME_LOWER"
-		exec "$0" "update"
+		Update_Version force
 		exit 0
 	;;
 	*)
