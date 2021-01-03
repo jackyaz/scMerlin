@@ -950,19 +950,17 @@ MainMenu(){
 				exit 0
 			;;
 			z)
-				while true; do
-					printf "\\n\\e[1mAre you sure you want to uninstall %s? (y/n)\\e[0m\\n" "$SCRIPT_NAME"
-					read -r confirm
-					case "$confirm" in
-						y|Y)
-							Menu_Uninstall
-							exit 0
-						;;
-						*)
-							break
-						;;
-					esac
-				done
+				printf "\\n\\e[1mAre you sure you want to uninstall %s? (y/n)\\e[0m\\n" "$SCRIPT_NAME"
+				read -r confirm
+				case "$confirm" in
+					y|Y)
+						Menu_Uninstall
+						exit 0
+					;;
+					*)
+						:
+					;;
+				esac
 			;;
 			*)
 				printf "\\nPlease choose a valid option\\n\\n"
