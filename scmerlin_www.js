@@ -75,11 +75,11 @@ function update_status(){
 		dataType: 'script',
 		timeout: 3000,
 		error:	function(xhr){
-			setTimeout('update_status();', 1000);
+			setTimeout(update_status, 1000);
 		},
 		success: function(){
 			if(updatestatus == "InProgress"){
-				setTimeout('update_status();', 1000);
+				setTimeout(update_status, 1000);
 			}
 			else{
 				document.getElementById("imgChkUpdate").style.display = "none";
@@ -104,7 +104,7 @@ function CheckUpdate(){
 	document.formScriptActions.action_script.value="start_scmerlincheckupdate";
 	document.formScriptActions.submit();
 	document.getElementById("imgChkUpdate").style.display = "";
-	setTimeout("update_status();", 2000);
+	setTimeout(update_status, 2000);
 }
 
 function DoUpdate(){
@@ -122,7 +122,7 @@ function RestartService(servicename){
 	document.formScriptActions.action_script.value="start_scmerlinservicerestart"+servicename;
 	document.formScriptActions.submit();
 	document.getElementById("imgRestartSrv_"+servicename).style.display = "";
-	setTimeout("service_status('"+servicename+"');", 1000);
+	setTimeout(service_status, 1000, servicename);
 }
 
 function service_status(servicename){
@@ -131,18 +131,18 @@ function service_status(servicename){
 		dataType: 'script',
 		timeout: 3000,
 		error:	function(xhr){
-			setTimeout("service_status('"+servicename+"');", 1000);
+			setTimeout(service_status, 1000, servicename);
 		},
 		success: function(){
 			if(servicestatus == "InProgress"){
-				setTimeout("service_status('"+servicename+"');", 1000);
+				setTimeout(service_status, 1000, servicename);
 			}
 			else{
 				document.getElementById("imgRestartSrv_"+servicename).style.display = "none";
 				if(servicestatus == "Done"){
 					showhide("btnRestartSrv_"+servicename, true);
 					showhide("txtRestartSrv_"+servicename, true);
-					setTimeout("showhide('txtRestartSrv_"+servicename+"',false);", 3000);
+					setTimeout(showhide, 3000,'txtRestartSrv_'+servicename,false);
 				}
 				else{
 					showhide("txtRestartSrvError_"+servicename, true);
@@ -225,7 +225,7 @@ function get_proclist_file(){
 		success: function(data){
 			ParseProcList(data);
 			if(document.getElementById("auto_refresh").checked){
-				tout = setTimeout("get_proclist_file();",3000);
+				tout = setTimeout(get_proclist_file,3000);
 			}
 		}
 	});
