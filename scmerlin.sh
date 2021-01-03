@@ -504,6 +504,35 @@ Mount_WebUI(){
 	fi
 }
 
+ToggleUSBFeatures(){
+	case "$1" in
+		enable)
+			rm -f "$DISABLE_USB_FEATURES_FILE"
+			Auto_Startup_NoUSB delete 2>/dev/null
+			Auto_Startup create 2>/dev/null
+			Update_File tailtop
+			Update_File tailtopd
+			Update_File S99tailtop
+		;;
+		disable)
+			touch "$DISABLE_USB_FEATURES_FILE"
+			Auto_Startup delete 2>/dev/null
+			Auto_Startup_NoUSB create 2>/dev/null
+			rm -f "$SCRIPT_DIR/tailtop"
+			rm -f "$SCRIPT_DIR/tailtopd"
+			/opt/etc/init.d/S99tailtop stop
+			rm -f /opt/etc/init.d/S99tailtop
+		;;
+		check)
+			if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+				echo "ENABLED"
+			else
+				echo "DISABLED"
+			fi
+		;;
+	esac
+}
+
 Shortcut_Script(){
 	case $1 in
 		create)
@@ -607,6 +636,7 @@ MainMenu(){
 	printf "t.    View router temperatures\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
+	printf "usb.    Toggle USB features (running processes in WebUI)\\n        Currently: \\e[1m%s\\e[0m\\n" "$(ToggleUSBFeatures check)"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
@@ -893,6 +923,11 @@ MainMenu(){
 				PressEnter
 				break
 			;;
+			usb)
+				printf "\\n"
+				Menu_ToggleUSBFeatures
+				break
+			;;
 			u)
 				printf "\\n"
 				if Check_Lock menu; then
@@ -1023,21 +1058,14 @@ Menu_Startup(){
 }
 
 Menu_ToggleUSBFeatures(){
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		touch "$DISABLE_USB_FEATURES_FILE"
-		Auto_Startup delete 2>/dev/null
-		Auto_Startup_NoUSB create 2>/dev/null
-		rm -f "$SCRIPT_DIR/tailtop"
-		rm -f "$SCRIPT_DIR/tailtopd"
-		/opt/etc/init.d/S99tailtop stop
-		rm -f /opt/etc/init.d/S99tailtop
+	if [ -z "$1" ]; then
+		if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
+			ToggleUSBFeatures disable
+		elif [ "$(ToggleUSBFeatures check)" = "DISABLED" ]; then
+			ToggleUSBFeatures enable
+		fi
 	else
-		rm -f "$DISABLE_USB_FEATURES_FILE"
-		Auto_Startup_NoUSB delete 2>/dev/null
-		Auto_Startup create 2>/dev/null
-		Update_File tailtop
-		Update_File tailtopd
-		Update_File S99tailtop
+		ToggleUSBFeatures "$1"
 	fi
 }
 
@@ -1159,8 +1187,9 @@ case "$1" in
 		exit 0
 	;;
 	service_event)
-		if [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}config" ]; then
-			Conf_FromSettings
+		if [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}config"; then
+			settingstate="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}config//")";
+			Menu_ToggleUSBFeatures "$settingstate"
 			exit 0
 		elif [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}servicerestart"; then
 			echo 'var servicestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_service.js"
