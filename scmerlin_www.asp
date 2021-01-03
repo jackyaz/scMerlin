@@ -15,6 +15,11 @@ p {
   font-weight: bolder;
 }
 
+label.settingvalue {
+  margin-right: 10px !important;
+  vertical-align: top !important;
+}
+
 thead.collapsible-jquery {
   color: white;
   padding: 0px;
@@ -126,7 +131,7 @@ function update_sysinfo(e){
 		url: '/ajax_sysinfo.asp',
 		dataType: 'script',
 		error: function(xhr) {
-		setTimeout("update_sysinfo();", 1000);
+		setTimeout(update_sysinfo, 1000);
 	},
 		success: function(response){
 			show_memcpu();
@@ -140,7 +145,7 @@ function update_sysinfo(e){
 			}
 			Draw_Chart("nvramUsage");
 			Draw_Chart("jffsUsage");
-			setTimeout("update_sysinfo();", 3000);
+			setTimeout(update_sysinfo, 3000);
 		}
 	});
 }
@@ -193,7 +198,7 @@ function update_temperatures(){
 			code +="&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>" + parseInt(CPUTemp) +"&deg;C</span>";
 		}
 		document.getElementById("temp_td").innerHTML = code;
-		setTimeout("update_temperatures();", 3000);
+		setTimeout(update_temperatures, 3000);
 		}
 	});
 }
@@ -263,6 +268,26 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 </tr>
 </table>
 
+<div style="line-height:10px;">&nbsp;</div>
+<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_config">
+<thead class="collapsible-jquery" id="scriptconfig">
+<tr><td colspan="2">Configuration (click to expand/collapse)</td></tr>
+</thead>
+<tr class="even" id="rowdataoutput">
+<th width="40%">Enable USB Features<br/><span style="color:#FFCC00;">(running processes in WebUI)</span></th>
+<td class="settingvalue">
+<input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_enabled" class="input" value="enable" checked>
+<label for="scmerlin_usbenabled_enabled" class="settingvalue">Yes</label>
+<input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_disabled" class="input" value="disable">
+<label for="scmerlin_usbenabled_disabled" class="settingvalue">No</label>
+</td>
+</tr>
+<tr class="apply_gen" valign="top" height="35px">
+<td colspan="2" style="background-color:rgb(77, 89, 93);">
+<input type="button" onclick="SaveConfig();" value="Save" class="button_gen" name="button">
+</td>
+</tr>
+</table>
 
 <!-- Insert service control tables here -->
 

@@ -30,21 +30,21 @@ function initial(){
 	for (i = 1; i < 3; i++){
 		vpnserverstablehtml += BuildVPNServerTable(i);
 	}
-	$j("#table_buttons").after(vpnserverstablehtml);
+	$j("#table_config").after(vpnserverstablehtml);
 	
 	var vpnclientstablehtml="";
 	for (i = 1; i < 6; i++){
 		vpnclientstablehtml += BuildVPNClientTable(i);
 	}
-	$j("#table_buttons").after(vpnclientstablehtml);
+	$j("#table_config").after(vpnclientstablehtml);
 	
 	var servicectablehtml="";
 	for (i = 0; i < srvnamelist.length; i++){
 		servicectablehtml += BuildServiceTable(srvnamelist[i],srvdesclist[i],srvnamevisiblelist[i],i);
 	}
-	$j("#table_buttons").after(servicectablehtml);
+	$j("#table_config").after(servicectablehtml);
 	
-	get_proclist_file();
+	get_usbdisabled_file();
 	update_temperatures();
 	update_sysinfo();
 	ScriptUpdateLayout();
@@ -213,6 +213,22 @@ function BuildProcListTableHtml() {
 	tablehtml += '</table>';
 	
 	return tablehtml;
+}
+
+function get_usbdisabled_file(){
+	$j.ajax({
+		url: '/ext/scmerlin/usbdisabled.htm',
+		dataType: 'text',
+		timeout: 10000,
+		error: function(xhr){
+			document.form.scmerlin_usbenabled.value = "enable";
+			get_proclist_file();
+		},
+		success: function(data){
+			document.form.scmerlin_usbenabled.value = "disable";
+			document.getElementById("procTableContainer").innerHTML = "Process list disabled, this feature requires the \"USB features\" option to be enabled and a USB device plugged into router for Entware";
+		}
+	});
 }
 
 function get_proclist_file(){
@@ -641,4 +657,13 @@ function Draw_Chart(txtchartname){
 		data: chartDataset
 	});
 	window["Chart" + txtchartname] = objchartname;
+}
+
+function SaveConfig(){
+	var action_script_tmp = "start_scmerlinconfig" + document.form.scmerlin_usbenabled.value;
+	document.form.action_script.value = action_script_tmp;
+	var restart_time = 10;
+	document.form.action_wait.value = restart_time;
+	showLoading();
+	document.form.submit();
 }
