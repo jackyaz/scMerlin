@@ -518,9 +518,9 @@ ToggleUSBFeatures(){
 			touch "$DISABLE_USB_FEATURES_FILE"
 			Auto_Startup delete 2>/dev/null
 			Auto_Startup_NoUSB create 2>/dev/null
+			/opt/etc/init.d/S99tailtop stop
 			rm -f "$SCRIPT_DIR/tailtop"
 			rm -f "$SCRIPT_DIR/tailtopd"
-			/opt/etc/init.d/S99tailtop stop
 			rm -f /opt/etc/init.d/S99tailtop
 		;;
 		check)
