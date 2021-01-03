@@ -50,6 +50,14 @@ Print_Output(){
 	fi
 }
 
+Firmware_Version_Check(){
+	if nvram get rc_support | grep -qF "am_addons"; then
+		return 0
+	else
+		return 1
+	fi
+}
+
 ### Code for these functions inspired by https://github.com/Adamm00 - credit to @Adamm ###
 Check_Lock(){
 	if [ -f "/tmp/$SCRIPT_NAME_LOWER.lock" ]; then
