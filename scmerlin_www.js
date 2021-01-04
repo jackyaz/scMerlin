@@ -30,21 +30,21 @@ function initial(){
 	for (i = 1; i < 3; i++){
 		vpnserverstablehtml += BuildVPNServerTable(i);
 	}
-	$j("#table_buttons").after(vpnserverstablehtml);
+	$j("#table_config").after(vpnserverstablehtml);
 	
 	var vpnclientstablehtml="";
 	for (i = 1; i < 6; i++){
 		vpnclientstablehtml += BuildVPNClientTable(i);
 	}
-	$j("#table_buttons").after(vpnclientstablehtml);
+	$j("#table_config").after(vpnclientstablehtml);
 	
 	var servicectablehtml="";
 	for (i = 0; i < srvnamelist.length; i++){
 		servicectablehtml += BuildServiceTable(srvnamelist[i],srvdesclist[i],srvnamevisiblelist[i],i);
 	}
-	$j("#table_buttons").after(servicectablehtml);
+	$j("#table_config").after(servicectablehtml);
 	
-	get_proclist_file();
+	get_usbdisabled_file();
 	update_temperatures();
 	update_sysinfo();
 	ScriptUpdateLayout();
@@ -75,11 +75,11 @@ function update_status(){
 		dataType: 'script',
 		timeout: 3000,
 		error:	function(xhr){
-			setTimeout('update_status();', 1000);
+			setTimeout(update_status, 1000);
 		},
 		success: function(){
 			if(updatestatus == "InProgress"){
-				setTimeout('update_status();', 1000);
+				setTimeout(update_status, 1000);
 			}
 			else{
 				document.getElementById("imgChkUpdate").style.display = "none";
@@ -104,7 +104,7 @@ function CheckUpdate(){
 	document.formScriptActions.action_script.value="start_scmerlincheckupdate";
 	document.formScriptActions.submit();
 	document.getElementById("imgChkUpdate").style.display = "";
-	setTimeout("update_status();", 2000);
+	setTimeout(update_status, 2000);
 }
 
 function DoUpdate(){
@@ -122,7 +122,7 @@ function RestartService(servicename){
 	document.formScriptActions.action_script.value="start_scmerlinservicerestart"+servicename;
 	document.formScriptActions.submit();
 	document.getElementById("imgRestartSrv_"+servicename).style.display = "";
-	setTimeout("service_status('"+servicename+"');", 1000);
+	setTimeout(service_status, 1000, servicename);
 }
 
 function service_status(servicename){
@@ -131,18 +131,18 @@ function service_status(servicename){
 		dataType: 'script',
 		timeout: 3000,
 		error:	function(xhr){
-			setTimeout("service_status('"+servicename+"');", 1000);
+			setTimeout(service_status, 1000, servicename);
 		},
 		success: function(){
 			if(servicestatus == "InProgress"){
-				setTimeout("service_status('"+servicename+"');", 1000);
+				setTimeout(service_status, 1000, servicename);
 			}
 			else{
 				document.getElementById("imgRestartSrv_"+servicename).style.display = "none";
 				if(servicestatus == "Done"){
 					showhide("btnRestartSrv_"+servicename, true);
 					showhide("txtRestartSrv_"+servicename, true);
-					setTimeout("showhide('txtRestartSrv_"+servicename+"',false);", 3000);
+					setTimeout(showhide, 3000,'txtRestartSrv_'+servicename,false);
 				}
 				else{
 					showhide("txtRestartSrvError_"+servicename, true);
@@ -215,6 +215,22 @@ function BuildProcListTableHtml() {
 	return tablehtml;
 }
 
+function get_usbdisabled_file(){
+	$j.ajax({
+		url: '/ext/scmerlin/usbdisabled.htm',
+		dataType: 'text',
+		timeout: 10000,
+		error: function(xhr){
+			document.form.scmerlin_usbenabled.value = "enable";
+			get_proclist_file();
+		},
+		success: function(data){
+			document.form.scmerlin_usbenabled.value = "disable";
+			document.getElementById("procTableContainer").innerHTML = "Process list disabled, this feature requires the \"USB features\" option to be enabled and a USB device plugged into router for Entware";
+		}
+	});
+}
+
 function get_proclist_file(){
 	$j.ajax({
 		url: '/ext/scmerlin/top.htm',
@@ -225,7 +241,7 @@ function get_proclist_file(){
 		success: function(data){
 			ParseProcList(data);
 			if(document.getElementById("auto_refresh").checked){
-				tout = setTimeout("get_proclist_file();",3000);
+				tout = setTimeout(get_proclist_file,3000);
 			}
 		}
 	});
@@ -641,4 +657,13 @@ function Draw_Chart(txtchartname){
 		data: chartDataset
 	});
 	window["Chart" + txtchartname] = objchartname;
+}
+
+function SaveConfig(){
+	var action_script_tmp = "start_scmerlinconfig" + document.form.scmerlin_usbenabled.value;
+	document.form.action_script.value = action_script_tmp;
+	var restart_time = 10;
+	document.form.action_wait.value = restart_time;
+	showLoading();
+	document.form.submit();
 }
