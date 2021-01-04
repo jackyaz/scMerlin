@@ -636,7 +636,7 @@ MainMenu(){
 	printf "t.    View router temperatures\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
-	printf "usb.  Toggle USB features (running processes in WebUI)\\n      Currently: \\e[1m%s\\e[0m\\n\\n" "$(ToggleUSBFeatures check)"
+	printf "usb.  Toggle USB features (list of running processes in WebUI)\\n      Currently: \\e[1m%s\\e[0m\\n\\n" "$(ToggleUSBFeatures check)"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
@@ -987,12 +987,20 @@ Check_Requirements(){
 		CHECKSFAILED="true"
 	fi
 	
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		if [ ! -f /opt/bin/opkg ]; then
-			Print_Output true "Entware not detected!" "$ERR"
-			CHECKSFAILED="true"
-		fi
-	fi
+	printf "\\n\\e[1mWould you like to enable USB Features (list of running processes in WebUI) (y/n)?\\nThis requires a USB device plugged into router for Entware\\e[0m\\n"
+	read -r confirm
+	case "$confirm" in
+		y|Y)
+			if [ ! -f /opt/bin/opkg ]; then
+				touch "$DISABLE_USB_FEATURES_FILE"
+				Print_Output true "Entware not detected, USB features disabled" "$WARN"
+			fi
+		;;
+		*)
+			touch "$DISABLE_USB_FEATURES_FILE"
+			Print_Output true "USB features can be enabled later via the WebUI or command line" "$WARN"
+		;;
+	esac
 	
 	if [ "$CHECKSFAILED" = "false" ]; then
 		return 0
