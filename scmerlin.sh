@@ -240,33 +240,33 @@ Update_File(){
 			fi
 		fi
 	elif [ "$1" = "S99tailtop" ]; then
-			tmpfile="/tmp/$1"
-			Download_File "$SCRIPT_REPO/$1" "$tmpfile"
-			if ! diff -q "$tmpfile" "/opt/etc/init.d/$1" >/dev/null 2>&1; then
-				if [ -f /opt/etc/init.d/S99tailtop ]; then
-					/opt/etc/init.d/S99tailtop >/dev/null 2>&1
-					sleep 2
-				fi
-				Download_File "$SCRIPT_REPO/$1" "/opt/etc/init.d/$1"
-				chmod 0755 "/opt/etc/init.d/$1"
-				/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
-				Print_Output true "New version of $1 downloaded" "$PASS"
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "/opt/etc/init.d/$1" >/dev/null 2>&1; then
+			if [ -f /opt/etc/init.d/S99tailtop ]; then
+				/opt/etc/init.d/S99tailtop >/dev/null 2>&1
+				sleep 2
 			fi
-			rm -f "$tmpfile"
+			Download_File "$SCRIPT_REPO/$1" "/opt/etc/init.d/$1"
+			chmod 0755 "/opt/etc/init.d/$1"
+			/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+			Print_Output true "New version of $1 downloaded" "$PASS"
+		fi
+		rm -f "$tmpfile"
 	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ]; then
-			tmpfile="/tmp/$1"
-			Download_File "$SCRIPT_REPO/$1" "$tmpfile"
-			if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
-				if [ -f /opt/etc/init.d/S99tailtop ]; then
-					/opt/etc/init.d/S99tailtop >/dev/null 2>&1
-					sleep 2
-				fi
-				Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
-				chmod 0755 "$SCRIPT_DIR/$1"
-				Print_Output true "New version of $1 downloaded" "$PASS"
-				/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			if [ -f /opt/etc/init.d/S99tailtop ]; then
+				/opt/etc/init.d/S99tailtop >/dev/null 2>&1
+				sleep 2
 			fi
-			rm -f "$tmpfile"
+			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			Print_Output true "New version of $1 downloaded" "$PASS"
+			/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+		fi
+		rm -f "$tmpfile"
 	else
 		return 1
 	fi
