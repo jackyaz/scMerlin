@@ -1050,15 +1050,36 @@ Menu_Install(){
 
 Menu_Startup(){
 	Create_Dirs
-	Set_Version_Custom_Settings local
-	Create_Symlinks
 	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+		if [ -z "$1" ]; then
+			Print_Output true "Missing argument for startup, not starting $SCRIPT_NAME" "$WARN"
+			exit 1
+		elif [ "$1" != "force" ]; then
+			if [ ! -f "$1/entware/bin/opkg" ]; then
+				Print_Output true "$1 does not contain Entware, not starting $SCRIPT_NAME" "$WARN"
+				exit 1
+			else
+				Print_Output true "$1 contains Entware, starting $SCRIPT_NAME" "$WARN"
+			fi
+		fi
 		Auto_Startup create 2>/dev/null
 	else
 		Auto_Startup_NoUSB create 2>/dev/null
 	fi
+	
+	NTP_Ready
+	
+	Check_Lock
+	
+	if [ "$1" != "force" ]; then
+		sleep 14
+	fi
+	
+	Set_Version_Custom_Settings local
+	Create_Symlinks
 	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_Script create
+	
 	Mount_WebUI
 	Clear_Lock
 }
