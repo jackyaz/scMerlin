@@ -2,8 +2,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/bfd397624cdf4803a465d4ae1530e7fe)](https://www.codacy.com/app/jackyaz/scMerlin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jackyaz/scMerlin&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.com/jackyaz/scMerlin.svg?branch=master)](https://travis-ci.com/jackyaz/scMerlin)
 
-## v2.1.0
-### Updated on 2021-01-04
+## v2.1.1
+### Updated on 2021-02-17
 ## About
 scMerlin allows you to easily control the most common services/scripts on your router.
 
@@ -44,15 +44,8 @@ If this does not work, you will need to use the full path:
 ## Screenshots
 
 ![WebUI](https://puu.sh/GJrCb/a55ad1a913.png)
+
 ![CLI UI](https://puu.sh/GKEK4/015c2c0108.png)
 
 ## Help
-Please post about any issues and problems here: [scMerlin on SNBForums](https://www.snbforums.com/threads/scmerlin-service-and-script-control-menu-for-asuswrt-merlin.56277/)
-
-## FAQs
-### I haven't used scripts before on AsusWRT-Merlin
-If this is the first time you are using scripts, don't panic! In your router's WebUI, go to the Administration area of the left menu, and then the System tab. Set Enable JFFS custom scripts and configs to Yes.
-
-Further reading about scripts is available here: [AsusWRT-Merlin User-scripts](https://github.com/RMerl/asuswrt-merlin/wiki/User-scripts)
-
-![WebUI enable scripts](https://puu.sh/A3wnG/00a43283ed.png)
+Please post about any issues and problems here: [Asuswrt-Merlin AddOns on SNBForums](https://www.snbforums.com/forums/asuswrt-merlin-addons.60/)
