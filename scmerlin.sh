@@ -915,7 +915,7 @@ MainMenu(){
 					portstring=""
 				fi
 				weburl="${httpstring}://$(nvram get lan_ipaddr)${portstring}/"
-				grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu=$weburl '{printf "%-10s "wu$2"\n",$4}'
+				grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%-10s "wu$2"\n",$4}'
 				printf "\\n"
 				PressEnter
 				break
