@@ -640,6 +640,7 @@ MainMenu(){
 	printf "c.    View running processes\\n"
 	printf "m.    View RAM/memory usage\n"
 	printf "t.    View router temperatures\n"
+	printf "w.    List Addon WebUI tab to page mapping\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "\\e[1mOther\\e[0m\\n\\n"
 	printf "usb.  Toggle USB features (list of running processes in WebUI)\\n      Currently: \\e[1m%s\\e[0m\\n\\n" "$(ToggleUSBFeatures check)"
@@ -901,6 +902,21 @@ MainMenu(){
 				else
 					printf "5 GHz: %s°C\\n\\n" "$(wl -i "$(nvram get wl1_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
 				fi
+				PressEnter
+				break
+			;;
+			w)
+				ScriptHeader
+				httpstring="https"
+				portstring=":$(nvram get https_lanport)"
+				
+				if [ "$(nvram get http_enable)" -eq 0 ]; then
+					httpstring="http"
+					portstring=""
+				fi
+				weburl="${httpstring}://$(nvram get lan_ipaddr)${portstring}/"
+				grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu=$weburl '{printf "%-10s "wu$2"\n",$4}'
+				printf "\\n"
 				PressEnter
 				break
 			;;
