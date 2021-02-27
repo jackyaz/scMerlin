@@ -1139,6 +1139,10 @@ Menu_Uninstall(){
 	
 	rm -rf "$SCRIPT_DIR"
 	
+	SETTINGSFILE=/jffs/addons/custom_settings.txt
+	sed -i '/scmerlin_version_local/d' "$SETTINGSFILE"
+	sed -i '/scmerlin_version_server/d' "$SETTINGSFILE"
+	
 	rm -f "/jffs/scripts/$SCRIPT_NAME_LOWER" 2>/dev/null
 	Clear_Lock
 	Print_Output true "Uninstall completed" "$PASS"
