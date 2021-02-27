@@ -244,7 +244,7 @@ Update_File(){
 		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
 		if ! diff -q "$tmpfile" "/opt/etc/init.d/$1" >/dev/null 2>&1; then
 			if [ -f /opt/etc/init.d/S99tailtop ]; then
-				/opt/etc/init.d/S99tailtop >/dev/null 2>&1
+				/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
 				sleep 2
 			fi
 			Download_File "$SCRIPT_REPO/$1" "/opt/etc/init.d/$1"
@@ -258,7 +258,7 @@ Update_File(){
 		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
 		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
 			if [ -f /opt/etc/init.d/S99tailtop ]; then
-				/opt/etc/init.d/S99tailtop >/dev/null 2>&1
+				/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
 				sleep 2
 			fi
 			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
