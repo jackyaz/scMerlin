@@ -272,7 +272,7 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 <thead class="collapsible-jquery" id="scriptconfig">
 <tr><td colspan="2">Configuration (click to expand/collapse)</td></tr>
 </thead>
-<tr class="even" id="rowdataoutput">
+<tr class="even" id="rowenableusb">
 <th width="40%">Enable USB Features<br/><span style="color:#FFCC00;">(running processes in WebUI)</span></th>
 <td class="settingvalue">
 <input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_enabled" class="input" value="enable" checked>
