@@ -1107,14 +1107,10 @@ Menu_Startup(){
 }
 
 Menu_ToggleUSBFeatures(){
-	if [ -z "$1" ]; then
-		if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
-			ToggleUSBFeatures disable
-		elif [ "$(ToggleUSBFeatures check)" = "DISABLED" ]; then
-			ToggleUSBFeatures enable
-		fi
-	else
-		ToggleUSBFeatures "$1"
+	if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
+		ToggleUSBFeatures disable
+	elif [ "$(ToggleUSBFeatures check)" = "DISABLED" ]; then
+		ToggleUSBFeatures enable
 	fi
 }
 
@@ -1242,7 +1238,7 @@ case "$1" in
 	service_event)
 		if [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}config"; then
 			settingstate="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}config//")";
-			Menu_ToggleUSBFeatures "$settingstate"
+			ToggleUSBFeatures "$settingstate"
 			exit 0
 		elif [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}servicerestart"; then
 			echo 'var servicestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_service.js"
