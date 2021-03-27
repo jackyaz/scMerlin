@@ -12,12 +12,16 @@
 ##                                                ##
 ####################################################
 
+#############        Shellcheck directives      ##########
+# shellcheck disable=SC2018
+# shellcheck disable=SC2019
+# shellcheck disable=SC2059
+# shellcheck disable=SC2034
+##########################################################
+
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
-#shellcheck disable=SC2019
-#shellcheck disable=SC2018
 readonly SCRIPT_NAME_LOWER=$(echo $SCRIPT_NAME | tr 'A-Z' 'a-z' | sed 's/d//')
-#shellcheck disable=SC2034
 readonly SCM_VERSION="v2.2.0"
 readonly SCRIPT_VERSION="v2.2.0"
 SCRIPT_BRANCH="develop"
