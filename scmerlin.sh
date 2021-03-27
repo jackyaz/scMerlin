@@ -1199,16 +1199,14 @@ Menu_Uninstall(){
 NTP_Ready(){
 	if [ "$(nvram get ntp_ready)" -eq 0 ]; then
 		Check_Lock
-		ntpwaitcount="0"
-		while [ "$(nvram get ntp_ready)" -eq 0 ] && [ "$ntpwaitcount" -lt 300 ]; do
-			ntpwaitcount="$((ntpwaitcount + 1))"
-			if [ "$ntpwaitcount" -eq 60 ]; then
-				Print_Output true "Waiting for NTP to sync..." "$WARN"
-			fi
-			sleep 1
+		ntpwaitcount=0
+		while [ "$(nvram get ntp_ready)" -eq 0 ] && [ "$ntpwaitcount" -lt 600 ]; do
+			ntpwaitcount="$((ntpwaitcount + 30))"
+			Print_Output true "Waiting for NTP to sync..." "$WARN"
+			sleep 30
 		done
-		if [ "$ntpwaitcount" -ge 300 ]; then
-			Print_Output true "NTP failed to sync after 5 minutes. Please resolve!" "$CRIT"
+		if [ "$ntpwaitcount" -ge 600 ]; then
+			Print_Output true "NTP failed to sync after 10 minutes. Please resolve!" "$CRIT"
 			Clear_Lock
 			exit 1
 		else
