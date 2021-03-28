@@ -953,15 +953,31 @@ MainMenu(){
 			;;
 			w)
 				ScriptHeader
-				httpstring="https"
-				portstring=":$(nvram get https_lanport)"
 				
-				if [ "$(nvram get http_enable)" -eq 0 ]; then
-					httpstring="http"
-					portstring=""
+				urlpage=""
+				urlproto=""
+				urldomain=""
+				urlport=""
+				
+				urlpage="$(sed -nE "/$SCRIPT_NAME/ s/.*url\: \"(user[0-9]+\.asp)\".*/\1/p" /tmp/menuTree.js)"
+				if [ "$(nvram get http_enable)" -eq 1 ]; then
+					urlproto="https"
+				else
+					urlproto="http"
 				fi
-				weburl="${httpstring}://$(nvram get lan_ipaddr)${portstring}/"
-				grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%-10s "wu$2"\n",$4}'
+				if [ -n "$(nvram get lan_domain)" ]; then
+					urldomain="$(nvram get lan_hostname).$(nvram get lan_domain)"
+				else
+					urldomain="$(nvram get lan_ipaddr)"
+				fi
+				if [ "$(nvram get ${urlproto}_lanport)" -eq 80 ] || [ "$(nvram get ${urlproto}_lanport)" -eq 443 ]; then
+					urlport=""
+				else
+					urlport=":$(nvram get ${urlproto}_lanport)"
+				fi
+				
+				weburl="$(echo "${urlproto}://${urldomain}${urlport}/" | tr "A-Z" "a-z")"
+				grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%-12s "wu$2"\n",$4}'
 				printf "\\n"
 				PressEnter
 				break
