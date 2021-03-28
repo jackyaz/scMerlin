@@ -318,6 +318,7 @@ Create_Symlinks(){
 	rm -rf "${SCRIPT_WEB_DIR:?}/"* 2>/dev/null
 	
 	ln -s /tmp/scmerlin-top "$SCRIPT_WEB_DIR/top.htm" 2>/dev/null
+	ln -s /tmp/addonwebpages.tmp "$SCRIPT_WEB_DIR/addonwebpages.htm" 2>/dev/null
 	ln -s "$DISABLE_USB_FEATURES_FILE" "$SCRIPT_WEB_DIR/usbdisabled.htm" 2>/dev/null
 	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
@@ -554,6 +555,37 @@ Mount_WebUI(){
 	flock -u "$FD"
 	Print_Output true "Mounted $SCRIPT_NAME WebUI page as $MyPage" "$PASS"
 }
+
+Get_Addon_Pages(){
+	urlpage=""
+	urlproto=""
+	urldomain=""
+	urlport=""
+	
+	if [ "$(nvram get http_enable)" -eq 1 ]; then
+		urlproto="https"
+	else
+		urlproto="http"
+	fi
+	if [ -n "$(nvram get lan_domain)" ]; then
+		urldomain="$(nvram get lan_hostname).$(nvram get lan_domain)"
+	else
+		urldomain="$(nvram get lan_ipaddr)"
+	fi
+	if [ "$(nvram get ${urlproto}_lanport)" -eq 80 ] || [ "$(nvram get ${urlproto}_lanport)" -eq 443 ]; then
+		urlport=""
+	else
+		urlport=":$(nvram get ${urlproto}_lanport)"
+	fi
+	
+	weburl="$(echo "${urlproto}://${urldomain}${urlport}/" | tr "A-Z" "a-z")"
+	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%-12s "wu"%s\n",$4,$2}' | sort -f
+	printf "var addonpages=[" > /tmp/addonwebpages.tmp
+	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "\[\"%s\",\""wu"%s\"\],",$4,$2}' >> /tmp/addonwebpages.tmp
+	sed -i 's/,$//' /tmp/addonwebpages.tmp
+	printf "];\\n" >> /tmp/addonwebpages.tmp
+}
+
 
 ToggleUSBFeatures(){
 	case "$1" in
@@ -953,31 +985,7 @@ MainMenu(){
 			;;
 			w)
 				ScriptHeader
-				
-				urlpage=""
-				urlproto=""
-				urldomain=""
-				urlport=""
-				
-				urlpage="$(sed -nE "/$SCRIPT_NAME/ s/.*url\: \"(user[0-9]+\.asp)\".*/\1/p" /tmp/menuTree.js)"
-				if [ "$(nvram get http_enable)" -eq 1 ]; then
-					urlproto="https"
-				else
-					urlproto="http"
-				fi
-				if [ -n "$(nvram get lan_domain)" ]; then
-					urldomain="$(nvram get lan_hostname).$(nvram get lan_domain)"
-				else
-					urldomain="$(nvram get lan_ipaddr)"
-				fi
-				if [ "$(nvram get ${urlproto}_lanport)" -eq 80 ] || [ "$(nvram get ${urlproto}_lanport)" -eq 443 ]; then
-					urlport=""
-				else
-					urlport=":$(nvram get ${urlproto}_lanport)"
-				fi
-				
-				weburl="$(echo "${urlproto}://${urldomain}${urlport}/" | tr "A-Z" "a-z")"
-				grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%-12s "wu$2"\n",$4}'
+				Get_Addon_Pages
 				printf "\\n"
 				PressEnter
 				break
