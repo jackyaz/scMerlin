@@ -1238,6 +1238,40 @@ Entware_Ready(){
 }
 ### ###
 
+Show_About(){
+	cat <<EOF
+About
+  $SCRIPT_NAME allows you to easily control the most common
+  services/scripts on your router.
+License
+  $SCRIPT_NAME is free to use under the GNU General Public License
+  version 3 (GPL-3.0) https://opensource.org/licenses/GPL-3.0
+Help & Support
+  https://www.snbforums.com/forums/asuswrt-merlin-addons.60/?prefix_id=23
+Source code
+  https://github.com/jackyaz/$SCRIPT_NAME
+EOF
+	printf "\\n"
+}
+### ###
+
+### function based on @dave14305's FlexQoS show_help function ###
+Show_Help(){
+	cat <<EOF
+Available commands:
+  $SCRIPT_NAME_LOWER about              explains functionality
+  $SCRIPT_NAME_LOWER update             checks for updates
+  $SCRIPT_NAME_LOWER forceupdate        updates to latest version (force update)
+  $SCRIPT_NAME_LOWER startup force      runs startup actions such as mount WebUI tab
+  $SCRIPT_NAME_LOWER install            installs script
+  $SCRIPT_NAME_LOWER uninstall          uninstalls script
+  $SCRIPT_NAME_LOWER develop            switch to development branch
+  $SCRIPT_NAME_LOWER stable             switch to stable branch
+EOF
+	printf "\\n"
+}
+### ###
+
 if [ -z "$1" ]; then
 	NTP_Ready
 	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
@@ -1384,6 +1418,16 @@ case "$1" in
 		Menu_Uninstall
 		exit 0
 	;;
+	about)
+		ScriptHeader
+		Show_About
+		exit 0
+	;;
+	help)
+		ScriptHeader
+		Show_Help
+		exit 0
+	;;
 	develop)
 		SCRIPT_BRANCH="develop"
 		SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/$SCRIPT_NAME/$SCRIPT_BRANCH"
@@ -1397,7 +1441,9 @@ case "$1" in
 		exit 0
 	;;
 	*)
-		echo "Command not recognised, please try again"
+		ScriptHeader
+		Print_Output false "Command not recognised." "$ERR"
+		Print_Output false "For a list of available commands run: $SCRIPT_NAME_LOWER help"
 		exit 1
 	;;
 esac
