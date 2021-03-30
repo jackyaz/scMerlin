@@ -291,7 +291,7 @@ function SetCookie(cookiename,cookievalue){
 }
 
 function AddEventHandlers(){
-	$j(".collapsible-jquery").click(function(){
+	$j(".collapsible-jquery").off('click').on('click', function(){
 		$j(this).siblings().toggle("fast",function(){
 			if($j(this).css("display") == "none"){
 				SetCookie($j(this).siblings()[0].id,"collapsed");
