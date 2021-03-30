@@ -21,28 +21,40 @@ var srvnamelist = ["dnsmasq","wan","httpd","wireless","vsftpd","samba","ddns","n
 var srvdesclist = ["DNS/DHCP Server","Internet Connection","Web Interface","WiFi","FTP Server","Samba","DDNS client","Timeserver"];
 var srvnamevisiblelist = [true,false,true,false,true,false,false,true];
 
+var sortedAddonPages = [];
+
 function initial(){
 	SetCurrentPage();
 	LoadCustomSettings();
 	show_menu();
 	
 	var vpnserverstablehtml="";
-	for (i = 1; i < 3; i++){
+	for(var i = 1; i < 3; i++){
 		vpnserverstablehtml += BuildVPNServerTable(i);
 	}
 	$j("#table_config").after(vpnserverstablehtml);
 	
 	var vpnclientstablehtml="";
-	for (i = 1; i < 6; i++){
+	for(var i = 1; i < 6; i++){
 		vpnclientstablehtml += BuildVPNClientTable(i);
 	}
 	$j("#table_config").after(vpnclientstablehtml);
 	
 	var servicectablehtml="";
-	for (i = 0; i < srvnamelist.length; i++){
+	for(var i = 0; i < srvnamelist.length; i++){
 		servicectablehtml += BuildServiceTable(srvnamelist[i],srvdesclist[i],srvnamevisiblelist[i],i);
 	}
 	$j("#table_config").after(servicectablehtml);
+	
+	sortedAddonPages = addonpages.sort(function(a, b) {
+		return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
+	});
+	var addonpageshtml="";
+	for(var i = 0; i < sortedAddonPages.length; i++){
+		addonpageshtml += BuildAddonPageTable(sortedAddonPages[i][0],sortedAddonPages[i][1],i);
+	}
+	
+	$j("#table_config").after(addonpageshtml);
 	
 	get_usbdisabled_file();
 	update_temperatures();
@@ -54,7 +66,6 @@ function initial(){
 function ScriptUpdateLayout(){
 	var localver = GetVersionNumber("local");
 	var serverver = GetVersionNumber("server");
-	$j("#scripttitle").text($j("#scripttitle").text()+" - "+localver);
 	$j("#scmerlin_version_local").text(localver);
 	
 	if(localver != serverver && serverver != "N/A"){
@@ -108,10 +119,8 @@ function CheckUpdate(){
 }
 
 function DoUpdate(){
-	var action_script_tmp = "start_scmerlindoupdate";
-	document.form.action_script.value = action_script_tmp;
-	var restart_time = 10;
-	document.form.action_wait.value = restart_time;
+	document.form.action_script.value = "start_scmerlindoupdate";
+	document.form.action_wait.value = 10;
 	showLoading();
 	document.form.submit();
 }
@@ -140,9 +149,9 @@ function service_status(servicename){
 			else{
 				document.getElementById("imgRestartSrv_"+servicename).style.display = "none";
 				if(servicestatus == "Done"){
-					showhide("btnRestartSrv_"+servicename, true);
-					showhide("txtRestartSrv_"+servicename, true);
-					setTimeout(showhide, 3000,'txtRestartSrv_'+servicename,false);
+					showhide('txtRestartSrv_'+servicename, true);
+					setTimeout(showhide, 3000,'txtRestartSrv_'+servicename, false);
+					setTimeout(showhide, 3250,'btnRestartSrv_'+servicename, true);
 				}
 				else{
 					showhide("txtRestartSrvError_"+servicename, true);
@@ -196,7 +205,7 @@ function BuildProcListTableHtml() {
 	tablehtml += '<tbody class="procTableContent">';
 	
 	for(var i = 0; i < arrayproclistlines.length; i++){
-		tablehtml += '<tr>';
+		tablehtml += '<tr class="procRow">';
 		tablehtml += '<td>'+arrayproclistlines[i].PID+'</td>';
 		tablehtml += '<td>'+arrayproclistlines[i].PPID+'</td>';
 		tablehtml += '<td>'+arrayproclistlines[i].USER+'</td>';
@@ -290,11 +299,11 @@ function GetCookie(cookiename,returntype){
 }
 
 function SetCookie(cookiename,cookievalue){
-	cookie.set("scm_"+cookiename, cookievalue, 31);
+	cookie.set("scm_"+cookiename, cookievalue, 10 * 365);
 }
 
 function AddEventHandlers(){
-	$j(".collapsible-jquery").click(function(){
+	$j(".collapsible-jquery").off('click').on('click', function(){
 		$j(this).siblings().toggle("fast",function(){
 			if($j(this).css("display") == "none"){
 				SetCookie($j(this).siblings()[0].id,"collapsed");
@@ -328,26 +337,6 @@ function AddEventHandlers(){
 	});
 	
 	$j("#auto_refresh")[0].addEventListener("click", function(){ToggleRefresh();});
-}
-
-/* http://www.alistapart.com/articles/zebratables/ */
-function stripedTable() {
-	if(document.getElementById && document.getElementsByTagName) {
-		var allTables = document.getElementsByClassName('procTable');
-		if(!allTables) { return; }
-		
-		for (var i = 0; i < allTables.length; i++) {
-			var trs = allTables[i].getElementsByTagName("tr");
-			for (var j = 0; j < trs.length; j++) {
-				$j(trs[j]).removeClass('procAlternateRow');
-				$j(trs[j]).addClass('procNormalRow');
-			}
-			for (var k = 0; k < trs.length; k += 2) {
-				$j(trs[k]).removeClass('procNormalRow');
-				$j(trs[k]).addClass('procAlternateRow');
-			}
-		}
-	}
 }
 
 function SortTable(sorttext){
@@ -403,7 +392,6 @@ function SortTable(sorttext){
 	
 	$j("#procTableContainer").empty();
 	$j("#procTableContainer").append(BuildProcListTableHtml());
-	stripedTable();
 	
 	$j(".sortable").each(function(index,element){
 		if(element.innerHTML == sortname){
@@ -421,33 +409,70 @@ function ToggleRefresh(){
 	$j("#auto_refresh").prop('checked', function(i, v) { if(v){get_proclist_file();} else{clearTimeout(tout);} });
 }
 
+function BuildAddonPageTable(addonname,addonurl,loopindex){
+	var addonpageshtml = '';
+	
+	if(loopindex == 0){
+		addonpageshtml+='<div style="line-height:10px;">&nbsp;</div>';
+		addonpageshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_services">';
+		addonpageshtml+='<thead class="collapsible-jquery" id="addonpages">';
+		addonpageshtml+='<tr><td colspan="4">WebUI Addons (click to expand/collapse)</td></tr>';
+		addonpageshtml+='</thead>';
+	}
+	
+	if(loopindex == 0 || loopindex % 4 == 0){
+		addonpageshtml+='<tr>';
+	}
+	
+	addonpageshtml+='<td class="addonpageurl"><a href="'+addonurl+'">'+addonname+'</a><br /><span class="addonpageurl">'+addonurl.substring(addonurl.lastIndexOf("/")+1)+'</span></td>';
+	if(loopindex > 0 && (loopindex+1) % 4 == 0){
+		addonpageshtml+='</tr>';
+	}
+	
+	if(loopindex == sortedAddonPages.length-1){
+		if(sortedAddonPages.length % 4 != 0){
+			var missingtds = 4 - sortedAddonPages.length % 4;
+			for(var i = 0; i < missingtds; i++){
+				addonpageshtml+='<td class="addonpageurl"></td>';
+			}
+			addonpageshtml+='</tr>';
+		}
+		addonpageshtml+='</table>';
+	}
+	
+	return addonpageshtml;
+}
+
 function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
 	var serviceshtml = '';
 	
 	if(loopindex == 0){
 		serviceshtml+='<div style="line-height:10px;">&nbsp;</div>';
-		serviceshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_services">';
+		serviceshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_services">';
 		serviceshtml+='<thead class="collapsible-jquery" id="servicescontrol">';
-		serviceshtml+='<tr><td colspan="2">Services (click to expand/collapse)</td></tr>';
+		serviceshtml+='<tr><td colspan="4">Services (click to expand/collapse)</td></tr>';
 		serviceshtml+='</thead>';
 	}
 	
-	serviceshtml+='<tr>';
+	if(loopindex == 0 || loopindex % 2 == 0){
+		serviceshtml+='<tr>';
+	}
 	if(srvnamevisible){
-		serviceshtml+='<th width="20%">'+srvdesc+' <span style="color:#FFCC00;">('+srvname+')</span></th>';
+		serviceshtml+='<td class="servicename">'+srvdesc+' <span class="settingname">('+srvname+')</span></td>';
 	}
 	else{
-		serviceshtml+='<th width="20%">'+srvdesc+'</th>';
+		serviceshtml+='<td class="servicename">'+srvdesc+'</td>';
 	}
 	srvname = srvname.replace('/','');
-	serviceshtml+='<td>';
-	serviceshtml+='<input type="button" class="button_gen" onclick="RestartService(\''+srvname+'\');" value="Restart" id="btnRestartSrv_'+srvname+'">';
-	serviceshtml+='<span id="txtRestartSrv_'+srvname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
-	serviceshtml+='<span id="txtRestartSrvError_'+srvname+'" style="display:none;">Invalid - service not enabled</span>';
+	serviceshtml+='<td class="servicevalue">';
+	serviceshtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+srvname+'\');" value="Restart" id="btnRestartSrv_'+srvname+'">';
+	serviceshtml+='<span id="txtRestartSrv_'+srvname+'" style="display:none;" class="servicespan">Done</span>';
+	serviceshtml+='<span id="txtRestartSrvError_'+srvname+'" style="display:none;" class="servicespan">Invalid - service disabled</span>';
 	serviceshtml+='<img id="imgRestartSrv_'+srvname+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
-	serviceshtml+='&nbsp;&nbsp;&nbsp;';
 	serviceshtml+='</td>';
-	serviceshtml+='</tr>';
+	if(loopindex > 0 && (loopindex+1) % 2 == 0){
+		serviceshtml+='</tr>';
+	}
 	
 	if(loopindex == srvnamelist.length-1){
 		serviceshtml+='</table>';
@@ -463,23 +488,31 @@ function BuildVPNClientTable(loopindex){
 	
 	if(loopindex == 1){
 		vpnclientshtml+='<div style="line-height:10px;">&nbsp;</div>';
-		vpnclientshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_vpnclients">';
+		vpnclientshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_vpnclients">';
 		vpnclientshtml+='<thead class="collapsible-jquery" id="vpnclientscontrol">';
-		vpnclientshtml+='<tr><td colspan="2">VPN Clients (click to expand/collapse)</td></tr>';
+		vpnclientshtml+='<tr><td colspan="4">VPN Clients (click to expand/collapse)</td></tr>';
 		vpnclientshtml+='</thead>';
 	}
 	
-	vpnclientshtml+='<tr>';
-	vpnclientshtml+='<th width="40%">VPN Client '+loopindex;
-	vpnclientshtml+='<br /><span style="color:#FFCC00;">('+vpnclientdesc+')</span></th>';
-	vpnclientshtml+='<td>';
-	vpnclientshtml+='<input type="button" class="button_gen" onclick="RestartService(\''+vpnclientname+'\');" value="Restart" id="btnRestartSrv_'+vpnclientname+'">';
-	vpnclientshtml+='<span id="txtRestartSrv_'+vpnclientname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
-	vpnclientshtml+='<span id="txtRestartSrvError_'+vpnclientname+'" style="display:none;">Invalid - VPN Client not enabled</span>';
+	if(loopindex == 1 || (loopindex+1) % 2 == 0){
+		vpnclientshtml+='<tr>';
+	}
+	vpnclientshtml+='<td class="servicename">VPN Client '+loopindex;
+	vpnclientshtml+='<br /><span class="settingname">('+vpnclientdesc+')</span></td>';
+	vpnclientshtml+='<td class="servicevalue">';
+	vpnclientshtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+vpnclientname+'\');" value="Restart" id="btnRestartSrv_'+vpnclientname+'">';
+	vpnclientshtml+='<span id="txtRestartSrv_'+vpnclientname+'" style="display:none;" class="servicespan">Done</span>';
+	vpnclientshtml+='<span id="txtRestartSrvError_'+vpnclientname+'" style="display:none;" class="servicespan">Invalid - VPN Client disabled</span>';
 	vpnclientshtml+='<img id="imgRestartSrv_'+vpnclientname+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
-	vpnclientshtml+='&nbsp;&nbsp;&nbsp;';
 	vpnclientshtml+='</td>';
-	vpnclientshtml+='</tr>';
+	
+	if(loopindex == 5){
+		vpnclientshtml+='<td class="servicename"></td><td class="servicevalue"></td>';
+	}
+	
+	if(loopindex > 1 && loopindex % 2 == 0){
+		vpnclientshtml+='</tr>';
+	}
 	
 	if(loopindex == 5){
 		vpnclientshtml+='</table>';
@@ -494,24 +527,23 @@ function BuildVPNServerTable(loopindex){
 	
 	if(loopindex == 1){
 		vpnservershtml+='<div style="line-height:10px;">&nbsp;</div>';
-		vpnservershtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_vpnservers">';
+		vpnservershtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_vpnservers">';
 		vpnservershtml+='<thead class="collapsible-jquery" id="vpnserverscontrol">';
-		vpnservershtml+='<tr><td colspan="2">VPN Servers (click to expand/collapse)</td></tr>';
+		vpnservershtml+='<tr><td colspan="4">VPN Servers (click to expand/collapse)</td></tr>';
 		vpnservershtml+='</thead>';
+		vpnservershtml+='<tr>';
 	}
 	
-	vpnservershtml+='<tr>';
-	vpnservershtml+='<th width="40%">VPN Server '+loopindex+'</th>';
-	vpnservershtml+='<td>';
-	vpnservershtml+='<input type="button" class="button_gen" onclick="RestartService(\''+vpnservername+'\');" value="Restart" id="btnRestartSrv_'+vpnservername+'">';
-	vpnservershtml+='<span id="txtRestartSrv_'+vpnservername+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
-	vpnservershtml+='<span id="txtRestartSrvError_'+vpnservername+'" style="display:none;">Invalid - VPN Server not enabled</span>';
+	vpnservershtml+='<td class="servicename">VPN Server '+loopindex+'</td>';
+	vpnservershtml+='<td class="servicevalue">';
+	vpnservershtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+vpnservername+'\');" value="Restart" id="btnRestartSrv_'+vpnservername+'">';
+	vpnservershtml+='<span id="txtRestartSrv_'+vpnservername+'" style="display:none;" class="servicespan">Done</span>';
+	vpnservershtml+='<span id="txtRestartSrvError_'+vpnservername+'" style="display:none;" class="servicespan">Invalid - VPN Server disabled</span>';
 	vpnservershtml+='<img id="imgRestartSrv_'+vpnservername+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
-	vpnservershtml+='&nbsp;&nbsp;&nbsp;';
 	vpnservershtml+='</td>';
-	vpnservershtml+='</tr>';
 	
 	if(loopindex == 2){
+		vpnservershtml+='</tr>';
 		vpnservershtml+='</table>';
 	}
 	
@@ -523,9 +555,9 @@ function round(value, decimals){
 }
 
 function Draw_Chart_NoData(txtchartname){
-	document.getElementById("canvasChart" + txtchartname).width = "270";
+	document.getElementById("canvasChart" + txtchartname).width = "265";
 	document.getElementById("canvasChart" + txtchartname).height = "250";
-	document.getElementById("canvasChart" + txtchartname).style.width = "270px";
+	document.getElementById("canvasChart" + txtchartname).style.width = "265px";
 	document.getElementById("canvasChart" + txtchartname).style.height = "250px";
 	var ctx = document.getElementById("canvasChart" + txtchartname).getContext("2d");
 	ctx.save();
@@ -576,7 +608,7 @@ function Draw_Chart(txtchartname){
 	
 	var objchartname = window["Chart" + txtchartname];
 	
-	if (objchartname != undefined) objchartname.destroy();
+	if(objchartname != undefined) objchartname.destroy();
 	var ctx = document.getElementById("canvasChart" + txtchartname).getContext("2d");
 	var chartOptions = {
 		segmentShowStroke: false,
@@ -660,10 +692,8 @@ function Draw_Chart(txtchartname){
 }
 
 function SaveConfig(){
-	var action_script_tmp = "start_scmerlinconfig" + document.form.scmerlin_usbenabled.value;
-	document.form.action_script.value = action_script_tmp;
-	var restart_time = 10;
-	document.form.action_wait.value = restart_time;
+	document.form.action_script.value = "start_scmerlinconfig" + document.form.scmerlin_usbenabled.value;
+	document.form.action_wait.value = 10;
 	showLoading();
 	document.form.submit();
 }
