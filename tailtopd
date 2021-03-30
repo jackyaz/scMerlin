@@ -7,10 +7,10 @@ trap '' SIGHUP
 while true; do
 	sleep 5
 	if [ "$(pidof tailtop | wc -w)" -lt 1 ]; then
-		logger -t "scMerlin" "tailtop dead, restarting..."
+		logger -t scMerlin "tailtop dead, restarting..."
 		killall -q tailtop
 		sleep 5
 		/jffs/addons/scmerlin.d/tailtop &
-		logger -t "scMerlin" "tailtop restarted"
+		logger -t scMerlin "tailtop restarted"
 	fi
 done
