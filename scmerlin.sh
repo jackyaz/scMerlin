@@ -12,12 +12,12 @@
 ##                                                ##
 ####################################################
 
-#############        Shellcheck directives      ##########
+#############        Shellcheck directives      ####
 # shellcheck disable=SC2018
 # shellcheck disable=SC2019
 # shellcheck disable=SC2059
 # shellcheck disable=SC2034
-##########################################################
+####################################################
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
