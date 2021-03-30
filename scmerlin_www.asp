@@ -244,6 +244,7 @@ span.addonpageurl {
 <script language="JavaScript" type="text/javascript" src="/tmmenu.js"></script>
 <script language="JavaScript" type="text/javascript" src="/client_function.js"></script>
 <script language="JavaScript" type="text/javascript" src="/validator.js"></script>
+<script language="JavaScript" type="text/javascript" src="/ext/scmerlin/addonwebpages.js"></script>
 <script>
 var custom_settings;
 function LoadCustomSettings(){
