@@ -21,6 +21,8 @@ var srvnamelist = ["dnsmasq","wan","httpd","wireless","vsftpd","samba","ddns","n
 var srvdesclist = ["DNS/DHCP Server","Internet Connection","Web Interface","WiFi","FTP Server","Samba","DDNS client","Timeserver"];
 var srvnamevisiblelist = [true,false,true,false,true,false,false,true];
 
+var sortedAddonPages = [];
+
 function initial(){
 	SetCurrentPage();
 	LoadCustomSettings();
@@ -43,6 +45,16 @@ function initial(){
 		servicectablehtml += BuildServiceTable(srvnamelist[i],srvdesclist[i],srvnamevisiblelist[i],i);
 	}
 	$j("#table_config").after(servicectablehtml);
+	
+	sortedAddonPages = addonpages.sort(function(a, b) {
+		return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
+	});
+	var addonpageshtml="";
+	for(var i = 0; i < sortedAddonPages.length; i++){
+		addonpageshtml += BuildAddonPageTable(sortedAddonPages[i][0],sortedAddonPages[i][1],i);
+	}
+	
+	$j("#table_config").after(addonpageshtml);
 	
 	get_usbdisabled_file();
 	update_temperatures();
@@ -395,6 +407,40 @@ function SortTable(sorttext){
 
 function ToggleRefresh(){
 	$j("#auto_refresh").prop('checked', function(i, v) { if(v){get_proclist_file();} else{clearTimeout(tout);} });
+}
+
+function BuildAddonPageTable(addonname,addonurl,loopindex){
+	var addonpageshtml = '';
+	
+	if(loopindex == 0){
+		addonpageshtml+='<div style="line-height:10px;">&nbsp;</div>';
+		addonpageshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_services">';
+		addonpageshtml+='<thead class="collapsible-jquery" id="addonpages">';
+		addonpageshtml+='<tr><td colspan="4">WebUI Addons (click to expand/collapse)</td></tr>';
+		addonpageshtml+='</thead>';
+	}
+	
+	if(loopindex == 0 || loopindex % 4 == 0){
+		addonpageshtml+='<tr>';
+	}
+	
+	addonpageshtml+='<td class="addonpageurl"><a href="'+addonurl+'">'+addonname+'</a><br /><span class="addonpageurl">'+addonurl.substring(addonurl.lastIndexOf("/")+1)+'</span></td>';
+	if(loopindex > 0 && (loopindex+1) % 4 == 0){
+		addonpageshtml+='</tr>';
+	}
+	
+	if(loopindex == sortedAddonPages.length-1){
+		if(sortedAddonPages.length % 4 != 0){
+			var missingtds = 4 - sortedAddonPages.length % 4;
+			for(var i = 0; i < missingtds; i++){
+				addonpageshtml+='<td class="addonpageurl"></td>';
+			}
+			addonpageshtml+='</tr>';
+		}
+		addonpageshtml+='</table>';
+	}
+	
+	return addonpageshtml;
 }
 
 function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
