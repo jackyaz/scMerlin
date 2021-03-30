@@ -193,7 +193,7 @@ function BuildProcListTableHtml() {
 	tablehtml += '<tbody class="procTableContent">';
 	
 	for(var i = 0; i < arrayproclistlines.length; i++){
-		tablehtml += '<tr>';
+		tablehtml += '<tr class="procRow">';
 		tablehtml += '<td>'+arrayproclistlines[i].PID+'</td>';
 		tablehtml += '<td>'+arrayproclistlines[i].PPID+'</td>';
 		tablehtml += '<td>'+arrayproclistlines[i].USER+'</td>';
@@ -327,26 +327,6 @@ function AddEventHandlers(){
 	$j("#auto_refresh")[0].addEventListener("click", function(){ToggleRefresh();});
 }
 
-/* http://www.alistapart.com/articles/zebratables/ */
-function stripedTable() {
-	if(document.getElementById && document.getElementsByTagName) {
-		var allTables = document.getElementsByClassName('procTable');
-		if(!allTables) { return; }
-		
-		for (var i = 0; i < allTables.length; i++) {
-			var trs = allTables[i].getElementsByTagName("tr");
-			for (var j = 0; j < trs.length; j++) {
-				$j(trs[j]).removeClass('procAlternateRow');
-				$j(trs[j]).addClass('procNormalRow');
-			}
-			for (var k = 0; k < trs.length; k += 2) {
-				$j(trs[k]).removeClass('procNormalRow');
-				$j(trs[k]).addClass('procAlternateRow');
-			}
-		}
-	}
-}
-
 function SortTable(sorttext){
 	sortname = sorttext.replace("↑","").replace("↓","").trim();
 	var sorttype = "number";
@@ -400,7 +380,6 @@ function SortTable(sorttext){
 	
 	$j("#procTableContainer").empty();
 	$j("#procTableContainer").append(BuildProcListTableHtml());
-	stripedTable();
 	
 	$j(".sortable").each(function(index,element){
 		if(element.innerHTML == sortname){
