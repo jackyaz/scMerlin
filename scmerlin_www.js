@@ -27,19 +27,19 @@ function initial(){
 	show_menu();
 	
 	var vpnserverstablehtml="";
-	for (i = 1; i < 3; i++){
+	for(var i = 1; i < 3; i++){
 		vpnserverstablehtml += BuildVPNServerTable(i);
 	}
 	$j("#table_config").after(vpnserverstablehtml);
 	
 	var vpnclientstablehtml="";
-	for (i = 1; i < 6; i++){
+	for(var i = 1; i < 6; i++){
 		vpnclientstablehtml += BuildVPNClientTable(i);
 	}
 	$j("#table_config").after(vpnclientstablehtml);
 	
 	var servicectablehtml="";
-	for (i = 0; i < srvnamelist.length; i++){
+	for(var i = 0; i < srvnamelist.length; i++){
 		servicectablehtml += BuildServiceTable(srvnamelist[i],srvdesclist[i],srvnamevisiblelist[i],i);
 	}
 	$j("#table_config").after(servicectablehtml);
@@ -108,10 +108,8 @@ function CheckUpdate(){
 }
 
 function DoUpdate(){
-	var action_script_tmp = "start_scmerlindoupdate";
-	document.form.action_script.value = action_script_tmp;
-	var restart_time = 10;
-	document.form.action_wait.value = restart_time;
+	document.form.action_script.value = "start_scmerlindoupdate";
+	document.form.action_wait.value = 10;
 	showLoading();
 	document.form.submit();
 }
@@ -576,7 +574,7 @@ function Draw_Chart(txtchartname){
 	
 	var objchartname = window["Chart" + txtchartname];
 	
-	if (objchartname != undefined) objchartname.destroy();
+	if(objchartname != undefined) objchartname.destroy();
 	var ctx = document.getElementById("canvasChart" + txtchartname).getContext("2d");
 	var chartOptions = {
 		segmentShowStroke: false,
@@ -660,10 +658,8 @@ function Draw_Chart(txtchartname){
 }
 
 function SaveConfig(){
-	var action_script_tmp = "start_scmerlinconfig" + document.form.scmerlin_usbenabled.value;
-	document.form.action_script.value = action_script_tmp;
-	var restart_time = 10;
-	document.form.action_wait.value = restart_time;
+	document.form.action_script.value = "start_scmerlinconfig" + document.form.scmerlin_usbenabled.value;
+	document.form.action_wait.value = 10;
 	showLoading();
 	document.form.submit();
 }
