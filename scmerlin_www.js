@@ -149,9 +149,9 @@ function service_status(servicename){
 			else{
 				document.getElementById("imgRestartSrv_"+servicename).style.display = "none";
 				if(servicestatus == "Done"){
-					showhide("btnRestartSrv_"+servicename, true);
-					showhide("txtRestartSrv_"+servicename, true);
-					setTimeout(showhide, 3000,'txtRestartSrv_'+servicename,false);
+					showhide('txtRestartSrv_'+servicename, true);
+					setTimeout(showhide, 3000,'txtRestartSrv_'+servicename, false);
+					setTimeout(showhide, 3250,'btnRestartSrv_'+servicename, true);
 				}
 				else{
 					showhide("txtRestartSrvError_"+servicename, true);
@@ -458,18 +458,17 @@ function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
 		serviceshtml+='<tr>';
 	}
 	if(srvnamevisible){
-		serviceshtml+='<td class="settingname">'+srvdesc+' <span class="settingname">('+srvname+')</span></td>';
+		serviceshtml+='<td class="servicename">'+srvdesc+' <span class="settingname">('+srvname+')</span></td>';
 	}
 	else{
-		serviceshtml+='<td class="settingname">'+srvdesc+'</td>';
+		serviceshtml+='<td class="servicename">'+srvdesc+'</td>';
 	}
 	srvname = srvname.replace('/','');
-	serviceshtml+='<td class="settingvalue">';
+	serviceshtml+='<td class="servicevalue">';
 	serviceshtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+srvname+'\');" value="Restart" id="btnRestartSrv_'+srvname+'">';
-	serviceshtml+='<span id="txtRestartSrv_'+srvname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
-	serviceshtml+='<span id="txtRestartSrvError_'+srvname+'" style="display:none;">Invalid - service not enabled</span>';
+	serviceshtml+='<span id="txtRestartSrv_'+srvname+'" style="display:none;" class="servicespan">Done</span>';
+	serviceshtml+='<span id="txtRestartSrvError_'+srvname+'" style="display:none;" class="servicespan">Invalid - service disabled</span>';
 	serviceshtml+='<img id="imgRestartSrv_'+srvname+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
-	serviceshtml+='&nbsp;&nbsp;&nbsp;';
 	serviceshtml+='</td>';
 	if(loopindex > 0 && (loopindex+1) % 2 == 0){
 		serviceshtml+='</tr>';
@@ -498,18 +497,17 @@ function BuildVPNClientTable(loopindex){
 	if(loopindex == 1 || (loopindex+1) % 2 == 0){
 		vpnclientshtml+='<tr>';
 	}
-	vpnclientshtml+='<td class="settingname">VPN Client '+loopindex;
+	vpnclientshtml+='<td class="servicename">VPN Client '+loopindex;
 	vpnclientshtml+='<br /><span class="settingname">('+vpnclientdesc+')</span></td>';
-	vpnclientshtml+='<td class="settingvalue">';
+	vpnclientshtml+='<td class="servicevalue">';
 	vpnclientshtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+vpnclientname+'\');" value="Restart" id="btnRestartSrv_'+vpnclientname+'">';
-	vpnclientshtml+='<span id="txtRestartSrv_'+vpnclientname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
-	vpnclientshtml+='<span id="txtRestartSrvError_'+vpnclientname+'" style="display:none;">Invalid - VPN Client not enabled</span>';
+	vpnclientshtml+='<span id="txtRestartSrv_'+vpnclientname+'" style="display:none;" class="servicespan">Done</span>';
+	vpnclientshtml+='<span id="txtRestartSrvError_'+vpnclientname+'" style="display:none;" class="servicespan">Invalid - VPN Client disabled</span>';
 	vpnclientshtml+='<img id="imgRestartSrv_'+vpnclientname+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
-	vpnclientshtml+='&nbsp;&nbsp;&nbsp;';
 	vpnclientshtml+='</td>';
 	
 	if(loopindex == 5){
-		vpnclientshtml+='<td class="settingname"></td><td class="settingvalue"></td>';
+		vpnclientshtml+='<td class="servicename"></td><td class="servicevalue"></td>';
 	}
 	
 	if(loopindex > 1 && loopindex % 2 == 0){
@@ -536,13 +534,12 @@ function BuildVPNServerTable(loopindex){
 		vpnservershtml+='<tr>';
 	}
 	
-	vpnservershtml+='<td class="settingname">VPN Server '+loopindex+'</td>';
-	vpnservershtml+='<td class="settingvalue">';
+	vpnservershtml+='<td class="servicename">VPN Server '+loopindex+'</td>';
+	vpnservershtml+='<td class="servicevalue">';
 	vpnservershtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+vpnservername+'\');" value="Restart" id="btnRestartSrv_'+vpnservername+'">';
-	vpnservershtml+='<span id="txtRestartSrv_'+vpnservername+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
-	vpnservershtml+='<span id="txtRestartSrvError_'+vpnservername+'" style="display:none;">Invalid - VPN Server not enabled</span>';
+	vpnservershtml+='<span id="txtRestartSrv_'+vpnservername+'" style="display:none;" class="servicespan">Done</span>';
+	vpnservershtml+='<span id="txtRestartSrvError_'+vpnservername+'" style="display:none;" class="servicespan">Invalid - VPN Server disabled</span>';
 	vpnservershtml+='<img id="imgRestartSrv_'+vpnservername+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
-	vpnservershtml+='&nbsp;&nbsp;&nbsp;';
 	vpnservershtml+='</td>';
 	
 	if(loopindex == 2){
