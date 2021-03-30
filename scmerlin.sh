@@ -12,7 +12,7 @@
 ##                                                ##
 ####################################################
 
-#############        Shellcheck directives      ####
+########        Shellcheck directives      #########
 # shellcheck disable=SC2018
 # shellcheck disable=SC2019
 # shellcheck disable=SC2059
