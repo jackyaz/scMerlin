@@ -249,7 +249,7 @@ span.addonpageurl {
 var custom_settings;
 function LoadCustomSettings(){
 	custom_settings = <% get_custom_settings(); %>;
-	for (var prop in custom_settings) {
+	for(var prop in custom_settings) {
 		if(Object.prototype.hasOwnProperty.call(custom_settings, prop)) {
 			if(prop.indexOf("scmerlin") != -1 && prop.indexOf("scmerlin_version") == -1){
 				eval("delete custom_settings."+prop)
@@ -315,7 +315,7 @@ function update_temperatures(){
 			}
 			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
 		}
-		else if (band5g_support){
+		else if(band5g_support){
 			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
 		}
 		
@@ -373,7 +373,7 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 <table width="98%" border="0" align="left" cellpadding="0" cellspacing="0">
 <tr>
 <td valign="top">
-<table width="775px" border="0" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTitle" id="FormTitle">
+<table width="760px" border="0" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTitle" id="FormTitle">
 <tbody>
 <tr bgcolor="#4D595D">
 <td valign="top">
@@ -401,22 +401,22 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 </table>
 
 <div style="line-height:10px;">&nbsp;</div>
-<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_config">
+<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_config">
 <thead class="collapsible-jquery" id="scriptconfig">
 <tr><td colspan="2">Configuration (click to expand/collapse)</td></tr>
 </thead>
 <tr class="even" id="rowenableusb">
-<th width="40%">Enable USB Features<br/><span style="color:#FFCC00;">(running processes in WebUI)</span></th>
+<td class="settingname">Enable USB Features<br/><span class="settingname">(running processes in WebUI)</span></td>
 <td class="settingvalue">
 <input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_enabled" class="input" value="enable" checked>
-<label for="scmerlin_usbenabled_enabled" class="settingvalue">Yes</label>
+<label for="scmerlin_usbenabled_enabled">Yes</label>
 <input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_disabled" class="input" value="disable">
-<label for="scmerlin_usbenabled_disabled" class="settingvalue">No</label>
+<label for="scmerlin_usbenabled_disabled">No</label>
 </td>
 </tr>
 <tr class="apply_gen" valign="top" height="35px">
-<td colspan="2" style="background-color:rgb(77, 89, 93);">
-<input type="button" onclick="SaveConfig();" value="Save" class="button_gen" name="button">
+<td colspan="2" class="savebutton">
+<input type="button" onclick="SaveConfig();" value="Save" class="button_gen savebutton" name="button">
 </td>
 </tr>
 </table>
@@ -425,14 +425,14 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 
 
 <div style="line-height:10px;">&nbsp;</div>
-<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_entware">
+<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_entware">
 <thead class="collapsible-jquery" id="entwarecontrol">
 <tr><td colspan="2">Entware (click to expand/collapse)</td></tr>
 </thead>
 <tr>
-<th width="40%">Entware applications</th>
-<td>
-<input type="button" class="button_gen" onclick="RestartService('entware');" value="Restart" id="btnRestartSrv_entware">
+<td class="settingname">Entware applications</td>
+<td class="settingvalue">
+<input type="button" class="button_gen restartbutton" onclick="RestartService('entware');" value="Restart" id="btnRestartSrv_entware">
 <span id="txtRestartSrv_entware" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>
 <span id="txtRestartSrvError_entware" style="display:none;">Invalid - Entware not running</span>
 <img id="imgRestartSrv_entware" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>
@@ -444,8 +444,8 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 <!-- Start Process List -->
 <div style="line-height:10px;">&nbsp;</div>
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_proclist">
-<col style="width:40%;">
-<col style="width:60%;">
+<col style="width:35%;">
+<col style="width:65%;">
 <thead class="collapsible-jquery" id="proclist">
 <tr><td colspan="2">Process List (click to expand/collapse)</td></tr>
 </thead>
@@ -472,34 +472,34 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 </tr>
 </thead>
 <tr>
-<th width="65px" style="width:65px;">Total</th>
+<td class="metricname">Total</td>
 <td id="mem_total_td" width="125px" style="width:125px;"></td>
-<td id="ram_chart" rowspan="5" style="padding-left:4px;width:270px;" width="270px">
-<div style="background-color:#2f3e44;border-radius:10px;width:270px;" id="divChartMemoryUsage">
+<td id="ram_chart" rowspan="5" style="padding-left:4px;width:265px;" width="265px">
+<div style="background-color:#2f3e44;border-radius:10px;width:265px;" id="divChartMemoryUsage">
 <canvas id="canvasChartMemoryUsage" height="250" />
 </div>
 </td>
-<td id="swap_chart" rowspan="5" style="padding-left:4px;width:270px;" width="270px">
-<div style="background-color:#2f3e44;border-radius:10px;width:270px;" id="divChartSwapUsage">
+<td id="swap_chart" rowspan="5" style="padding-left:4px;width:265px;" width="265px">
+<div style="background-color:#2f3e44;border-radius:10px;width:265px;" id="divChartSwapUsage">
 <canvas id="canvasChartSwapUsage" height="250" />
 </div>
 </td>
 </tr>
 <tr>
-<th width="65px" style="width:65px;">Free</th>
-<td id="mem_free_td" width="125px" style="width:125px;"></td>
+<td class="metricname">Free</td>
+<td id="mem_free_td" style="width:125px;"></td>
 </tr>
 <tr>
-<th width="65px" style="width:65px;">Buffers</th>
-<td id="mem_buffer_td" width="125px" style="width:125px;"></td>
+<td class="metricname">Buffers</td>
+<td id="mem_buffer_td" style="width:125px;"></td>
 </tr>
 <tr>
-<th width="65px" style="width:65px;">Cache</th>
-<td id="mem_cache_td" width="125px" style="width:125px;"></td>
+<td class="metricname">Cache</td>
+<td id="mem_cache_td" style="width:125px;"></td>
 </tr>
 <tr>
-<th width="65px" style="width:65px;">Swap</th>
-<td id="mem_swap_td" width="125px" style="width:125px;"></td>
+<td class="metricname">Swap</td>
+<td id="mem_swap_td" style="width:125px;"></td>
 </tr>
 </table>
 <div style="line-height:10px;">&nbsp;</div>
@@ -510,34 +510,34 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 </tr>
 </thead>
 <tr>
-<th width="65px" style="width:65px;">NVRAM</th>
-<td id="nvram_td"></td>
-<td id="nvram_chart" rowspan="2" style="padding-left:4px;width:270px;" width="270px">
-<div style="background-color:#2f3e44;border-radius:10px;width:270px;" id="divChartnvramUsage">
+<td class="metricname">NVRAM</td>
+<td id="nvram_td" style="width:125px;"></td>
+<td id="nvram_chart" rowspan="2" style="padding-left:4px;width:265px;" width="265px">
+<div style="background-color:#2f3e44;border-radius:10px;width:265px;" id="divChartnvramUsage">
 <canvas id="canvasChartnvramUsage" height="250" />
 </div>
 </td>
-<td id="jffs_chart" rowspan="2" style="padding-left:4px;width:270px;" width="270px">
-<div style="background-color:#2f3e44;border-radius:10px;width:270px;" id="divChartjffsUsage">
+<td id="jffs_chart" rowspan="2" style="padding-left:4px;width:265px;" width="265px">
+<div style="background-color:#2f3e44;border-radius:10px;width:265px;" id="divChartjffsUsage">
 <canvas id="canvasChartjffsUsage" height="250" />
 </div>
 </td>
 </tr>
 <tr>
-<th width="65px" style="width:65px;">JFFS</th>
-<td id="jffs_td"></td>
+<td class="metricname">JFFS</td>
+<td id="jffs_td" style="width:125px;"></td>
 </tr>
 </table>
 <div style="line-height:10px;">&nbsp;</div>
-<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable">
 <thead class="collapsible-jquery" id="routertemps">
 <tr>
 <td colspan="2">Router (click to expand/collapse)</td>
 </tr>
 </thead>
 <tr>
-<th>Temperatures</th>
-<td id="temp_td"></td>
+<td class="settingname">Temperatures</td>
+<td id="temp_td" class="settingvalue"></td>
 </tr>
 </table>
 </td>
