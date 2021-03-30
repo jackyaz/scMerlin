@@ -402,28 +402,32 @@ function BuildServiceTable(srvname,srvdesc,srvnamevisible,loopindex){
 	
 	if(loopindex == 0){
 		serviceshtml+='<div style="line-height:10px;">&nbsp;</div>';
-		serviceshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_services">';
+		serviceshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_services">';
 		serviceshtml+='<thead class="collapsible-jquery" id="servicescontrol">';
-		serviceshtml+='<tr><td colspan="2">Services (click to expand/collapse)</td></tr>';
+		serviceshtml+='<tr><td colspan="4">Services (click to expand/collapse)</td></tr>';
 		serviceshtml+='</thead>';
 	}
 	
-	serviceshtml+='<tr>';
+	if(loopindex == 0 || loopindex % 2 == 0){
+		serviceshtml+='<tr>';
+	}
 	if(srvnamevisible){
-		serviceshtml+='<th width="20%">'+srvdesc+' <span style="color:#FFCC00;">('+srvname+')</span></th>';
+		serviceshtml+='<td class="settingname">'+srvdesc+' <span class="settingname">('+srvname+')</span></td>';
 	}
 	else{
-		serviceshtml+='<th width="20%">'+srvdesc+'</th>';
+		serviceshtml+='<td class="settingname">'+srvdesc+'</td>';
 	}
 	srvname = srvname.replace('/','');
-	serviceshtml+='<td>';
-	serviceshtml+='<input type="button" class="button_gen" onclick="RestartService(\''+srvname+'\');" value="Restart" id="btnRestartSrv_'+srvname+'">';
+	serviceshtml+='<td class="settingvalue">';
+	serviceshtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+srvname+'\');" value="Restart" id="btnRestartSrv_'+srvname+'">';
 	serviceshtml+='<span id="txtRestartSrv_'+srvname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
 	serviceshtml+='<span id="txtRestartSrvError_'+srvname+'" style="display:none;">Invalid - service not enabled</span>';
 	serviceshtml+='<img id="imgRestartSrv_'+srvname+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
 	serviceshtml+='&nbsp;&nbsp;&nbsp;';
 	serviceshtml+='</td>';
-	serviceshtml+='</tr>';
+	if(loopindex > 0 && (loopindex+1) % 2 == 0){
+		serviceshtml+='</tr>';
+	}
 	
 	if(loopindex == srvnamelist.length-1){
 		serviceshtml+='</table>';
@@ -439,23 +443,32 @@ function BuildVPNClientTable(loopindex){
 	
 	if(loopindex == 1){
 		vpnclientshtml+='<div style="line-height:10px;">&nbsp;</div>';
-		vpnclientshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_vpnclients">';
+		vpnclientshtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_vpnclients">';
 		vpnclientshtml+='<thead class="collapsible-jquery" id="vpnclientscontrol">';
-		vpnclientshtml+='<tr><td colspan="2">VPN Clients (click to expand/collapse)</td></tr>';
+		vpnclientshtml+='<tr><td colspan="4">VPN Clients (click to expand/collapse)</td></tr>';
 		vpnclientshtml+='</thead>';
 	}
 	
-	vpnclientshtml+='<tr>';
-	vpnclientshtml+='<th width="40%">VPN Client '+loopindex;
-	vpnclientshtml+='<br /><span style="color:#FFCC00;">('+vpnclientdesc+')</span></th>';
-	vpnclientshtml+='<td>';
-	vpnclientshtml+='<input type="button" class="button_gen" onclick="RestartService(\''+vpnclientname+'\');" value="Restart" id="btnRestartSrv_'+vpnclientname+'">';
+	if(loopindex == 1 || (loopindex+1) % 2 == 0){
+		vpnclientshtml+='<tr>';
+	}
+	vpnclientshtml+='<td class="settingname">VPN Client '+loopindex;
+	vpnclientshtml+='<br /><span class="settingname">('+vpnclientdesc+')</span></td>';
+	vpnclientshtml+='<td class="settingvalue">';
+	vpnclientshtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+vpnclientname+'\');" value="Restart" id="btnRestartSrv_'+vpnclientname+'">';
 	vpnclientshtml+='<span id="txtRestartSrv_'+vpnclientname+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
 	vpnclientshtml+='<span id="txtRestartSrvError_'+vpnclientname+'" style="display:none;">Invalid - VPN Client not enabled</span>';
 	vpnclientshtml+='<img id="imgRestartSrv_'+vpnclientname+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
 	vpnclientshtml+='&nbsp;&nbsp;&nbsp;';
 	vpnclientshtml+='</td>';
-	vpnclientshtml+='</tr>';
+	
+	if(loopindex == 5){
+		vpnclientshtml+='<td class="settingname"></td><td class="settingvalue"></td>';
+	}
+	
+	if(loopindex > 1 && loopindex % 2 == 0){
+		vpnclientshtml+='</tr>';
+	}
 	
 	if(loopindex == 5){
 		vpnclientshtml+='</table>';
@@ -470,24 +483,24 @@ function BuildVPNServerTable(loopindex){
 	
 	if(loopindex == 1){
 		vpnservershtml+='<div style="line-height:10px;">&nbsp;</div>';
-		vpnservershtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_vpnservers">';
+		vpnservershtml+='<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_vpnservers">';
 		vpnservershtml+='<thead class="collapsible-jquery" id="vpnserverscontrol">';
-		vpnservershtml+='<tr><td colspan="2">VPN Servers (click to expand/collapse)</td></tr>';
+		vpnservershtml+='<tr><td colspan="4">VPN Servers (click to expand/collapse)</td></tr>';
 		vpnservershtml+='</thead>';
+		vpnservershtml+='<tr>';
 	}
 	
-	vpnservershtml+='<tr>';
-	vpnservershtml+='<th width="40%">VPN Server '+loopindex+'</th>';
-	vpnservershtml+='<td>';
-	vpnservershtml+='<input type="button" class="button_gen" onclick="RestartService(\''+vpnservername+'\');" value="Restart" id="btnRestartSrv_'+vpnservername+'">';
+	vpnservershtml+='<td class="settingname">VPN Server '+loopindex+'</td>';
+	vpnservershtml+='<td class="settingvalue">';
+	vpnservershtml+='<input type="button" class="button_gen restartbutton" onclick="RestartService(\''+vpnservername+'\');" value="Restart" id="btnRestartSrv_'+vpnservername+'">';
 	vpnservershtml+='<span id="txtRestartSrv_'+vpnservername+'" style="display:none;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Done</span>';
 	vpnservershtml+='<span id="txtRestartSrvError_'+vpnservername+'" style="display:none;">Invalid - VPN Server not enabled</span>';
 	vpnservershtml+='<img id="imgRestartSrv_'+vpnservername+'" style="display:none;vertical-align:middle;" src="images/InternetScan.gif"/>';
 	vpnservershtml+='&nbsp;&nbsp;&nbsp;';
 	vpnservershtml+='</td>';
-	vpnservershtml+='</tr>';
 	
 	if(loopindex == 2){
+		vpnservershtml+='</tr>';
 		vpnservershtml+='</table>';
 	}
 	
@@ -499,9 +512,9 @@ function round(value, decimals){
 }
 
 function Draw_Chart_NoData(txtchartname){
-	document.getElementById("canvasChart" + txtchartname).width = "270";
+	document.getElementById("canvasChart" + txtchartname).width = "265";
 	document.getElementById("canvasChart" + txtchartname).height = "250";
-	document.getElementById("canvasChart" + txtchartname).style.width = "270px";
+	document.getElementById("canvasChart" + txtchartname).style.width = "265px";
 	document.getElementById("canvasChart" + txtchartname).style.height = "250px";
 	var ctx = document.getElementById("canvasChart" + txtchartname).getContext("2d");
 	ctx.save();
