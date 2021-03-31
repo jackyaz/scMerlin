@@ -22,8 +22,8 @@
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
 readonly SCRIPT_NAME_LOWER=$(echo $SCRIPT_NAME | tr 'A-Z' 'a-z' | sed 's/d//')
-readonly SCM_VERSION="v2.2.0"
-readonly SCRIPT_VERSION="v2.2.0"
+readonly SCM_VERSION="v2.2.1"
+readonly SCRIPT_VERSION="v2.2.1"
 SCRIPT_BRANCH="master"
 SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME_LOWER.d"
@@ -1403,6 +1403,9 @@ case "$1" in
 			exit 0
 		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}doupdate" ]; then
 			Update_Version force unattended
+			exit 0
+		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}getaddonpages" ]; then
+			Get_Addon_Pages
 			exit 0
 		fi
 		exit 0
