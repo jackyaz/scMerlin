@@ -46,6 +46,8 @@ function initial(){
 	}
 	$j("#table_config").after(servicectablehtml);
 	
+	document.formScriptActions.action_script.value="start_scmerlingetaddonpages";
+	document.formScriptActions.submit();
 	load_addonpages();
 	get_usbdisabled_file();
 	update_temperatures();
@@ -70,29 +72,6 @@ function ScriptUpdateLayout(){
 function reload(){
 	location.reload(true);
 }
-
-function load_addonpages(){
-	$j.ajax({
-		url: '/ext/scmerlin/detect_update.js',
-		dataType: 'script',
-		timeout: 3000,
-		error: function(xhr){
-			setTimeout(load_addonpages, 1000);
-		},
-		success: function(){
-			sortedAddonPages = addonpages.sort(function(a, b) {
-				return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
-			});
-			var addonpageshtml="";
-			for(var i = 0; i < sortedAddonPages.length; i++){
-				addonpageshtml += BuildAddonPageTable(sortedAddonPages[i][0],sortedAddonPages[i][1],i);
-			}
-			
-			$j("#table_config").after(addonpageshtml);
-		}
-	});
-}
-
 
 function update_status(){
 	$j.ajax({
@@ -250,6 +229,27 @@ function get_usbdisabled_file(){
 		success: function(data){
 			document.form.scmerlin_usbenabled.value = "disable";
 			document.getElementById("procTableContainer").innerHTML = "Process list disabled, this feature requires the \"USB features\" option to be enabled and a USB device plugged into router for Entware";
+		}
+	});
+}
+
+function load_addonpages(){
+	$j.ajax({
+		url: '/ext/scmerlin/addonwebpages.js',
+		dataType: 'script',
+		error: function(xhr){
+			setTimeout(load_addonpages, 1000);
+		},
+		success: function(){
+			sortedAddonPages = addonpages.sort(function(a, b) {
+				return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
+			});
+			var addonpageshtml="";
+			for(var i = 0; i < sortedAddonPages.length; i++){
+				addonpageshtml += BuildAddonPageTable(sortedAddonPages[i][0],sortedAddonPages[i][1],i);
+			}
+			
+			$j("#table_config").after(addonpageshtml);
 		}
 	});
 }
