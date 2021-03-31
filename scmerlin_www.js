@@ -46,16 +46,7 @@ function initial(){
 	}
 	$j("#table_config").after(servicectablehtml);
 	
-	sortedAddonPages = addonpages.sort(function(a, b) {
-		return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
-	});
-	var addonpageshtml="";
-	for(var i = 0; i < sortedAddonPages.length; i++){
-		addonpageshtml += BuildAddonPageTable(sortedAddonPages[i][0],sortedAddonPages[i][1],i);
-	}
-	
-	$j("#table_config").after(addonpageshtml);
-	
+	load_addonpages();
 	get_usbdisabled_file();
 	update_temperatures();
 	update_sysinfo();
@@ -80,12 +71,35 @@ function reload(){
 	location.reload(true);
 }
 
+function load_addonpages(){
+	$j.ajax({
+		url: '/ext/scmerlin/detect_update.js',
+		dataType: 'script',
+		timeout: 3000,
+		error: function(xhr){
+			setTimeout(load_addonpages, 1000);
+		},
+		success: function(){
+			sortedAddonPages = addonpages.sort(function(a, b) {
+				return a[0].toLowerCase().localeCompare(b[0].toLowerCase());
+			});
+			var addonpageshtml="";
+			for(var i = 0; i < sortedAddonPages.length; i++){
+				addonpageshtml += BuildAddonPageTable(sortedAddonPages[i][0],sortedAddonPages[i][1],i);
+			}
+			
+			$j("#table_config").after(addonpageshtml);
+		}
+	});
+}
+
+
 function update_status(){
 	$j.ajax({
 		url: '/ext/scmerlin/detect_update.js',
 		dataType: 'script',
 		timeout: 3000,
-		error:	function(xhr){
+		error: function(xhr){
 			setTimeout(update_status, 1000);
 		},
 		success: function(){

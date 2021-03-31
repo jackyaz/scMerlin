@@ -1404,6 +1404,9 @@ case "$1" in
 		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}doupdate" ]; then
 			Update_Version force unattended
 			exit 0
+		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}getaddonpages" ]; then
+			Get_Addon_Pages
+			exit 0
 		fi
 		exit 0
 	;;
