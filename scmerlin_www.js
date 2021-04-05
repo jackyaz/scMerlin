@@ -438,7 +438,7 @@ function BuildAddonPageTable(addonname,addonurl,loopindex){
 		addonpageshtml+='<tr>';
 	}
 	
-	addonpageshtml+='<td class="addonpageurl"><a href="'+addonurl+'">'+addonname+'</a><br /><span class="addonpageurl">'+addonurl.substring(addonurl.lastIndexOf("/")+1)+'</span></td>';
+	addonpageshtml+='<td class="addonpageurl"><a href="'+addonurl.substring(addonurl.lastIndexOf("/")+1)+'">'+addonname+'</a><br /><span class="addonpageurl">'+addonurl.substring(addonurl.lastIndexOf("/")+1)+'</span></td>';
 	if(loopindex > 0 && (loopindex+1) % 4 == 0){
 		addonpageshtml+='</tr>';
 	}
