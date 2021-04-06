@@ -5,6 +5,6 @@ trap '' SIGHUP
 while true; do
 	top -b -n 1 | tail -n +5 | head -n -1 | sed 's/S </S</g' | \
 awk -F" " -v OFS=',' '{gsub(/m[^\s\\]/,"m,",$5);printf "%s,%s,%s,%s,%s,%s,%s,%s,", $1,$2,$3,$4,$5,$6,$7,$8;for(i=9; i<=NF; ++i) printf "%s ", $i; print ""}' | \
-sed 's/S</S </g' > /tmp/scmerlin-top.tmp
+sed 's/,$//g;s/S</S </g' > /tmp/scmerlin-top.tmp
 	sleep 3
 done
