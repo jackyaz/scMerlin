@@ -53,7 +53,6 @@ function initial(){
 	update_temperatures();
 	update_sysinfo();
 	ScriptUpdateLayout();
-	AddEventHandlers();
 }
 
 function ScriptUpdateLayout(){
@@ -250,6 +249,8 @@ function load_addonpages(){
 			}
 			
 			$j("#table_config").after(addonpageshtml);
+			
+			AddEventHandlers();
 		}
 	});
 }
