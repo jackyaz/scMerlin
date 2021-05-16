@@ -1,24 +1,24 @@
 #!/bin/sh
 
-####################################################
-##              __  __              _  _          ##
-##             |  \/  |            | |(_)         ##
-##   ___   ___ | \  / |  ___  _ __ | | _  _ __    ##
-##  / __| / __|| |\/| | / _ \| '__|| || || '_ \   ##
-##  \__ \| (__ | |  | ||  __/| |   | || || | | |  ##
-##  |___/ \___||_|  |_| \___||_|   |_||_||_| |_|  ##
-##                                                ##
-##      https://github.com/jackyaz/scMerlin       ##
-##                                                ##
-####################################################
+######################################################
+##               __  __              _  _           ##
+##              |  \/  |            | |(_)          ##
+##    ___   ___ | \  / |  ___  _ __ | | _  _ __     ##
+##   / __| / __|| |\/| | / _ \| '__|| || || '_ \    ##
+##   \__ \| (__ | |  | ||  __/| |   | || || | | |   ##
+##   |___/ \___||_|  |_| \___||_|   |_||_||_| |_|   ##
+##                                                  ##
+##       https://github.com/jackyaz/scMerlin        ##
+##                                                  ##
+######################################################
 
-########         directives      #########
+##########       Shellcheck directives     ###########
 # shellcheck disable=SC2016
 # shellcheck disable=SC2018
 # shellcheck disable=SC2019
 # shellcheck disable=SC2059
 # shellcheck disable=SC2034
-####################################################
+######################################################
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
@@ -42,7 +42,9 @@ readonly CRIT="\\e[41m"
 readonly ERR="\\e[31m"
 readonly WARN="\\e[33m"
 readonly PASS="\\e[32m"
-readonly SETTING="\\e[1m\\e[36m"
+readonly BOLD="\\e[1m"
+readonly SETTING="${BOLD}\\e[36m"
+readonly CLEARFORMAT="\\e[0m"
 ### End of output format variables ###
 
 # $1 = print to syslog, $2 = message to print, $3 = log level
@@ -50,7 +52,7 @@ Print_Output(){
 	if [ "$1" = "true" ]; then
 		logger -t "$SCRIPT_NAME" "$2"
 	fi
-	printf "\\e[1m${3}%s\\e[0m\\n\\n" "$2"
+	printf "${BOLD}${3}%s${CLEARFORMAT}\\n\\n" "$2"
 }
 
 Firmware_Version_Check(){
@@ -163,7 +165,7 @@ Update_Version(){
 		fi
 		
 		if [ "$isupdate" != "false" ]; then
-			printf "\\n\\e[1mDo you want to continue with the update? (y/n)\\e[0m  "
+			printf "\\n${BOLD}Do you want to continue with the update? (y/n)${CLEARFORMAT}  "
 			read -r confirm
 			case "$confirm" in
 				y|Y)
@@ -580,7 +582,6 @@ Get_Addon_Pages(){
 	printf "];\\n" >> /tmp/addonwebpages.tmp
 }
 
-
 ToggleUSBFeatures(){
 	case "$1" in
 		enable)
@@ -642,26 +643,26 @@ PressEnter(){
 ScriptHeader(){
 	clear
 	printf "\\n"
-	printf "\\e[1m#####################################################\\e[0m\\n"
-	printf "\\e[1m##               __  __              _  _          ##\\e[0m\\n"
-	printf "\\e[1m##              |  \/  |            | |(_)         ##\\e[0m\\n"
-	printf "\\e[1m##    ___   ___ | \  / |  ___  _ __ | | _  _ __    ##\\e[0m\\n"
-	printf "\\e[1m##   / __| / __|| |\/| | / _ \| '__|| || || '_ \   ##\\e[0m\\n"
-	printf "\\e[1m##   \__ \| (__ | |  | ||  __/| |   | || || | | |  ##\\e[0m\\n"
-	printf "\\e[1m##   |___/ \___||_|  |_| \___||_|   |_||_||_| |_|  ##\\e[0m\\n"
-	printf "\\e[1m##                                                 ##\\e[0m\\n"
-	printf "\\e[1m##               %s on %-11s             ##\\e[0m\\n" "$SCRIPT_VERSION" "$ROUTER_MODEL"
-	printf "\\e[1m##                                                 ##\\e[0m\\n"
-	printf "\\e[1m##       https://github.com/jackyaz/scMerlin       ##\\e[0m\\n"
-	printf "\\e[1m##                                                 ##\\e[0m\\n"
-	printf "\\e[1m#####################################################\\e[0m\\n"
+	printf "${BOLD}######################################################${CLEARFORMAT}\\n"
+	printf "${BOLD}##               __  __              _  _           ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##              |  \/  |            | |(_)          ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##    ___   ___ | \  / |  ___  _ __ | | _  _ __     ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##   / __| / __|| |\/| | / _ \| '__|| || || '_ \    ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##   \__ \| (__ | |  | ||  __/| |   | || || | | |   ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##   |___/ \___||_|  |_| \___||_|   |_||_||_| |_|   ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##                                                  ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##               %s on %-11s              ##${CLEARFORMAT}\\n" "$SCRIPT_VERSION" "$ROUTER_MODEL"
+	printf "${BOLD}##                                                  ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##       https://github.com/jackyaz/scMerlin        ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##                                                  ##${CLEARFORMAT}\\n"
+	printf "${BOLD}######################################################${CLEARFORMAT}\\n"
 	printf "\\n"
 }
 
 MainMenu(){
-	printf "WebUI for %s is available at:\\n${SETTING}%s\\e[0m\\n\\n" "$SCRIPT_NAME" "$(Get_WebUI_URL)"
-	printf "\\e[1m\\e[4mServices\\e[0m"
-	printf "\\e[1m${WARN} (selecting an option will restart the service)\\e[0m\\n"
+	printf "WebUI for %s is available at:\\n${SETTING}%s${CLEARFORMAT}\\n\\n" "$SCRIPT_NAME" "$(Get_WebUI_URL)"
+	printf "${BOLD}\\e[4mServices${CLEARFORMAT}"
+	printf "${BOLD}${WARN} (selecting an option will restart the service)${CLEARFORMAT}\\n"
 	printf "1.    DNS/DHCP Server (dnsmasq)\\n"
 	printf "2.    Internet connection\\n"
 	printf "3.    Web Interface (httpd)\\n"
@@ -678,8 +679,8 @@ MainMenu(){
 		fi
 	done
 	if [ "$vpnclientenabled" = "true" ]; then
-		printf "\\n\\e[1m\\e[4mVPN Clients\\e[0m"
-		printf "\\e[1m${WARN} (selecting an option will restart the VPN Client)\\e[0m\\n"
+		printf "\\n${BOLD}\\e[4mVPN Clients${CLEARFORMAT}"
+		printf "${BOLD}${WARN} (selecting an option will restart the VPN Client)${CLEARFORMAT}\\n"
 		vpnclientnum=1
 		while [ "$vpnclientnum" -lt 6 ]; do
 			printf "vc%s.  VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
@@ -692,8 +693,8 @@ MainMenu(){
 		vpnserverenabled="true"
 	fi
 	if [ "$vpnserverenabled" = "true" ]; then
-		printf "\\n\\e[1m\\e[4mVPN Servers\\e[0m"
-		printf "\\e[1m${WARN} (selecting an option will restart the VPN Server)\\e[0m\\n"
+		printf "\\n${BOLD}\\e[4mVPN Servers${CLEARFORMAT}"
+		printf "${BOLD}${WARN} (selecting an option will restart the VPN Server)${CLEARFORMAT}\\n"
 		vpnservernum=1
 		while [ "$vpnservernum" -lt 3 ]; do
 			vpnsdesc=""
@@ -705,28 +706,28 @@ MainMenu(){
 		done
 	fi
 	if [ -f /opt/bin/opkg ]; then
-		printf "\\n\\e[1m\\e[4mEntware\\e[0m\\n"
+		printf "\\n${BOLD}\\e[4mEntware${CLEARFORMAT}\\n"
 		printf "et.   Restart all Entware applications\\n"
 	fi
-	printf "\\n\\e[1m\\e[4mRouter\\e[0m\\n"
+	printf "\\n${BOLD}\\e[4mRouter${CLEARFORMAT}\\n"
 	printf "c.    View running processes\\n"
 	printf "m.    View RAM/memory usage\n"
 	printf "t.    View router temperatures\n"
 	printf "w.    List Addon WebUI tab to page mapping\n"
 	printf "r.    Reboot router\\n\\n"
-	printf "\\e[1m\\e[4mOther\\e[0m\\n"
+	printf "${BOLD}\\e[4mOther${CLEARFORMAT}\\n"
 	if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
 		USB_ENABLED="${PASS}Enabled"
 	else
 		USB_ENABLED="${ERR}Disabled"
 	fi
-	printf "usb.  Toggle USB features (list of running processes in WebUI)\\n      Currently: \\e[1m$USB_ENABLED\\e[0m\\n\\n"
+	printf "usb.  Toggle USB features (list of running processes in WebUI)\\n      Currently: ${BOLD}$USB_ENABLED${CLEARFORMAT}\\n\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
 	printf "z.    Uninstall %s\\n" "$SCRIPT_NAME"
 	printf "\\n"
-	printf "\\e[1m#####################################################\\e[0m\\n"
+	printf "${BOLD}######################################################${CLEARFORMAT}\\n"
 	printf "\\n"
 	while true; do
 		printf "Choose an option:  "
@@ -741,7 +742,7 @@ MainMenu(){
 			2)
 				printf "\\n"
 				while true; do
-					printf "\\n\\e[1mInternet connection will take 30s-60s to reconnect. Continue? (y/n)\\e[0m  "
+					printf "\\n${BOLD}Internet connection will take 30s-60s to reconnect. Continue? (y/n)${CLEARFORMAT}  "
 					read -r confirm
 					case "$confirm" in
 						y|Y)
@@ -775,7 +776,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_ftpd >/dev/null 2>&1
 				else
-				printf "\\n\\e[1m\\e[31mInvalid selection (FTP not enabled)\\e[0m\\n\\n"
+				printf "\\n${BOLD}\\e[31mInvalid selection (FTP not enabled)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -787,7 +788,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_samba >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (Samba not enabled)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (Samba not enabled)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -799,7 +800,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_ddns >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (DDNS client not enabled)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (DDNS client not enabled)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -817,7 +818,7 @@ MainMenu(){
 					printf "\\n"
 					/opt/etc/init.d/S77chronyd restart
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (NTP server not enabled/installed)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (NTP server not enabled/installed)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -827,7 +828,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient1 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -837,7 +838,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient2 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -847,7 +848,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient3 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -857,7 +858,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient4 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -867,7 +868,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient5 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -877,7 +878,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnserver1 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Server not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -887,7 +888,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnserver2 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Server not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -897,7 +898,7 @@ MainMenu(){
 				if [ -f /opt/bin/opkg ]; then
 					if Check_Lock menu; then
 						while true; do
-							printf "\\n\\e[1mAre you sure you want to restart all Entware scripts? (y/n)\\e[0m  "
+							printf "\\n${BOLD}Are you sure you want to restart all Entware scripts? (y/n)${CLEARFORMAT}  "
 							read -r confirm
 							case "$confirm" in
 								y|Y)
@@ -912,7 +913,7 @@ MainMenu(){
 						Clear_Lock
 					fi
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (Entware not installed)\\e[0m\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (Entware not installed)${CLEARFORMAT}\\n"
 				fi
 				PressEnter
 				break
@@ -926,7 +927,7 @@ MainMenu(){
 					else
 						program=""
 						while true; do
-							printf "\\n\\e[1mWould you like to install htop (enhanced version of top)? (y/n)\\e[0m  "
+							printf "\\n${BOLD}Would you like to install htop (enhanced version of top)? (y/n)${CLEARFORMAT}  "
 							read -r confirm
 							case "$confirm" in
 								y|Y)
@@ -963,7 +964,7 @@ MainMenu(){
 			;;
 			t)
 				ScriptHeader
-				printf "\\n\\e[1mTemperatures\\e[0m\\n\\n"
+				printf "\\n${BOLD}Temperatures${CLEARFORMAT}\\n\\n"
 				if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
 					printf "CPU: %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
 				elif [ -f /proc/dmu/temperature ]; then
@@ -993,10 +994,10 @@ MainMenu(){
 				printf "\\n"
 				while true; do
 					if [ "$ROUTER_MODEL" = "RT-AC86U" ]; then
-						printf "\\n\\e[1m${WARN}Remote reboots are not recommend for %s\\e[0m" "$ROUTER_MODEL"
-						printf "\\n\\e[1m${WARN}Some %s fail to reboot correctly and require a manual power cycle\\e[0m\\n" "$ROUTER_MODEL"
+						printf "\\n${BOLD}${WARN}Remote reboots are not recommend for %s${CLEARFORMAT}" "$ROUTER_MODEL"
+						printf "\\n${BOLD}${WARN}Some %s fail to reboot correctly and require a manual power cycle${CLEARFORMAT}\\n" "$ROUTER_MODEL"
 					fi
-					printf "\\n\\e[1mAre you sure you want to reboot? (y/n)\\e[0m  "
+					printf "\\n${BOLD}Are you sure you want to reboot? (y/n)${CLEARFORMAT}  "
 					read -r confirm
 					case "$confirm" in
 						y|Y)
@@ -1040,11 +1041,11 @@ MainMenu(){
 			;;
 			e)
 				ScriptHeader
-				printf "\\n\\e[1mThanks for using %s!\\e[0m\\n\\n\\n" "$SCRIPT_NAME"
+				printf "\\n${BOLD}Thanks for using %s!${CLEARFORMAT}\\n\\n\\n" "$SCRIPT_NAME"
 				exit 0
 			;;
 			z)
-				printf "\\n\\e[1mAre you sure you want to uninstall %s? (y/n)\\e[0m  " "$SCRIPT_NAME"
+				printf "\\n${BOLD}Are you sure you want to uninstall %s? (y/n)${CLEARFORMAT}  " "$SCRIPT_NAME"
 				read -r confirm
 				case "$confirm" in
 					y|Y)
@@ -1081,7 +1082,7 @@ Check_Requirements(){
 		CHECKSFAILED="true"
 	fi
 	
-	printf "\\n\\e[1mWould you like to enable USB Features (list of running processes in WebUI) (y/n)?\\nThis requires a USB device plugged into router for Entware\\e[0m  "
+	printf "\\n${BOLD}Would you like to enable USB Features (list of running processes in WebUI) (y/n)?\\nThis requires a USB device plugged into router for Entware${CLEARFORMAT}  "
 	read -r confirm
 	case "$confirm" in
 		y|Y)
@@ -1262,7 +1263,7 @@ Entware_Ready(){
 ### ###
 
 Show_About(){
-	cat <<EOF
+	cat << EOF
 About
   $SCRIPT_NAME allows you to easily control the most common
   services/scripts on your router.
@@ -1280,7 +1281,7 @@ EOF
 
 ### function based on @dave14305's FlexQoS show_help function ###
 Show_Help(){
-	cat <<EOF
+	cat << EOF
 Available commands:
   $SCRIPT_NAME_LOWER about              explains functionality
   $SCRIPT_NAME_LOWER update             checks for updates
