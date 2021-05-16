@@ -1409,20 +1409,6 @@ case "$1" in
 		Update_Version force
 		exit 0
 	;;
-	setversion)
-		Create_Dirs
-		Shortcut_Script create
-		Create_Symlinks
-		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-			Auto_Startup create 2>/dev/null
-		else
-			Auto_Startup_NoUSB create 2>/dev/null
-		fi
-		Auto_ServiceEvent create 2>/dev/null
-		Set_Version_Custom_Settings local "$SCRIPT_VERSION"
-		Set_Version_Custom_Settings server "$SCRIPT_VERSION"
-		exit 0
-	;;
 	postupdate)
 		Create_Dirs
 		Shortcut_Script create
