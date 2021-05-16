@@ -611,6 +611,79 @@ ToggleUSBFeatures(){
 	esac
 }
 
+NTPBootWatchdog(){
+	case "$1" in
+		enable)
+			cat << "EOF" > /jffs/scripts/ntpbootwatchdog.sh
+#!/bin/sh
+if [ "$(nvram get ntp_ready)" -eq 1 ]; then
+	/usr/bin/logger -st ntpbootwatchdog "NTP is synced, exiting"
+else
+	/usr/bin/logger -st ntpbootwatchdog "NTP boot watchdog started..."
+	ntptimer=0
+	while [ "$(nvram get ntp_ready)" -eq 0 ] && [ "$ntptimer" -lt 600 ]; do
+		if [ "$ntptimer" -ne 0 ]; then
+			/usr/bin/logger -st ntpbootwatchdog "Still waiting for NTP to sync..."
+		fi
+		killall ntp
+		killall ntpd
+		service restart_ntpd
+		ntptimer=$((ntptimer+30))
+		sleep 30
+	done
+	
+	if [ "$ntptimer" -ge 600 ]; then
+		/usr/bin/logger -st ntpbootwatchdog "NTP failed to sync after 10 minutes - please check immediately!"
+		exit 1
+	else
+		/usr/bin/logger -st ntpbootwatchdog "NTP has synced!"
+	fi
+fi
+EOF
+			chmod +x /jffs/scripts/ntpbootwatchdog.sh
+			if [ -f /jffs/scripts/init-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c 'ntpbootwatchdog' /jffs/scripts/init-start)
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/ntpbootwatchdog/d' /jffs/scripts/init-start
+				fi
+				
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/init-start)
+				STARTUPLINECOUNTEX=$(grep -i -cx "sh /jffs/scripts/ntpbootwatchdog.sh & # $SCRIPT_NAME" /jffs/scripts/init-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/init-start
+				fi
+				
+				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
+					echo "sh /jffs/scripts/ntpbootwatchdog.sh & # $SCRIPT_NAME" >> /jffs/scripts/init-start
+				fi
+			else
+				echo "#!/bin/sh" > /jffs/scripts/init-start
+				echo "" >> /jffs/scripts/init-start
+				echo "sh /jffs/scripts/ntpbootwatchdog.sh & # $SCRIPT_NAME" >> /jffs/scripts/init-start
+				chmod 0755 /jffs/scripts/init-start
+			fi
+		;;
+		disable)
+			rm -f /jffs/scripts/ntpbootwatchdog.sh
+			if [ -f /jffs/scripts/init-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/init-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/init-start
+				fi
+			fi
+		;;
+		check)
+			if [ -f /jffs/scripts/ntpbootwatchdog.sh ] && [ "$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/init-start)" -gt 0 ]; then
+				echo "ENABLED"
+			else
+				echo "DISABLED"
+			fi
+		;;
+	esac
+}
+
 Shortcut_Script(){
 	case $1 in
 		create)
@@ -717,6 +790,12 @@ MainMenu(){
 	printf "w.    List Addon WebUI tab to page mapping\n"
 	printf "r.    Reboot router\\n\\n"
 	printf "${BOLD}\\e[4mOther${CLEARFORMAT}\\n"
+	if [ "$(NTPBootWatchdog check)" = "ENABLED" ]; then
+		NTPBW_ENABLED="${SETTING}Enabled"
+	else
+		NTPBW_ENABLED="Disabled"
+	fi
+	printf "ntp.  Toggle NTP boot watchdog script\\n      Currently: ${BOLD}$NTPBW_ENABLED${CLEARFORMAT}\\n\\n"
 	if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
 		USB_ENABLED="${PASS}Enabled"
 	else
@@ -1021,6 +1100,15 @@ MainMenu(){
 					esac
 				done
 				PressEnter
+				break
+			;;
+			ntp)
+				printf "\\n"
+				if [ "$(NTPBootWatchdog check)" = "ENABLED" ]; then
+					NTPBootWatchdog disable
+				elif [ "$(NTPBootWatchdog check)" = "DISABLED" ]; then
+					NTPBootWatchdog enable
+				fi
 				break
 			;;
 			usb)
