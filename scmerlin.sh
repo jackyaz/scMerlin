@@ -320,7 +320,7 @@ Create_Symlinks(){
 	rm -rf "${SCRIPT_WEB_DIR:?}/"* 2>/dev/null
 	
 	ln -s /tmp/scmerlin-top "$SCRIPT_WEB_DIR/top.htm" 2>/dev/null
-	ln -s /tmp/addonwebpages.tmp "$SCRIPT_WEB_DIR/addonwebpages.js" 2>/dev/null
+	ln -s /tmp/addonwebpages.tmp "$SCRIPT_WEB_DIR/addonwebpages.htm" 2>/dev/null
 	ln -s "$DISABLE_USB_FEATURES_FILE" "$SCRIPT_WEB_DIR/usbdisabled.htm" 2>/dev/null
 	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
@@ -583,10 +583,7 @@ Get_Addon_Pages(){
 	
 	weburl="$(echo "${urlproto}://${urldomain}${urlport}/" | tr "A-Z" "a-z")"
 	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%-12s "wu"%s\n",$4,$2}' | sort -f
-	printf "var addonpages=[" > /tmp/addonwebpages.tmp
-	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "\[\"%s\",\""wu"%s\"\],",$4,$2}' >> /tmp/addonwebpages.tmp
-	sed -i 's/,$//' /tmp/addonwebpages.tmp
-	printf "];\\n" >> /tmp/addonwebpages.tmp
+	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%s,"wu"%s\n",$4,$2}' > /tmp/addonwebpages.tmp
 }
 
 ToggleUSBFeatures(){
