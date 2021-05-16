@@ -711,7 +711,8 @@ MainMenu(){
 	fi
 	printf "\\n${BOLD}\\e[4mRouter${CLEARFORMAT}\\n"
 	printf "c.    View running processes\\n"
-	printf "m.    View RAM/memory usage\n"
+	printf "m.    View RAM/memory usage\\n"
+	printf "cr.   View cron jobs\\n"
 	printf "t.    View router temperatures\n"
 	printf "w.    List Addon WebUI tab to page mapping\n"
 	printf "r.    Reboot router\\n\\n"
@@ -958,6 +959,16 @@ MainMenu(){
 				ScriptHeader
 				printf "\\n"
 				free
+				printf "\\n"
+				PressEnter
+				break
+			;;
+			cr)
+				ScriptHeader
+				printf "\\n"
+				printf "${BOLD}%-25s %-6s %-6s %-6s %-6s %-9s %s${CLEARFORMAT}\\n" "Cron job name" "Min" "Hour" "Day W" "Month" "Day M" "Command"
+				cronjobs="$(cru l | awk 'FS="#" {printf "%s %s\n",$2,$1}' | awk '{printf "%-25s %-6s %-6s %-6s %-6s %-10s",$1,$2,$3,$4,$5,$6;for(i=7; i<=NF; ++i) printf "%s ", $i; print ""}')"
+				echo "$cronjobs"
 				printf "\\n"
 				PressEnter
 				break
