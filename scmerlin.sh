@@ -1330,6 +1330,7 @@ case "$1" in
 			ToggleUSBFeatures "$settingstate"
 			exit 0
 		elif [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}servicerestart"; then
+			rm -f "$SCRIPT_WEB_DIR/detect_service.js"
 			echo 'var servicestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_service.js"
 			srvname="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}servicerestart//")";
 			if [ "$srvname" = "vsftpd" ]; then
