@@ -554,7 +554,7 @@ Mount_WebUI(){
 }
 
 Get_Cron_Jobs(){
-	printf "${BOLD}%-25s %-6s %-6s %-6s %-6s %-9s %s${CLEARFORMAT}\\n" "Cron job name" "Min" "Hour" "Day W" "Month" "Day M" "Command"
+	printf "${BOLD}%-25s %-6s %-6s %-6s %-6s %-9s %s${CLEARFORMAT}\\n" "Cron job name" "Min" "Hour" "DayM" "Month" "DayW" "Command"
 	cronjobs="$(cru l | awk 'FS="#" {printf "%s %s\n",$2,$1}' | awk '{printf "%-25s %-6s %-6s %-6s %-6s %-10s",$1,$2,$3,$4,$5,$6;for(i=7; i<=NF; ++i) printf "%s ", $i; print ""}')"
 	echo "$cronjobs"
 	cru l | sed 's/,/|/g' | awk 'FS="#" {printf "%s %s\n",$2,$1}' | awk '{printf "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"",$1,$2,$3,$4,$5,$6;for(i=7; i<=NF; ++i) printf "%s ", $i; print "\""}' | sed 's/ "$/"/g' > /tmp/scmcronjobs.tmp
