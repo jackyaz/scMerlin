@@ -140,14 +140,14 @@ thead.collapsible-jquery {
   color: #888888 !important;
 }
 
-div.procTableContainer {
+div.sortTableContainer {
   height: 500px;
   overflow-y: scroll;
   width: 745px;
   border: 1px solid #000;
 }
 
-thead.procTableHeader th {
+thead.sortTableHeader th {
   background-image: linear-gradient(rgb(146, 160, 165) 0%, rgb(102, 117, 124) 100%);
   border-top: none !important;
   border-left: none !important;
@@ -161,27 +161,27 @@ thead.procTableHeader th {
   top: 0;
 }
 
-thead.procTableHeader th:first-child,
-thead.procTableHeader th:last-child {
+thead.sortTableHeader th:first-child,
+thead.sortTableHeader th:last-child {
   border-right: none !important;
 }
 
-thead.procTableHeader th:last-child {
+thead.sortTableHeader th:last-child {
   text-align: left !important;
   padding-left: 4px !important;
 }
 
-thead.procTableHeader th:first-child,
-thead.procTableHeader td:first-child {
+thead.sortTableHeader th:first-child,
+thead.sortTableHeader td:first-child {
   border-left: none !important;
 }
 
-tbody.procTableContent td:last-child, tbody.procTableContent tr.procNormalRow td:last-child, tbody.procTableContent tr.procAlternateRow td:last-child {
+tbody.sortTableContent td:last-child, tbody.sortTableContent tr.sortNormalRow td:last-child, tbody.sortTableContent tr.sortAlternateRow td:last-child {
   text-align: left !important;
   padding-left: 4px !important;
 }
 
-tbody.procTableContent td{
+tbody.sortTableContent td{
   border-bottom: 1px solid #000 !important;
   border-left: none !important;
   border-right: 1px solid #000 !important;
@@ -193,11 +193,11 @@ tbody.procTableContent td{
   font-size: 12px !important;
 }
 
-tbody.procTableContent tr.procRow:nth-child(odd) td {
+tbody.sortTableContent tr.sortRow:nth-child(odd) td {
   background-color: #2F3A3E !important;
 }
 
-tbody.procTableContent tr.procRow:nth-child(even) td {
+tbody.sortTableContent tr.sortRow:nth-child(even) td {
   background-color: #475A5F !important;
 }
 
