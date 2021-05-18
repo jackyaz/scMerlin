@@ -702,7 +702,7 @@ EOF
 Process_Upgrade(){
 	if [ -f /opt/etc/init.d/S99tailtop ]; then
 		/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
-		sleep 5
+		sleep 2
 		rm -f /opt/etc/init.d/S99tailtop 2>/dev/null
 		rm -f /opt/bin/tailtopd
 		Update_File sc.func
