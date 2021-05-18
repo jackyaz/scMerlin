@@ -422,13 +422,13 @@ var tout,arrayproclistlines=[],sortnameproc="CPU%",sortdirproc="desc",arraycronj
 <thead class="collapsible-jquery" id="scriptconfig">
 <tr><td colspan="2">Configuration (click to expand/collapse)</td></tr>
 </thead>
-<tr class="even" id="rowenableusb">
-<td class="settingname">Enable USB Features<br/><span class="settingname">(running processes in WebUI)</span></td>
+<tr class="even" id="rowenablentpwatchdog">
+<td class="settingname">Enable NTP boot watchdog script<br/></td>
 <td class="settingvalue">
-<input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_enabled" class="input" value="enable" checked>
-<label for="scmerlin_usbenabled_enabled">Yes</label>
-<input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_disabled" class="input" value="disable">
-<label for="scmerlin_usbenabled_disabled">No</label>
+<input type="radio" name="scmerlin_ntpwatchdog" id="scmerlin_ntpwatchdog_enabled" class="input" value="enable">
+<label for="scmerlin_ntpwatchdog_enabled">Yes</label>
+<input type="radio" name="scmerlin_ntpwatchdog" id="scmerlin_ntpwatchdog_disabled" class="input" value="disable" checked>
+<label for="scmerlin_ntpwatchdog_disabled">No</label>
 </td>
 </tr>
 <tr class="apply_gen" valign="top" height="35px">
@@ -440,7 +440,7 @@ var tout,arrayproclistlines=[],sortnameproc="CPU%",sortdirproc="desc",arraycronj
 
 <!-- Insert service control tables here -->
 
-
+<!-- Start Entware table -->
 <div style="line-height:10px;">&nbsp;</div>
 <table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_entware">
 <thead class="collapsible-jquery" id="entwarecontrol">
@@ -457,30 +457,26 @@ var tout,arrayproclistlines=[],sortnameproc="CPU%",sortdirproc="desc",arraycronj
 </td>
 </tr>
 </table>
-
-<!-- Start Process List -->
+<!-- End Entware table -->
 <div style="line-height:10px;">&nbsp;</div>
-<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_proclist">
-<col style="width:35%;">
-<col style="width:65%;">
-<thead class="collapsible-jquery" id="proclist">
-<tr><td colspan="2">Process List (click to expand/collapse)</td></tr>
-</thead>
-<tr class="even">
-<th>Update automatically?</th>
-<td>
-<label style="color:#FFCC00;display:block;">
-<input type="checkbox" checked="" id="auto_refresh" style="padding:0;margin:0;vertical-align:middle;position:relative;top:-1px;" />&nbsp;&nbsp;Table will refresh every 3s</label>
-</td>
-</tr>
-<tr style="line-height:5px;"><td colspan="2">&nbsp;</td></tr>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+<thead class="collapsible-jquery" id="router">
 <tr>
-<td colspan="2" align="center" style="padding: 0px;">
-<div id="procTableContainer" class="procTableContainer"></div>
-</td>
+<td>Router (click to expand/collapse)</td>
+</tr>
+</thead>
+<tr><td align="center" style="padding: 0px;">
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable">
+<thead class="collapsible-jquery" id="routertemps">
+<tr>
+<td colspan="2">Temperatures (click to expand/collapse)</td>
+</tr>
+</thead>
+<tr>
+<td class="settingname">Temperatures</td>
+<td id="temp_td" class="settingvalue"></td>
 </tr>
 </table>
-<!-- End Process List -->
 <div style="line-height:10px;">&nbsp;</div>
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 <thead class="collapsible-jquery" id="routermemory">
@@ -545,16 +541,45 @@ var tout,arrayproclistlines=[],sortnameproc="CPU%",sortdirproc="desc",arraycronj
 <td id="jffs_td" style="width:125px;"></td>
 </tr>
 </table>
+
+<!-- Start Cron table -->
 <div style="line-height:10px;">&nbsp;</div>
-<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable">
-<thead class="collapsible-jquery" id="routertemps">
-<tr>
-<td colspan="2">Router (click to expand/collapse)</td>
-</tr>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_cron">
+<thead class="collapsible-jquery" id="thead_cron">
+<tr><td>Cron Jobs (click to expand/collapse)</td></tr>
 </thead>
 <tr>
-<td class="settingname">Temperatures</td>
-<td id="temp_td" class="settingvalue"></td>
+<td align="center" style="padding: 0px;">
+<div id="sortTableCron" class="sortTableContainer" style="height:300px;"></div>
+</td>
+</tr>
+</table>
+<!-- End Cron table -->
+
+<!-- Start Process List -->
+<div style="line-height:10px;">&nbsp;</div>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_proclist">
+<col style="width:35%;">
+<col style="width:65%;">
+<thead class="collapsible-jquery" id="proclist">
+<tr><td colspan="2">Process List (click to expand/collapse)</td></tr>
+</thead>
+<tr class="even">
+<th>Update automatically?</th>
+<td>
+<label style="color:#FFCC00;display:block;">
+<input type="checkbox" checked="" id="auto_refresh" style="padding:0;margin:0;vertical-align:middle;position:relative;top:-1px;" />&nbsp;&nbsp;Table will refresh every 5s</label>
+</td>
+</tr>
+<tr style="line-height:5px;"><td colspan="2">&nbsp;</td></tr>
+<tr>
+<td colspan="2" align="center" style="padding: 0px;">
+<div id="sortTableProcesses" class="sortTableContainer"></div>
+</td>
+</tr>
+</table>
+<!-- End Process List -->
+</td>
 </tr>
 </table>
 </td>
