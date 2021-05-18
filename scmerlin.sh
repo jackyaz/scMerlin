@@ -33,7 +33,6 @@ readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME_LOWER"
 readonly SHARED_DIR="/jffs/addons/shared-jy"
 readonly SHARED_REPO="https://raw.githubusercontent.com/jackyaz/shared-jy/master"
 readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
-readonly DISABLE_USB_FEATURES_FILE="$SCRIPT_DIR/.usbdisabled"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
 
@@ -172,13 +171,10 @@ Update_Version(){
 					printf "\\n"
 					Update_File shared-jy.tar.gz
 					Update_File scmerlin_www.asp
-					
-					if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-						Update_File tailtop
-						Update_File tailtopd
-						Update_File sc.func
-						Update_File S99tailtop
-					fi
+					Update_File tailtop
+					Update_File tailtopd
+					Update_File sc.func
+					Update_File S99tailtop
 					/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 					chmod 0755 "/jffs/scripts/$SCRIPT_NAME_LOWER"
 					Set_Version_Custom_Settings local "$serverver"
@@ -205,12 +201,10 @@ Update_Version(){
 		Print_Output true "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
 		Update_File shared-jy.tar.gz
 		Update_File scmerlin_www.asp
-		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-			Update_File tailtop
-			Update_File tailtopd
-			Update_File sc.func
-			Update_File S99tailtop
-		fi
+		Update_File tailtop
+		Update_File tailtopd
+		Update_File sc.func
+		Update_File S99tailtop
 		/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 		chmod 0755 "/jffs/scripts/$SCRIPT_NAME_LOWER"
 		Set_Version_Custom_Settings local "$serverver"
@@ -324,7 +318,6 @@ Create_Symlinks(){
 	ln -s /tmp/scmerlin-top "$SCRIPT_WEB_DIR/top.htm" 2>/dev/null
 	ln -s /tmp/addonwebpages.tmp "$SCRIPT_WEB_DIR/addonwebpages.htm" 2>/dev/null
 	ln -s /tmp/scmcronjobs.tmp "$SCRIPT_WEB_DIR/scmcronjobs.htm" 2>/dev/null
-	ln -s "$DISABLE_USB_FEATURES_FILE" "$SCRIPT_WEB_DIR/usbdisabled.htm" 2>/dev/null
 	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
 		ln -s "$SHARED_DIR" "$SHARED_WEB_DIR" 2>/dev/null
@@ -365,53 +358,6 @@ Auto_ServiceEvent(){
 }
 
 Auto_Startup(){
-	case $1 in
-		create)
-			if [ -f /jffs/scripts/services-start ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
-				
-				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
-				fi
-			fi
-			if [ -f /jffs/scripts/post-mount ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
-				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" /jffs/scripts/post-mount)
-				
-				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
-				fi
-				
-				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
-					echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" >> /jffs/scripts/post-mount
-				fi
-			else
-				echo "#!/bin/sh" > /jffs/scripts/post-mount
-				echo "" >> /jffs/scripts/post-mount
-				echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" >> /jffs/scripts/post-mount
-				chmod 0755 /jffs/scripts/post-mount
-			fi
-		;;
-		delete)
-			if [ -f /jffs/scripts/services-start ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
-				
-				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
-				fi
-			fi
-			if [ -f /jffs/scripts/post-mount ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
-				
-				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
-				fi
-			fi
-		;;
-	esac
-}
-
-Auto_Startup_NoUSB(){
 	case $1 in
 		create)
 			if [ -f /jffs/scripts/post-mount ]; then
@@ -594,36 +540,6 @@ Get_Addon_Pages(){
 	weburl="$(echo "${urlproto}://${urldomain}${urlport}/" | tr "A-Z" "a-z")"
 	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%-12s "wu"%s\n",$4,$2}' | sort -f
 	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%s,"wu"%s\n",$4,$2}' > /tmp/addonwebpages.tmp
-}
-
-ToggleUSBFeatures(){
-	case "$1" in
-		enable)
-			rm -f "$DISABLE_USB_FEATURES_FILE"
-			Auto_Startup_NoUSB delete 2>/dev/null
-			Auto_Startup create 2>/dev/null
-			Update_File tailtop
-			Update_File tailtopd
-			Update_File sc.func
-			Update_File S99tailtop
-		;;
-		disable)
-			touch "$DISABLE_USB_FEATURES_FILE"
-			Auto_Startup delete 2>/dev/null
-			Auto_Startup_NoUSB create 2>/dev/null
-			/opt/etc/init.d/S99tailtop stop
-			rm -f "$SCRIPT_DIR/tailtop"
-			rm -f "$SCRIPT_DIR/tailtopd"
-			rm -f /opt/etc/init.d/S99tailtop
-		;;
-		check)
-			if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-				echo "ENABLED"
-			else
-				echo "DISABLED"
-			fi
-		;;
-	esac
 }
 
 NTPBootWatchdog(){
@@ -822,12 +738,6 @@ MainMenu(){
 		NTPBW_ENABLED="Disabled"
 	fi
 	printf "ntp.  Toggle NTP boot watchdog script\\n      Currently: ${BOLD}$NTPBW_ENABLED${CLEARFORMAT}\\n\\n"
-	if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
-		USB_ENABLED="${PASS}Enabled"
-	else
-		USB_ENABLED="${ERR}Disabled"
-	fi
-	printf "usb.  Toggle USB features (list of running processes in WebUI)\\n      Currently: ${BOLD}$USB_ENABLED${CLEARFORMAT}\\n\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
@@ -1134,15 +1044,6 @@ MainMenu(){
 				fi
 				break
 			;;
-			usb)
-				printf "\\n"
-				if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
-					ToggleUSBFeatures disable
-				elif [ "$(ToggleUSBFeatures check)" = "DISABLED" ]; then
-					ToggleUSBFeatures enable
-				fi
-				break
-			;;
 			u)
 				printf "\\n"
 				if Check_Lock menu; then
@@ -1204,21 +1105,6 @@ Check_Requirements(){
 		CHECKSFAILED="true"
 	fi
 	
-	printf "\\n${BOLD}Would you like to enable USB Features (list of running processes in WebUI) (y/n)?\\nThis requires a USB device plugged into router for Entware${CLEARFORMAT}  "
-	read -r confirm
-	case "$confirm" in
-		y|Y)
-			if [ ! -f /opt/bin/opkg ]; then
-				touch "$DISABLE_USB_FEATURES_FILE"
-				Print_Output false "Entware not detected, USB features disabled" "$WARN"
-			fi
-		;;
-		*)
-			touch "$DISABLE_USB_FEATURES_FILE"
-			Print_Output false "USB features can be enabled later via the WebUI or command line" "$WARN"
-		;;
-	esac
-	
 	if [ "$CHECKSFAILED" = "false" ]; then
 		return 0
 	else
@@ -1246,21 +1132,15 @@ Menu_Install(){
 	Set_Version_Custom_Settings local "$SCRIPT_VERSION"
 	Set_Version_Custom_Settings server "$SCRIPT_VERSION"
 	Create_Symlinks
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Auto_Startup create 2>/dev/null
-	else
-		Auto_Startup_NoUSB create 2>/dev/null
-	fi
+	Auto_Startup create 2>/dev/null
 	Auto_ServiceEvent create 2>/dev/null
 	
 	Update_File scmerlin_www.asp
 	Update_File shared-jy.tar.gz
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Update_File tailtop
-		Update_File tailtopd
-		Update_File sc.func
-		Update_File S99tailtop
-	fi
+	Update_File tailtop
+	Update_File tailtopd
+	Update_File sc.func
+	Update_File S99tailtop
 	
 	Clear_Lock
 	ScriptHeader
@@ -1269,22 +1149,7 @@ Menu_Install(){
 
 Menu_Startup(){
 	Create_Dirs
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		if [ -z "$1" ]; then
-			Print_Output true "Missing argument for startup, not starting $SCRIPT_NAME" "$WARN"
-			exit 1
-		elif [ "$1" != "force" ]; then
-			if [ ! -f "$1/entware/bin/opkg" ]; then
-				Print_Output true "$1 does not contain Entware, not starting $SCRIPT_NAME" "$WARN"
-				exit 1
-			else
-				Print_Output true "$1 contains Entware, starting $SCRIPT_NAME" "$WARN"
-			fi
-		fi
-		Auto_Startup create 2>/dev/null
-	else
-		Auto_Startup_NoUSB create 2>/dev/null
-	fi
+	Auto_Startup create 2>/dev/null
 	
 	NTP_Ready
 	
@@ -1305,11 +1170,7 @@ Menu_Startup(){
 Menu_Uninstall(){
 	Print_Output true "Removing $SCRIPT_NAME..." "$PASS"
 	Shortcut_Script delete
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Auto_Startup delete 2>/dev/null
-	else
-		Auto_Startup_NoUSB delete 2>/dev/null
-	fi
+	Auto_Startup delete 2>/dev/null
 	Auto_ServiceEvent delete 2>/dev/null
 	
 	LOCKFILE=/tmp/addonwebui.lock
@@ -1421,17 +1282,10 @@ EOF
 
 if [ -z "$1" ]; then
 	NTP_Ready
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Entware_Ready
-	fi
 	Create_Dirs
 	Shortcut_Script create
 	Create_Symlinks
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Auto_Startup create 2>/dev/null
-	else
-		Auto_Startup_NoUSB create 2>/dev/null
-	fi
+	Auto_Startup create 2>/dev/null
 	Auto_ServiceEvent create 2>/dev/null
 	Process_Upgrade
 	ScriptHeader
@@ -1451,8 +1305,8 @@ case "$1" in
 	;;
 	service_event)
 		if [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}config"; then
-			settingstate="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}config//")";
-			ToggleUSBFeatures "$settingstate"
+			#settingstate="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}config//")";
+			#ToggleUSBFeatures "$settingstate"
 			exit 0
 		elif [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}servicerestart"; then
 			rm -f "$SCRIPT_WEB_DIR/detect_service.js"
@@ -1539,11 +1393,7 @@ case "$1" in
 		Create_Dirs
 		Shortcut_Script create
 		Create_Symlinks
-		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-			Auto_Startup create 2>/dev/null
-		else
-			Auto_Startup_NoUSB create 2>/dev/null
-		fi
+		Auto_Startup create 2>/dev/null
 		Auto_ServiceEvent create 2>/dev/null
 		Process_Upgrade
 		exit 0
