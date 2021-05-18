@@ -554,11 +554,18 @@ Mount_WebUI(){
 }
 
 Get_Cron_Jobs(){
+	printf "%-27s┌────────── minute (0 - 59)\\n" " "
+	printf "%-27s│%-6s┌──────── hour (0 - 23)\\n" " " " "
+	printf "%-27s│%-6s│%-6s┌────── day of month (1 - 31)\\n" " " " " " "
+	printf "%-27s│%-6s│%-6s│%-6s┌──── month (1 - 12)\\n" " " " " " " " "
+	printf "%-27s│%-6s│%-6s│%-6s│%-6s┌── day of week (0 - 6 => Sunday - Saturday)\\n" " " " " " " " " " "
+	printf "%-27s│%-6s│%-6s│%-6s│%-6s│\\n" " " " " " " " " " "
+	printf "%-27s↓%-6s↓%-6s↓%-6s↓%-6s↓\\n" " " " " " " " " " "
 	printf "${BOLD}%-25s %-6s %-6s %-6s %-6s %-9s %s${CLEARFORMAT}\\n" "Cron job name" "Min" "Hour" "DayM" "Month" "DayW" "Command"
+	cru l | sed 's/,/|/g' | awk 'FS="#" {printf "%s %s\n",$2,$1}' | awk '{printf "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"",$1,$2,$3,$4,$5,$6;for(i=7; i<=NF; ++i) printf "%s ", $i; print "\""}' | sed 's/ "$/"/g' > /tmp/scmcronjobs.tmp
 	cronjobs="$(cru l | awk 'FS="#" {printf "%s %s\n",$2,$1}' | awk '{printf "%-25s %-6s %-6s %-6s %-6s %-10s",$1,$2,$3,$4,$5,$6;for(i=7; i<=NF; ++i) printf "%s ", $i; print ""}')"
 	echo "$cronjobs"
-	cru l | sed 's/,/|/g' | awk 'FS="#" {printf "%s %s\n",$2,$1}' | awk '{printf "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"",$1,$2,$3,$4,$5,$6;for(i=7; i<=NF; ++i) printf "%s ", $i; print "\""}' | sed 's/ "$/"/g' > /tmp/scmcronjobs.tmp
-}
+	}
 
 Get_Addon_Pages(){
 	urlpage=""
