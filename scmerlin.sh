@@ -176,6 +176,7 @@ Update_Version(){
 					if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
 						Update_File tailtop
 						Update_File tailtopd
+						Update_File sc.func
 						Update_File S99tailtop
 					fi
 					/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
@@ -207,6 +208,7 @@ Update_Version(){
 		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
 			Update_File tailtop
 			Update_File tailtopd
+			Update_File sc.func
 			Update_File S99tailtop
 		fi
 		/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
@@ -260,29 +262,29 @@ Update_File(){
 	elif [ "$1" = "S99tailtop" ]; then
 		tmpfile="/tmp/$1"
 		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
-		if ! diff -q "$tmpfile" "/opt/etc/init.d/$1" >/dev/null 2>&1; then
-			if [ -f /opt/etc/init.d/S99tailtop ]; then
-				/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			if [ -f "$SCRIPT_DIR/S99tailtop" ]; then
+				"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 				sleep 2
 			fi
-			Download_File "$SCRIPT_REPO/$1" "/opt/etc/init.d/$1"
-			chmod 0755 "/opt/etc/init.d/$1"
-			/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
 			Print_Output true "New version of $1 downloaded" "$PASS"
 		fi
 		rm -f "$tmpfile"
-	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ]; then
+	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ] || [ "$1" = "sc.func" ]; then
 		tmpfile="/tmp/$1"
 		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
 		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
-			if [ -f /opt/etc/init.d/S99tailtop ]; then
-				/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
+			if [ -f "$SCRIPT_DIR/S99tailtop" ]; then
+				"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 				sleep 2
 			fi
 			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
 			chmod 0755 "$SCRIPT_DIR/$1"
 			Print_Output true "New version of $1 downloaded" "$PASS"
-			/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
 		fi
 		rm -f "$tmpfile"
 	else
@@ -602,6 +604,7 @@ ToggleUSBFeatures(){
 			Auto_Startup create 2>/dev/null
 			Update_File tailtop
 			Update_File tailtopd
+			Update_File sc.func
 			Update_File S99tailtop
 		;;
 		disable)
@@ -694,6 +697,17 @@ EOF
 			fi
 		;;
 	esac
+}
+
+Process_Upgrade(){
+	if [ -f /opt/etc/init.d/S99tailtop ]; then
+		/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
+		sleep 5
+		rm -f /opt/etc/init.d/S99tailtop 2>/dev/null
+		rm -f /opt/bin/tailtopd
+		Update_File sc.func
+		Update_File S99tailtop
+	fi
 }
 
 Shortcut_Script(){
@@ -1244,6 +1258,7 @@ Menu_Install(){
 	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
 		Update_File tailtop
 		Update_File tailtopd
+		Update_File sc.func
 		Update_File S99tailtop
 	fi
 	
@@ -1312,9 +1327,9 @@ Menu_Uninstall(){
 	rm -f "$SCRIPT_DIR/scmerlin_www.asp" 2>/dev/null
 	rm -rf "$SCRIPT_WEB_DIR" 2>/dev/null
 	
-	/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
+	"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 	sleep 5
-	rm -f /opt/etc/init.d/S99tailtop 2>/dev/null
+	rm -f "$SCRIPT_DIR/S99tailtop" 2>/dev/null
 	rm -f "$SCRIPT_DIR/tailtop"* 2>/dev/null
 	
 	rm -rf "$SCRIPT_DIR"
@@ -1418,6 +1433,7 @@ if [ -z "$1" ]; then
 		Auto_Startup_NoUSB create 2>/dev/null
 	fi
 	Auto_ServiceEvent create 2>/dev/null
+	Process_Upgrade
 	ScriptHeader
 	MainMenu
 	exit 0
@@ -1529,6 +1545,7 @@ case "$1" in
 			Auto_Startup_NoUSB create 2>/dev/null
 		fi
 		Auto_ServiceEvent create 2>/dev/null
+		Process_Upgrade
 		exit 0
 	;;
 	checkupdate)
