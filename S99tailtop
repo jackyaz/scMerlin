@@ -1,7 +1,5 @@
 #!/bin/sh
 # shellcheck disable=SC2034
-ln -s /jffs/addons/scmerlin.d/tailtopd /opt/bin 2>/dev/null
-chmod 0755 /opt/bin/tailtopd
 
 if [ "$1" = "restart" ] || [ "$1" = "stop" ] || [ "$1" = "kill" ]; then
 	killall -q tailtopd
@@ -10,12 +8,12 @@ if [ "$1" = "restart" ] || [ "$1" = "stop" ] || [ "$1" = "kill" ]; then
 fi
 
 ENABLED=yes
-PROCS=tailtopd
+PROCS=/jffs/addons/scmerlin.d/tailtopd
 ARGS=""
 PREARGS=""
 PRECMD=""
 POSTCMD=""
 DESC=$PROCS
-PATH=/opt/sbin:/opt/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-. /opt/etc/init.d/rc.func
+. /jffs/addons/scmerlin.d/sc.func
