@@ -33,6 +33,7 @@ readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME_LOWER"
 readonly SHARED_DIR="/jffs/addons/shared-jy"
 readonly SHARED_REPO="https://raw.githubusercontent.com/jackyaz/shared-jy/master"
 readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
+readonly NTP_WATCHDOG_FILE="$SCRIPT_DIR/.watchdogenabled"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
 
@@ -319,6 +320,8 @@ Create_Symlinks(){
 	ln -s /tmp/addonwebpages.tmp "$SCRIPT_WEB_DIR/addonwebpages.htm" 2>/dev/null
 	ln -s /tmp/scmcronjobs.tmp "$SCRIPT_WEB_DIR/scmcronjobs.htm" 2>/dev/null
 	
+	ln -s "$NTP_WATCHDOG_FILE" "$SCRIPT_WEB_DIR/watchdogenabled.htm" 2>/dev/null
+	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
 		ln -s "$SHARED_DIR" "$SHARED_WEB_DIR" 2>/dev/null
 	fi
@@ -545,6 +548,7 @@ Get_Addon_Pages(){
 NTPBootWatchdog(){
 	case "$1" in
 		enable)
+			touch "$NTP_WATCHDOG_FILE"
 			cat << "EOF" > /jffs/scripts/ntpbootwatchdog.sh
 #!/bin/sh
 if [ "$(nvram get ntp_ready)" -eq 1 ]; then
@@ -596,6 +600,7 @@ EOF
 			fi
 		;;
 		disable)
+			rm -f "$NTP_WATCHDOG_FILE"
 			rm -f /jffs/scripts/ntpbootwatchdog.sh
 			if [ -f /jffs/scripts/init-start ]; then
 				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/init-start)
@@ -623,6 +628,7 @@ Process_Upgrade(){
 		rm -f /opt/bin/tailtopd
 		Update_File sc.func
 		Update_File S99tailtop
+		rm -f "$SCRIPT_DIR/.usbdisabled"
 	fi
 }
 
@@ -1305,8 +1311,8 @@ case "$1" in
 	;;
 	service_event)
 		if [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}config"; then
-			#settingstate="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}config//")";
-			#ToggleUSBFeatures "$settingstate"
+			settingstate="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}config//")";
+			NTPBootWatchdog "$settingstate"
 			exit 0
 		elif [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}servicerestart"; then
 			rm -f "$SCRIPT_WEB_DIR/detect_service.js"
