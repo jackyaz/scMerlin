@@ -1178,6 +1178,7 @@ Menu_Uninstall(){
 	Shortcut_Script delete
 	Auto_Startup delete 2>/dev/null
 	Auto_ServiceEvent delete 2>/dev/null
+	NTPBootWatchdog disable
 	
 	LOCKFILE=/tmp/addonwebui.lock
 	FD=386
@@ -1188,17 +1189,15 @@ Menu_Uninstall(){
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
 		umount /www/require/modules/menuTree.js
 		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
-		rm -rf "{$SCRIPT_WEBPAGE_DIR:?}/$MyPage"
+		rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage"
+		rm -f "$SCRIPT_WEBPAGE_DIR/$(echo $MyPage | cut -f1 -d'.').title"
 	fi
 	flock -u "$FD"
-	rm -f "$SCRIPT_DIR/scmerlin_www.asp" 2>/dev/null
 	rm -rf "$SCRIPT_WEB_DIR" 2>/dev/null
 	
 	"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 	sleep 5
-	rm -f "$SCRIPT_DIR/S99tailtop" 2>/dev/null
-	rm -f "$SCRIPT_DIR/tailtop"* 2>/dev/null
-	
+		
 	rm -rf "$SCRIPT_DIR"
 	
 	SETTINGSFILE="/jffs/addons/custom_settings.txt"
