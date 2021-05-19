@@ -1383,6 +1383,9 @@ case "$1" in
 		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}getaddonpages" ]; then
 			Get_Addon_Pages
 			exit 0
+		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}getcronjobs" ]; then
+			Get_Cron_Jobs
+			exit 0
 		fi
 		exit 0
 	;;
