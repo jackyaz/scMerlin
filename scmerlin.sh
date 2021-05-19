@@ -1169,6 +1169,8 @@ Menu_Startup(){
 	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_Script create
 	
+	"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
+	
 	Mount_WebUI
 	Clear_Lock
 }
