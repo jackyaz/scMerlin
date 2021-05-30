@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.com/jackyaz/scMerlin.svg?branch=master)](https://travis-ci.com/jackyaz/scMerlin)
 
 ## v2.3.0
-### Updated on 2021-05-30
+### Updated on 2021-05-31
 ## About
 scMerlin allows you to easily control the most common services/scripts on your router.
 
