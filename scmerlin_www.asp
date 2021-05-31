@@ -11,244 +11,7 @@
 <link rel="stylesheet" type="text/css" href="/index_style.css">
 <link rel="stylesheet" type="text/css" href="/form_style.css">
 <style>
-p {
-  font-weight: bolder;
-}
-
-thead.collapsible-jquery {
-  color: white;
-  padding: 0px;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  cursor: pointer;
-}
-
-.SettingsTable {
-  text-align: left;
-}
-
-.SettingsTable input {
-  text-align: left;
-  margin-left: 3px !important;
-}
-
-.SettingsTable input.savebutton {
-  text-align: center;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  border-right: solid 1px black;
-  border-left: solid 1px black;
-  border-bottom: solid 1px black;
-}
-
-.SettingsTable td.savebutton {
-  border-right: solid 1px black;
-  border-left: solid 1px black;
-  border-bottom: solid 1px black;
-  background-color:rgb(77, 89, 93);
-}
-
-.SettingsTable .cronbutton {
-  text-align: center;
-  min-width: 50px;
-  width: 50px;
-  height: 23px;
-  vertical-align: middle;
-}
-
-.SettingsTable select {
-  margin-left: 3px !important;
-}
-
-.SettingsTable label {
-  margin-right: 10px !important;
-  vertical-align: top !important;
-}
-
-.SettingsTable th {
-  background-color: #1F2D35 !important;
-  background: #2F3A3E !important;
-  border-bottom: none !important;
-  border-top: none !important;
-  font-size: 12px !important;
-  color: white !important;
-  padding: 4px !important;
-  font-weight: bolder !important;
-  padding: 0px !important;
-}
-
-.SettingsTable td {
-  word-wrap: break-word !important;
-  overflow-wrap: break-word !important;
-  border-right: none;
-  border-left: none;
-}
-
-.SettingsTable span.settingname {
-  background-color: #1F2D35 !important;
-  background: #2F3A3E !important;
-}
-
-.SettingsTable td.settingname {
-  border-right: solid 1px black;
-  border-left: solid 1px black;
-  background-color: #1F2D35 !important;
-  background: #2F3A3E !important;
-  width: 35% !important;
-}
-
-.SettingsTable td.settingvalue {
-  text-align: left !important;
-  border-right: solid 1px black;
-}
-
-.SettingsTable td.servicename {
-  border-right: solid 1px black;
-  border-left: solid 1px black;
-  background-color: #1F2D35 !important;
-  background: #2F3A3E !important;
-  width: 30% !important;
-}
-
-.SettingsTable td.servicevalue {
-  text-align: center !important;
-  border-right: solid 1px black;
-  width: 20% !important;
-  padding-left: 4px !important;
-}
-
-.SettingsTable span.servicespan {
-  font-size: 10px !important;
-}
-
-.SettingsTable th:first-child{
-  border-left: none !important;
-}
-
-.SettingsTable th:last-child {
-  border-right: none !important;
-}
-
-.SettingsTable .invalid {
-  background-color: darkred !important;
-}
-
-.SettingsTable .disabled {
-  background-color: #CCCCCC !important;
-  color: #888888 !important;
-}
-
-div.procTableContainer {
-  height: 500px;
-  overflow-y: scroll;
-  width: 745px;
-  border: 1px solid #000;
-}
-
-thead.procTableHeader th {
-  background-image: linear-gradient(rgb(146, 160, 165) 0%, rgb(102, 117, 124) 100%);
-  border-top: none !important;
-  border-left: none !important;
-  border-right: none !important;
-  border-bottom: 1px solid #000 !important;
-  font-weight: bolder;
-  padding: 2px;
-  text-align: center;
-  color: #fff;
-  position: sticky;
-  top: 0;
-}
-
-thead.procTableHeader th:first-child,
-thead.procTableHeader th:last-child {
-  border-right: none !important;
-}
-
-thead.procTableHeader th:last-child {
-  text-align: left !important;
-  padding-left: 4px !important;
-}
-
-thead.procTableHeader th:first-child,
-thead.procTableHeader td:first-child {
-  border-left: none !important;
-}
-
-tbody.procTableContent td:last-child, tbody.procTableContent tr.procNormalRow td:last-child, tbody.procTableContent tr.procAlternateRow td:last-child {
-  text-align: left !important;
-  padding-left: 4px !important;
-}
-
-tbody.procTableContent td{
-  border-bottom: 1px solid #000 !important;
-  border-left: none !important;
-  border-right: 1px solid #000 !important;
-  border-top: none !important;
-  padding: 2px;
-  text-align: center;
-  overflow: hidden !important;
-  white-space: nowrap !important;
-  font-size: 12px !important;
-}
-
-tbody.procTableContent tr.procRow:nth-child(odd) td {
-  background-color: #2F3A3E !important;
-}
-
-tbody.procTableContent tr.procRow:nth-child(even) td {
-  background-color: #475A5F !important;
-}
-
-th.sortable {
-  cursor: pointer;
-}
-
-td.metricname {
-  background-color: #1F2D35 !important;
-  background: #2F3A3E !important;
-  width:50px !important;
-}
-
-.restartbutton {
-  text-align: center !important;
-  min-width: 75px;
-  width: 75px;
-  vertical-align: middle;
-}
-
-td.addonpageurl:nth-child(even) {
-  border: 1px solid #000 !important;
-  text-align: center !important;
-  background-color: #475A5F !important;
-}
-
-td.addonpageurl:nth-child(odd) {
-  border: 1px solid #000 !important;
-  text-align: center !important;
-  background-color: #1F2D35 !important;
-  background: #2F3A3E !important;
-}
-
-td.addonpageurl:nth-child(even) span {
-  background-color: #475A5F !important;
-}
-
-td.addonpageurl:nth-child(odd) span {
-  background-color: #1F2D35 !important;
-  background: #2F3A3E !important;
-}
-
-td.addonpageurl a {
-  font-weight: bolder !important;
-  text-decoration: underline !important;
-}
-
-span.addonpageurl {
-  color: #FFCC00;
-  font-size: 10px !important;
-}
+p{font-weight:bolder}thead.collapsible-jquery{color:#fff;padding:0;width:100%;border:none;text-align:left;outline:none;cursor:pointer}.SettingsTable{text-align:left}.SettingsTable input{text-align:left;margin-left:3px!important}.SettingsTable input.savebutton{text-align:center;margin-top:5px;margin-bottom:5px;border-right:solid 1px #000;border-left:solid 1px #000;border-bottom:solid 1px #000}.SettingsTable td.savebutton{border-right:solid 1px #000;border-left:solid 1px #000;border-bottom:solid 1px #000;background-color:#4d595d}.SettingsTable .cronbutton{text-align:center;min-width:50px;width:50px;height:23px;vertical-align:middle}.SettingsTable select{margin-left:3px!important}.SettingsTable label{margin-right:10px!important;vertical-align:top!important}.SettingsTable th{background-color:#1F2D35!important;background:#2F3A3E!important;border-bottom:none!important;border-top:none!important;font-size:12px!important;color:#fff!important;padding:4px!important;font-weight:bolder!important;padding:0!important}.SettingsTable td{word-wrap:break-word!important;overflow-wrap:break-word!important;border-right:none;border-left:none}.SettingsTable span.settingname{background-color:#1F2D35!important;background:#2F3A3E!important}.SettingsTable td.settingname{border-right:solid 1px #000;border-left:solid 1px #000;background-color:#1F2D35!important;background:#2F3A3E!important;width:35%!important}.SettingsTable td.settingvalue{text-align:left!important;border-right:solid 1px #000}.SettingsTable td.servicename{border-right:solid 1px #000;border-left:solid 1px #000;background-color:#1F2D35!important;background:#2F3A3E!important;width:30%!important}.SettingsTable td.servicevalue{text-align:center!important;border-right:solid 1px #000;width:20%!important;padding-left:4px!important}.SettingsTable span.servicespan{font-size:10px!important}.SettingsTable th:first-child{border-left:none!important}.SettingsTable th:last-child{border-right:none!important}.SettingsTable .invalid{background-color:#8b0000!important}.SettingsTable .disabled{background-color:#CCC!important;color:#888!important}div.sortTableContainer{height:500px;overflow-y:scroll;width:745px;border:1px solid #000}thead.sortTableHeader th{background-image:linear-gradient(#92a0a5 0%,#66757c 100%);border-top:none!important;border-left:none!important;border-right:none!important;border-bottom:1px solid #000!important;font-weight:bolder;padding:2px;text-align:center;color:#fff;position:sticky;top:0}thead.sortTableHeader th:first-child,thead.sortTableHeader th:last-child{border-right:none!important}thead.sortTableHeader th:last-child{text-align:left!important;padding-left:4px!important}thead.sortTableHeader th:first-child,thead.sortTableHeader td:first-child{border-left:none!important}tbody.sortTableContent td:last-child,tbody.sortTableContent tr.sortNormalRow td:last-child,tbody.sortTableContent tr.sortAlternateRow td:last-child{text-align:left!important;padding-left:4px!important}tbody.sortTableContent td{border-bottom:1px solid #000!important;border-left:none!important;border-right:1px solid #000!important;border-top:none!important;padding:2px;text-align:center;overflow:hidden!important;white-space:nowrap!important;font-size:12px!important}tbody.sortTableContent tr.sortRow:nth-child(odd) td{background-color:#2F3A3E!important}tbody.sortTableContent tr.sortRow:nth-child(even) td{background-color:#475A5F!important}th.sortable{cursor:pointer}td.metricname{background-color:#1F2D35!important;background:#2F3A3E!important;width:50px!important}.restartbutton{text-align:center!important;min-width:75px;width:75px;vertical-align:middle}td.addonpageurl:nth-child(even){border:1px solid #000!important;text-align:center!important;background-color:#475A5F!important}td.addonpageurl:nth-child(odd){border:1px solid #000!important;text-align:center!important;background-color:#1F2D35!important;background:#2F3A3E!important}td.addonpageurl:nth-child(even) span{background-color:#475A5F!important}td.addonpageurl:nth-child(odd) span{background-color:#1F2D35!important;background:#2F3A3E!important}td.addonpageurl a{font-weight:bolder!important;text-decoration:underline!important}span.addonpageurl{color:#FC0;font-size:10px!important}td.nodata{height:65px!important;border:none!important;text-align:center!important;font:bolder 48px Arial!important}
 </style>
 <script language="JavaScript" type="text/javascript" src="/ext/shared-jy/jquery.js"></script>
 <script language="JavaScript" type="text/javascript" src="/ext/shared-jy/moment.js"></script>
@@ -269,8 +32,8 @@ function LoadCustomSettings(){
 	custom_settings = <% get_custom_settings(); %>;
 	for(var prop in custom_settings) {
 		if(Object.prototype.hasOwnProperty.call(custom_settings, prop)) {
-			if(prop.indexOf("scmerlin") != -1 && prop.indexOf("scmerlin_version") == -1){
-				eval("delete custom_settings."+prop)
+			if(prop.indexOf('scmerlin') != -1 && prop.indexOf('scmerlin_version') == -1){
+				eval('delete custom_settings.'+prop)
 			}
 		}
 	}
@@ -287,33 +50,33 @@ function update_sysinfo(e){
 		success: function(response){
 			show_memcpu();
 			nvramtotal = <% sysinfo("nvram.total"); %> / 1024;
-			Draw_Chart("MemoryUsage");
+			Draw_Chart('MemoryUsage');
 			if(parseInt(mem_stats_arr[5]) != 0){
-				Draw_Chart("SwapUsage");
+				Draw_Chart('SwapUsage');
 			}
 			else{
-				Draw_Chart_NoData("SwapUsage");
+				Draw_Chart_NoData('SwapUsage');
 			}
-			Draw_Chart("nvramUsage");
-			Draw_Chart("jffsUsage");
+			Draw_Chart('nvramUsage');
+			Draw_Chart('jffsUsage');
 			setTimeout(update_sysinfo, 3000);
 		}
 	});
 }
 
 function show_memcpu(){
-	document.getElementById("mem_total_td").innerHTML = mem_stats_arr[0] + " MB";
-	document.getElementById("mem_free_td").innerHTML = mem_stats_arr[1] + " MB";
-	document.getElementById("mem_buffer_td").innerHTML = mem_stats_arr[2] + " MB";
-	document.getElementById("mem_cache_td").innerHTML = mem_stats_arr[3] + " MB";
-	document.getElementById("nvram_td").innerHTML = round(mem_stats_arr[6]/1024,2).toFixed(2) + " / " + nvramtotal + " KB";
-	document.getElementById("jffs_td").innerHTML = mem_stats_arr[7];
+	document.getElementById('mem_total_td').innerHTML = mem_stats_arr[0] + ' MB';
+	document.getElementById('mem_free_td').innerHTML = mem_stats_arr[1] + ' MB';
+	document.getElementById('mem_buffer_td').innerHTML = mem_stats_arr[2] + ' MB';
+	document.getElementById('mem_cache_td').innerHTML = mem_stats_arr[3] + ' MB';
+	document.getElementById('nvram_td').innerHTML = round(mem_stats_arr[6]/1024,2).toFixed(2) + ' / ' + nvramtotal + ' KB';
+	document.getElementById('jffs_td').innerHTML = mem_stats_arr[7];
 	
 	if(parseInt(mem_stats_arr[5]) == 0){
-		document.getElementById("mem_swap_td").innerHTML = "<span>No swap configured</span>";
+		document.getElementById('mem_swap_td').innerHTML = '<span>No swap configured</span>';
 	}
 	else{
-		document.getElementById("mem_swap_td").innerHTML = mem_stats_arr[4] + " / " + mem_stats_arr[5] + " MB";
+		document.getElementById('mem_swap_td').innerHTML = mem_stats_arr[4] + ' / ' + mem_stats_arr[5] + ' MB';
 	}
 }
 
@@ -325,19 +88,19 @@ function update_temperatures(){
 		update_temperatures();
 	},
 	success: function(response){
-		code = "<b>2.4 GHz:</b><span> " + curr_coreTmp_2_raw + "</span>";
+		code = '<b>2.4 GHz:</b><span> ' + curr_coreTmp_2_raw + '</span>';
 		if(wl_info.band5g_2_support){
-			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>" + curr_coreTmp_5_raw + "</span>";
+			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>' + curr_coreTmp_5_raw + '</span>';
 			if(typeof curr_coreTmp_52_raw == 'undefined' || curr_coreTmp_52_raw == null){
-				curr_coreTmp_52_raw = "N/A"
+				curr_coreTmp_52_raw = 'N/A'
 			}
-			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>" + curr_coreTmp_52_raw + "</span>";
+			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>' + curr_coreTmp_52_raw + '</span>';
 		}
 		else if(band5g_support){
-			code += "&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>" + curr_coreTmp_5_raw + "</span>";
+			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>' + curr_coreTmp_5_raw + '</span>';
 		}
 		
-		var CPUTemp = "";
+		var CPUTemp = '';
 		if(typeof curr_cpuTemp === 'undefined' || curr_cpuTemp === null){
 			CPUTemp = curr_coreTmp_cpu;
 		}
@@ -345,18 +108,17 @@ function update_temperatures(){
 			CPUTemp = curr_cpuTemp;
 		}
 		
-		if(CPUTemp != ""){
-			code +="&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>" + parseInt(CPUTemp) +"&deg;C</span>";
+		if(CPUTemp != ''){
+			code +='&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>' + parseInt(CPUTemp) +'&deg;C</span>';
 		}
-		document.getElementById("temp_td").innerHTML = code;
+		document.getElementById('temp_td').innerHTML = code;
 		setTimeout(update_temperatures, 3000);
 		}
 	});
 }
 /* End firmware functions */
-
 var nvramtotal = <% sysinfo("nvram.total"); %> / 1024;
-var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",sortname="CPU%",sortdir="desc";Chart.defaults.global.defaultFontColor="#CCC",Chart.Tooltip.positioners.cursor=function(a,b){return b};var $j=jQuery.noConflict();function SetCurrentPage(){document.form.next_page.value=window.location.pathname.substring(1),document.form.current_page.value=window.location.pathname.substring(1)}var srvnamelist=["dnsmasq","wan","httpd","wireless","vsftpd","samba","ddns","ntpd/chronyd"],srvdesclist=["DNS/DHCP Server","Internet Connection","Web Interface","WiFi","FTP Server","Samba","DDNS client","Timeserver"],srvnamevisiblelist=[!0,!1,!0,!1,!0,!1,!1,!0],sortedAddonPages=[];function initial(){SetCurrentPage(),LoadCustomSettings(),show_menu();for(var a="",b=1;3>b;b++)a+=BuildVPNServerTable(b);$j("#table_config").after(a);for(var c="",b=1;6>b;b++)c+=BuildVPNClientTable(b);$j("#table_config").after(c);for(var d="",b=0;b<srvnamelist.length;b++)d+=BuildServiceTable(srvnamelist[b],srvdesclist[b],srvnamevisiblelist[b],b);$j("#table_config").after(d),document.formScriptActions.action_script.value="start_scmerlingetaddonpages",document.formScriptActions.submit(),load_addonpages(),get_usbdisabled_file(),update_temperatures(),update_sysinfo(),ScriptUpdateLayout()}function ScriptUpdateLayout(){var a=GetVersionNumber("local"),b=GetVersionNumber("server");$j("#scmerlin_version_local").text(a),a!=b&&"N/A"!=b&&($j("#scmerlin_version_server").text("Updated version available: "+b),showhide("btnChkUpdate",!1),showhide("scmerlin_version_server",!0),showhide("btnDoUpdate",!0))}function reload(){location.reload(!0)}function update_status(){$j.ajax({url:"/ext/scmerlin/detect_update.js",dataType:"script",timeout:3e3,error:function(){setTimeout(update_status,1e3)},success:function(){"InProgress"==updatestatus?setTimeout(update_status,1e3):(document.getElementById("imgChkUpdate").style.display="none",showhide("scmerlin_version_server",!0),"None"==updatestatus?($j("#scmerlin_version_server").text("No update available"),showhide("btnChkUpdate",!0),showhide("btnDoUpdate",!1)):($j("#scmerlin_version_server").text("Updated version available: "+updatestatus),showhide("btnChkUpdate",!1),showhide("btnDoUpdate",!0)))}})}function CheckUpdate(){showhide("btnChkUpdate",!1),document.formScriptActions.action_script.value="start_scmerlincheckupdate",document.formScriptActions.submit(),document.getElementById("imgChkUpdate").style.display="",setTimeout(update_status,2e3)}function DoUpdate(){document.form.action_script.value="start_scmerlindoupdate",document.form.action_wait.value=10,showLoading(),document.form.submit()}function RestartService(a){showhide("btnRestartSrv_"+a,!1),showhide("txtRestartSrv_"+a,!1),document.formScriptActions.action_script.value="start_scmerlinservicerestart"+a,document.formScriptActions.submit(),document.getElementById("imgRestartSrv_"+a).style.display="",setTimeout(service_status,1e3,a)}function service_status(a){$j.ajax({url:"/ext/scmerlin/detect_service.js",dataType:"script",timeout:3e3,error:function(){setTimeout(service_status,1e3,a)},success:function(){"InProgress"==servicestatus?setTimeout(service_status,1e3,a):(document.getElementById("imgRestartSrv_"+a).style.display="none","Done"==servicestatus?(showhide("txtRestartSrv_"+a,!0),setTimeout(showhide,3e3,"txtRestartSrv_"+a,!1),setTimeout(showhide,3250,"btnRestartSrv_"+a,!0)):showhide("txtRestartSrvError_"+a,!0))}})}function GetVersionNumber(a){var b;return"local"==a?b=custom_settings.scmerlin_version_local:"server"==a&&(b=custom_settings.scmerlin_version_server),"undefined"==typeof b||null==b?"N/A":b}function BuildProcListTableHtml(){var a="<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" class=\"procTable\" style=\"table-layout:fixed;\">";a+="<col style=\"width:50px;\">",a+="<col style=\"width:50px;\">",a+="<col style=\"width:75px;\">",a+="<col style=\"width:50px;\">",a+="<col style=\"width:50px;\">",a+="<col style=\"width:55px;\">",a+="<col style=\"width:50px;\">",a+="<col style=\"width:55px;\">",a+="<col style=\"width:740px;\">",a+="<thead class=\"procTableHeader\">",a+="<tr>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">PID</th>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">PPID</th>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">USER</th>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">STAT</th>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">VSZ</th>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">VSZ%</th>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">CPU</th>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">CPU%</th>",a+="<th class=\"sortable\" onclick=\"SortTable(this.innerHTML)\">COMMAND</th>",a+="</tr>",a+="</thead>",a+="<tbody class=\"procTableContent\">";for(var b=0;b<arrayproclistlines.length;b++)a+="<tr class=\"procRow\">",a+="<td>"+arrayproclistlines[b].PID+"</td>",a+="<td>"+arrayproclistlines[b].PPID+"</td>",a+="<td>"+arrayproclistlines[b].USER+"</td>",a+="<td>"+arrayproclistlines[b].STAT+"</td>",a+="<td>"+arrayproclistlines[b].VSZ+"</td>",a+="<td>"+arrayproclistlines[b].VSZP+"</td>",a+="<td>"+arrayproclistlines[b].CPU+"</td>",a+="<td>"+arrayproclistlines[b].CPUP+"</td>",a+="<td>"+arrayproclistlines[b].COMMAND+"</td>",a+="</tr>";return a+="</tbody>",a+="</table>",a}function get_usbdisabled_file(){$j.ajax({url:"/ext/scmerlin/usbdisabled.htm",dataType:"text",timeout:1e4,error:function(){document.form.scmerlin_usbenabled.value="enable",get_proclist_file()},success:function(){document.form.scmerlin_usbenabled.value="disable",document.getElementById("procTableContainer").innerHTML="Process list disabled, this feature requires the \"USB features\" option to be enabled and a USB device plugged into router for Entware"}})}function load_addonpages(){$j.ajax({url:"/ext/scmerlin/addonwebpages.js",dataType:"script",error:function(){setTimeout(load_addonpages,1e3)},success:function(){sortedAddonPages=addonpages.sort(function(c,a){return c[0].toLowerCase().localeCompare(a[0].toLowerCase())});for(var a="",b=0;b<sortedAddonPages.length;b++)a+=BuildAddonPageTable(sortedAddonPages[b][0],sortedAddonPages[b][1],b);$j("#table_config").after(a),AddEventHandlers()}})}function get_proclist_file(){$j.ajax({url:"/ext/scmerlin/top.htm",dataType:"text",error:function(){tout=setTimeout(get_proclist_file,1e3)},success:function(a){ParseProcList(a),document.getElementById("auto_refresh").checked&&(tout=setTimeout(get_proclist_file,3e3))}})}function ParseProcList(a){var b=a.split("\n");b=b.filter(Boolean),arrayproclistlines=[];for(var c=0;c<b.length;c++)try{var d=b[c].split(","),e={};e.PID=d[0].trim(),e.PPID=d[1].trim(),e.USER=d[2].trim(),e.STAT=d[3].trim(),e.VSZ=d[4].trim(),e.VSZP=d[5].trim(),e.CPU=d[6].trim(),e.CPUP=d[7].trim(),e.COMMAND=d[8].trim(),arrayproclistlines.push(e)}catch{}originalarrayproclistlines=arrayproclistlines,SortTable(sortname+" "+sortdir.replace("desc","\u2191").replace("asc","\u2193").trim())}function GetCookie(a,b){var c;if(null!=(c=cookie.get("scm_"+a)))return cookie.get("scm_"+a);return"string"==b?"":"number"==b?0:void 0}function SetCookie(a,b){cookie.set("scm_"+a,b,3650)}function AddEventHandlers(){$j(".collapsible-jquery").off("click").on("click",function(){$j(this).siblings().toggle("fast",function(){"none"==$j(this).css("display")?SetCookie($j(this).siblings()[0].id,"collapsed"):(SetCookie($j(this).siblings()[0].id,"expanded"),"routermemory"==$j(this).siblings()[0].id?(Draw_Chart("MemoryUsage"),0==parseInt(mem_stats_arr[5])?Draw_Chart_NoData("SwapUsage"):Draw_Chart("SwapUsage")):"routerstorage"==$j(this).siblings()[0].id&&(Draw_Chart("nvramUsage"),Draw_Chart("jffsUsage")))})}),$j(".collapsible-jquery").each(function(){"collapsed"==GetCookie($j(this)[0].id,"string")?$j(this).siblings().toggle(!1):$j(this).siblings().toggle(!0)}),$j("#auto_refresh")[0].addEventListener("click",function(){ToggleRefresh()})}function SortTable(sorttext){sortname=sorttext.replace("\u2191","").replace("\u2193","").trim();var sorttype="number";sortfield=sortname;"VSZ%"===sortname?sortfield="VSZP":"CPU%"===sortname?sortfield="CPUP":"USER"===sortname?sorttype="string":"STAT"===sortname?sorttype="string":"COMMAND"===sortname?sorttype="string":void 0;"string"==sorttype?-1==sorttext.indexOf("\u2193")&&-1==sorttext.indexOf("\u2191")?(eval("arrayproclistlines = arrayproclistlines.sort((a,b) => (a."+sortfield+" > b."+sortfield+") ? 1 : ((b."+sortfield+" > a."+sortfield+") ? -1 : 0)); "),sortdir="asc"):-1==sorttext.indexOf("\u2193")?(eval("arrayproclistlines = arrayproclistlines.sort((a,b) => (a."+sortfield+" < b."+sortfield+") ? 1 : ((b."+sortfield+" < a."+sortfield+") ? -1 : 0)); "),sortdir="desc"):(eval("arrayproclistlines = arrayproclistlines.sort((a,b) => (a."+sortfield+" > b."+sortfield+") ? 1 : ((b."+sortfield+" > a."+sortfield+") ? -1 : 0)); "),sortdir="asc"):"number"==sorttype&&(-1==sorttext.indexOf("\u2193")&&-1==sorttext.indexOf("\u2191")?(eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(a."+sortfield+".replace('m','000')) - parseFloat(b."+sortfield+".replace('m','000'))); "),sortdir="asc"):-1==sorttext.indexOf("\u2193")?(eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(b."+sortfield+".replace('m','000')) - parseFloat(a."+sortfield+".replace('m','000'))); "),sortdir="desc"):(eval("arrayproclistlines = arrayproclistlines.sort((a, b) => parseFloat(a."+sortfield+".replace('m','000')) - parseFloat(b."+sortfield+".replace('m','000'))); "),sortdir="asc")),$j("#procTableContainer").empty(),$j("#procTableContainer").append(BuildProcListTableHtml()),$j(".sortable").each(function(a,b){b.innerHTML==sortname&&("asc"==sortdir?b.innerHTML=sortname+" \u2191":b.innerHTML=sortname+" \u2193")})}function ToggleRefresh(){$j("#auto_refresh").prop("checked",function(a,b){b?get_proclist_file():clearTimeout(tout)})}function BuildAddonPageTable(a,b,c){var d="";if(0==c&&(d+="<div style=\"line-height:10px;\">&nbsp;</div>",d+="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"2\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"FormTable SettingsTable\" style=\"border:0px;\" id=\"table_services\">",d+="<thead class=\"collapsible-jquery\" id=\"addonpages\">",d+="<tr><td colspan=\"4\">WebUI Addons (click to expand/collapse)</td></tr>",d+="</thead>"),(0==c||0==c%4)&&(d+="<tr>"),d+="<td class=\"addonpageurl\"><a href=\""+b.substring(b.lastIndexOf("/")+1)+"\">"+a+"</a><br /><span class=\"addonpageurl\">"+b.substring(b.lastIndexOf("/")+1)+"</span></td>",0<c&&0==(c+1)%4&&(d+="</tr>"),c==sortedAddonPages.length-1){if(0!=sortedAddonPages.length%4){for(var e=4-sortedAddonPages.length%4,f=0;f<e;f++)d+="<td class=\"addonpageurl\"></td>";d+="</tr>"}d+="</table>"}return d}function BuildServiceTable(a,b,c,d){var e="";return 0==d&&(e+="<div style=\"line-height:10px;\">&nbsp;</div>",e+="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"2\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"FormTable SettingsTable\" style=\"border:0px;\" id=\"table_services\">",e+="<thead class=\"collapsible-jquery\" id=\"servicescontrol\">",e+="<tr><td colspan=\"4\">Services (click to expand/collapse)</td></tr>",e+="</thead>"),(0==d||0==d%2)&&(e+="<tr>"),e+=c?"<td class=\"servicename\">"+b+" <span class=\"settingname\">("+a+")</span></td>":"<td class=\"servicename\">"+b+"</td>",a=a.replace("/",""),e+="<td class=\"servicevalue\">",e+="<input type=\"button\" class=\"button_gen restartbutton\" onclick=\"RestartService('"+a+"');\" value=\"Restart\" id=\"btnRestartSrv_"+a+"\">",e+="<span id=\"txtRestartSrv_"+a+"\" style=\"display:none;\" class=\"servicespan\">Done</span>",e+="<span id=\"txtRestartSrvError_"+a+"\" style=\"display:none;\" class=\"servicespan\">Invalid - service disabled</span>",e+="<img id=\"imgRestartSrv_"+a+"\" style=\"display:none;vertical-align:middle;\" src=\"images/InternetScan.gif\"/>",e+="</td>",0<d&&0==(d+1)%2&&(e+="</tr>"),d==srvnamelist.length-1&&(e+="</table>"),e}function BuildVPNClientTable(loopindex){var vpnclientshtml="",vpnclientname="vpnclient"+loopindex,vpnclientdesc=eval("document.form.vpnc"+loopindex+"_desc").value;return 1==loopindex&&(vpnclientshtml+="<div style=\"line-height:10px;\">&nbsp;</div>",vpnclientshtml+="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"2\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"FormTable SettingsTable\" style=\"border:0px;\" id=\"table_vpnclients\">",vpnclientshtml+="<thead class=\"collapsible-jquery\" id=\"vpnclientscontrol\">",vpnclientshtml+="<tr><td colspan=\"4\">VPN Clients (click to expand/collapse)</td></tr>",vpnclientshtml+="</thead>"),(1==loopindex||0==(loopindex+1)%2)&&(vpnclientshtml+="<tr>"),vpnclientshtml+="<td class=\"servicename\">VPN Client "+loopindex,vpnclientshtml+="<br /><span class=\"settingname\">("+vpnclientdesc+")</span></td>",vpnclientshtml+="<td class=\"servicevalue\">",vpnclientshtml+="<input type=\"button\" class=\"button_gen restartbutton\" onclick=\"RestartService('"+vpnclientname+"');\" value=\"Restart\" id=\"btnRestartSrv_"+vpnclientname+"\">",vpnclientshtml+="<span id=\"txtRestartSrv_"+vpnclientname+"\" style=\"display:none;\" class=\"servicespan\">Done</span>",vpnclientshtml+="<span id=\"txtRestartSrvError_"+vpnclientname+"\" style=\"display:none;\" class=\"servicespan\">Invalid - VPN Client disabled</span>",vpnclientshtml+="<img id=\"imgRestartSrv_"+vpnclientname+"\" style=\"display:none;vertical-align:middle;\" src=\"images/InternetScan.gif\"/>",vpnclientshtml+="</td>",5==loopindex&&(vpnclientshtml+="<td class=\"servicename\"></td><td class=\"servicevalue\"></td>"),1<loopindex&&0==loopindex%2&&(vpnclientshtml+="</tr>"),5==loopindex&&(vpnclientshtml+="</table>"),vpnclientshtml}function BuildVPNServerTable(a){var b="",c="vpnserver"+a;return 1==a&&(b+="<div style=\"line-height:10px;\">&nbsp;</div>",b+="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"2\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"FormTable SettingsTable\" style=\"border:0px;\" id=\"table_vpnservers\">",b+="<thead class=\"collapsible-jquery\" id=\"vpnserverscontrol\">",b+="<tr><td colspan=\"4\">VPN Servers (click to expand/collapse)</td></tr>",b+="</thead>",b+="<tr>"),b+="<td class=\"servicename\">VPN Server "+a+"</td>",b+="<td class=\"servicevalue\">",b+="<input type=\"button\" class=\"button_gen restartbutton\" onclick=\"RestartService('"+c+"');\" value=\"Restart\" id=\"btnRestartSrv_"+c+"\">",b+="<span id=\"txtRestartSrv_"+c+"\" style=\"display:none;\" class=\"servicespan\">Done</span>",b+="<span id=\"txtRestartSrvError_"+c+"\" style=\"display:none;\" class=\"servicespan\">Invalid - VPN Server disabled</span>",b+="<img id=\"imgRestartSrv_"+c+"\" style=\"display:none;vertical-align:middle;\" src=\"images/InternetScan.gif\"/>",b+="</td>",2==a&&(b+="</tr>",b+="</table>"),b}function round(a,b){return+(Math.round(a+"e"+b)+"e-"+b)}function Draw_Chart_NoData(a){document.getElementById("canvasChart"+a).width="265",document.getElementById("canvasChart"+a).height="250",document.getElementById("canvasChart"+a).style.width="265px",document.getElementById("canvasChart"+a).style.height="250px";var b=document.getElementById("canvasChart"+a).getContext("2d");b.save(),b.textAlign="center",b.textBaseline="middle",b.font="normal normal bolder 22px Arial",b.fillStyle="white",b.fillText("No swap file configured",135,125),b.restore()}function Draw_Chart(a){var b=[],c=[],d=[],e="",f="";if("MemoryUsage"==a)b=[1*mem_stats_arr[0]-1*mem_stats_arr[1]-1*mem_stats_arr[2]-1*mem_stats_arr[3],mem_stats_arr[1],mem_stats_arr[2],mem_stats_arr[3]],c=["Used","Free","Buffers","Cache"],d=["#5eaec0","#12cf80","#ceca09","#9d12c4"],e="Memory Usage",f="MB";else if("SwapUsage"==a)b=[mem_stats_arr[4],1*mem_stats_arr[5]-1*mem_stats_arr[4]],c=["Used","Free"],d=["#135fee","#1aa658"],e="Swap Usage",f="MB";else if("nvramUsage"==a)b=[round(mem_stats_arr[6]/1024,2).toFixed(2),round(1*nvramtotal-1*mem_stats_arr[6]/1024,2).toFixed(2)],c=["Used","Free"],d=["#5eaec0","#12cf80"],e="NVRAM Usage",f="KB";else if("jffsUsage"==a){var g=mem_stats_arr[7].split(" ");b=[1*g[0],1*g[2]-1*g[0]],c=["Used","Free"],d=["#135fee","#1aa658"],e="JFFS Usage",f="MB"}var h=window["Chart"+a];h!=null&&h.destroy();var i=document.getElementById("canvasChart"+a).getContext("2d"),j={segmentShowStroke:!1,segmentStrokeColor:"#000",maintainAspectRatio:!1,animation:{duration:0},hover:{animationDuration:0},responsiveAnimationDuration:0,legend:{onClick:null,display:!0,position:"left",labels:{fontColor:"#ffffff"}},title:{display:!0,text:e,position:"top"},tooltips:{callbacks:{title:function(a,b){return b.labels[a[0].index]},label:function(a,b){return round(b.datasets[a.datasetIndex].data[a.index],2).toFixed(2)+" "+f}},mode:"point",position:"cursor",intersect:!0},scales:{xAxes:[{display:!1,gridLines:{display:!1},scaleLabel:{display:!1},ticks:{display:!1}}],yAxes:[{display:!1,gridLines:{display:!1},scaleLabel:{display:!1},ticks:{display:!1}}]}},k={labels:c,datasets:[{data:b,borderWidth:1,backgroundColor:d,borderColor:"#000000"}]};h=new Chart(i,{type:"pie",options:j,data:k}),window["Chart"+a]=h}function SaveConfig(){document.form.action_script.value="start_scmerlinconfig"+document.form.scmerlin_usbenabled.value,document.form.action_wait.value=10,showLoading(),document.form.submit()}
+var tout,arrayproclistlines=[],sortnameproc="CPU%",sortdirproc="desc",arraycronjobs=[],sortnamecron="Name",sortdircron="asc";Chart.defaults.global.defaultFontColor="#CCC",Chart.Tooltip.positioners.cursor=function(a,b){return b};var $j=jQuery.noConflict();function SetCurrentPage(){document.form.next_page.value=window.location.pathname.substring(1),document.form.current_page.value=window.location.pathname.substring(1)}var srvnamelist=["dnsmasq","wan","httpd","wireless","vsftpd","samba","ddns","ntpd/chronyd"],srvdesclist=["DNS/DHCP Server","Internet Connection","Web Interface","WiFi","FTP Server","Samba","DDNS client","Timeserver"],srvnamevisiblelist=[!0,!1,!0,!1,!0,!1,!1,!0],sortedAddonPages=[];function initial(){SetCurrentPage(),LoadCustomSettings(),show_menu(),Draw_Chart_NoData("nvramUsage","Data loading..."),Draw_Chart_NoData("jffsUsage","Data loading..."),Draw_Chart_NoData("MemoryUsage","Data loading..."),Draw_Chart_NoData("SwapUsage","No swap file configured"),$j("#sortTableCron").empty(),$j("#sortTableCron").append(BuildSortTableHtmlNoData()),$j("#sortTableProcesses").empty(),$j("#sortTableProcesses").append(BuildSortTableHtmlNoData());for(var a="",b=1;3>b;b++)a+=BuildVPNServerTable(b);$j("#table_config").after(a);for(var c="",b=1;6>b;b++)c+=BuildVPNClientTable(b);$j("#table_config").after(c);for(var d="",b=0;b<srvnamelist.length;b++)d+=BuildServiceTable(srvnamelist[b],srvdesclist[b],srvnamevisiblelist[b],b);$j("#table_config").after(d),document.formScriptActions.action_script.value="start_scmerlingetaddonpages;start_scmerlingetcronjobs",document.formScriptActions.submit(),load_addonpages(),get_proclist_file(),get_cronlist_file(),get_ntpwatchdogenabled_file(),update_temperatures(),update_sysinfo(),ScriptUpdateLayout()}function ScriptUpdateLayout(){var a=GetVersionNumber("local"),b=GetVersionNumber("server");$j("#scmerlin_version_local").text(a),a!=b&&"N/A"!=b&&($j("#scmerlin_version_server").text("Updated version available: "+b),showhide("btnChkUpdate",!1),showhide("scmerlin_version_server",!0),showhide("btnDoUpdate",!0))}function reload(){location.reload(!0)}function update_status(){$j.ajax({url:"/ext/scmerlin/detect_update.js",dataType:"script",timeout:3e3,error:function(){setTimeout(update_status,1e3)},success:function(){"InProgress"==updatestatus?setTimeout(update_status,1e3):(document.getElementById("imgChkUpdate").style.display="none",showhide("scmerlin_version_server",!0),"None"==updatestatus?($j("#scmerlin_version_server").text("No update available"),showhide("btnChkUpdate",!0),showhide("btnDoUpdate",!1)):($j("#scmerlin_version_server").text("Updated version available: "+updatestatus),showhide("btnChkUpdate",!1),showhide("btnDoUpdate",!0)))}})}function CheckUpdate(){showhide("btnChkUpdate",!1),document.formScriptActions.action_script.value="start_scmerlincheckupdate",document.formScriptActions.submit(),document.getElementById("imgChkUpdate").style.display="",setTimeout(update_status,2e3)}function DoUpdate(){document.form.action_script.value="start_scmerlindoupdate",document.form.action_wait.value=10,showLoading(),document.form.submit()}function RestartService(a){showhide("btnRestartSrv_"+a,!1),showhide("txtRestartSrv_"+a,!1),document.formScriptActions.action_script.value="start_scmerlinservicerestart"+a,document.formScriptActions.submit(),document.getElementById("imgRestartSrv_"+a).style.display="",setTimeout(service_status,1e3,a)}function service_status(a){$j.ajax({url:"/ext/scmerlin/detect_service.js",dataType:"script",timeout:3e3,error:function(){setTimeout(service_status,1e3,a)},success:function(){"InProgress"==servicestatus?setTimeout(service_status,1e3,a):(document.getElementById("imgRestartSrv_"+a).style.display="none","Done"==servicestatus?(showhide("txtRestartSrv_"+a,!0),setTimeout(showhide,3e3,"txtRestartSrv_"+a,!1),setTimeout(showhide,3250,"btnRestartSrv_"+a,!0)):showhide("txtRestartSrvError_"+a,!0))}})}function GetVersionNumber(a){var b;return"local"==a?b=custom_settings.scmerlin_version_local:"server"==a&&(b=custom_settings.scmerlin_version_server),"undefined"==typeof b||null==b?"N/A":b}function BuildSortTableHtmlNoData(){var a="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"4\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"sortTable\">";return a+="<tr>",a+="<td colspan=\"3\" class=\"nodata\">",a+="Data loading...",a+="</td>",a+="</tr>",a+="</table>",a}function BuildSortTableHtml(a){var b="<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" class=\"procTable\" style=\"table-layout:fixed;\">";if("sortTableProcesses"==a){b+="<col style=\"width:50px;\">",b+="<col style=\"width:50px;\">",b+="<col style=\"width:75px;\">",b+="<col style=\"width:50px;\">",b+="<col style=\"width:50px;\">",b+="<col style=\"width:55px;\">",b+="<col style=\"width:50px;\">",b+="<col style=\"width:55px;\">",b+="<col style=\"width:740px;\">",b+="<thead class=\"sortTableHeader\">",b+="<tr>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">PID</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">PPID</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">USER</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">STAT</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">VSZ</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">VSZ%</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">CPU</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">CPU%</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableProcesses','arrayproclistlines',this.innerHTML,'sortnameproc','sortdirproc')\">COMMAND</th>",b+="</tr>",b+="</thead>",b+="<tbody class=\"sortTableContent\">";for(var c=0;c<arrayproclistlines.length;c++)b+="<tr class=\"sortRow\">",b+="<td>"+arrayproclistlines[c].PID+"</td>",b+="<td>"+arrayproclistlines[c].PPID+"</td>",b+="<td>"+arrayproclistlines[c].USER+"</td>",b+="<td>"+arrayproclistlines[c].STAT+"</td>",b+="<td>"+arrayproclistlines[c].VSZ+"</td>",b+="<td>"+arrayproclistlines[c].VSZP+"</td>",b+="<td>"+arrayproclistlines[c].CPU+"</td>",b+="<td>"+arrayproclistlines[c].CPUP+"</td>",b+="<td>"+arrayproclistlines[c].COMMAND+"</td>",b+="</tr>"}else if("sortTableCron"==a){b+="<col style=\"width:175px;\">",b+="<col style=\"width:45px;\">",b+="<col style=\"width:45px;\">",b+="<col style=\"width:45px;\">",b+="<col style=\"width:45px;\">",b+="<col style=\"width:45px;\">",b+="<col style=\"width:740px;\">",b+="<thead class=\"sortTableHeader\">",b+="<tr>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableCron','arraycronjobs',this.innerHTML,'sortnamecron','sortdircron')\">Name</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableCron','arraycronjobs',this.innerHTML,'sortnamecron','sortdircron')\">Min</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableCron','arraycronjobs',this.innerHTML,'sortnamecron','sortdircron')\">Hour</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableCron','arraycronjobs',this.innerHTML,'sortnamecron','sortdircron')\">DayM</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableCron','arraycronjobs',this.innerHTML,'sortnamecron','sortdircron')\">Month</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableCron','arraycronjobs',this.innerHTML,'sortnamecron','sortdircron')\">DayW</th>",b+="<th class=\"sortable\" onclick=\"SortTable('sortTableCron','arraycronjobs',this.innerHTML,'sortnamecron','sortdircron')\">Command</th>",b+="</tr>",b+="</thead>",b+="<tbody class=\"sortTableContent\">";for(var c=0;c<arraycronjobs.length;c++)b+="<tr class=\"sortRow\">",b+="<td>"+arraycronjobs[c].Name+"</td>",b+="<td>"+arraycronjobs[c].Min+"</td>",b+="<td>"+arraycronjobs[c].Hour+"</td>",b+="<td>"+arraycronjobs[c].DayM+"</td>",b+="<td>"+arraycronjobs[c].Month+"</td>",b+="<td>"+arraycronjobs[c].DayW+"</td>",b+="<td>"+arraycronjobs[c].Command+"</td>",b+="</tr>"}return b+="</tbody>",b+="</table>",b}function get_ntpwatchdogenabled_file(){$j.ajax({url:"/ext/scmerlin/watchdogenabled.htm",dataType:"text",timeout:1e4,error:function(){document.form.scmerlin_ntpwatchdog.value="disable"},success:function(){document.form.scmerlin_ntpwatchdog.value="enable"}})}function load_addonpages(){$j.ajax({url:"/ext/scmerlin/addonwebpages.htm",dataType:"text",error:function(){setTimeout(load_addonpages,1e3)},success:function(a){var b=a.split("\n");b=b.filter(Boolean);for(var c=0;c<b.length;c++)try{var d=b[c].split(","),e={};e.NAME=d[0].trim(),e.URL=d[1].trim(),sortedAddonPages.push(e)}catch{}sortedAddonPages=sortedAddonPages.sort(function(c,a){return c.NAME.toLowerCase().localeCompare(a.NAME.toLowerCase())});for(var f="",c=0;c<sortedAddonPages.length;c++)f+=BuildAddonPageTable(sortedAddonPages[c].NAME,sortedAddonPages[c].URL,c);$j("#table_config").after(f),AddEventHandlers()}})}function get_cronlist_file(){$j.ajax({url:"/ext/scmerlin/scmcronjobs.htm",dataType:"text",error:function(){tout=setTimeout(get_cronlist_file,1e3)},success:function(a){ParseCronJobs(a)}})}function ParseCronJobs(a){var b=a.split("\n");b=b.filter(Boolean),arraycronjobs=[];for(var c=0;c<b.length;c++)try{var d=b[c].split(","),e={};e.Name=d[0].trim().replace(/^\"/,"").replace(/\"$/,""),e.Min=d[1].trim().replace(/^\"/,"").replace(/\"$/,"").replace(/\|/,","),e.Hour=d[2].trim().replace(/^\"/,"").replace(/\"$/,"").replace(/\|/,","),e.DayM=d[3].trim().replace(/^\"/,"").replace(/\"$/,"").replace(/\|/,","),e.Month=d[4].trim().replace(/^\"/,"").replace(/\"$/,"").replace(/\|/,","),e.DayW=d[5].trim().replace(/^\"/,"").replace(/\"$/,"").replace(/\|/,","),e.Command=d[6].trim().replace(/^\"/,"").replace(/\"$/,""),arraycronjobs.push(e)}catch{}SortTable("sortTableCron","arraycronjobs",sortnamecron+" "+sortdircron.replace("desc","\u2191").replace("asc","\u2193").trim(),"sortnamecron","sortdircron")}function get_proclist_file(){$j.ajax({url:"/ext/scmerlin/top.htm",dataType:"text",error:function(){tout=setTimeout(get_proclist_file,1e3)},success:function(a){ParseProcList(a),document.getElementById("auto_refresh").checked&&(tout=setTimeout(get_proclist_file,5e3))}})}function ParseProcList(a){var b=a.split("\n");b=b.filter(Boolean),arrayproclistlines=[];for(var c=0;c<b.length;c++)try{var d=b[c].split(","),e={};e.PID=d[0].trim(),e.PPID=d[1].trim(),e.USER=d[2].trim(),e.STAT=d[3].trim(),e.VSZ=d[4].trim(),e.VSZP=d[5].trim(),e.CPU=d[6].trim(),e.CPUP=d[7].trim(),e.COMMAND=d[8].trim(),arrayproclistlines.push(e)}catch{}SortTable("sortTableProcesses","arrayproclistlines",sortnameproc+" "+sortdirproc.replace("desc","\u2191").replace("asc","\u2193").trim(),"sortnameproc","sortdirproc")}function GetCookie(a,b){if(null!=cookie.get("scm_"+a))return cookie.get("scm_"+a);return"string"==b?"":"number"==b?0:void 0}function SetCookie(a,b){cookie.set("scm_"+a,b,3650)}function AddEventHandlers(){$j(".collapsible-jquery").off("click").on("click",function(){$j(this).siblings().toggle("fast",function(){"none"==$j(this).css("display")?SetCookie($j(this).siblings()[0].id,"collapsed"):(SetCookie($j(this).siblings()[0].id,"expanded"),"routermemory"==$j(this).siblings()[0].id?(Draw_Chart("MemoryUsage"),0==parseInt(mem_stats_arr[5])?Draw_Chart_NoData("SwapUsage","No swap file configured"):Draw_Chart("SwapUsage")):"routerstorage"==$j(this).siblings()[0].id&&(Draw_Chart("nvramUsage"),Draw_Chart("jffsUsage")))})}),$j(".collapsible-jquery").each(function(){"collapsed"==GetCookie($j(this)[0].id,"string")?$j(this).siblings().toggle(!1):$j(this).siblings().toggle(!0)}),$j("#auto_refresh")[0].addEventListener("click",function(){ToggleRefresh()})}function SortTable(tableid,arrayid,sorttext,sortname,sortdir){window[sortname]=sorttext.replace("\u2191","").replace("\u2193","").trim();var sorttype="number",sortfield=window[sortname];switch(window[sortname]){case"VSZ%":sortfield="VSZP";break;case"CPU%":sortfield="CPUP";break;case"USER":case"STAT":case"COMMAND":case"Name":case"Command":sorttype="string";}"string"==sorttype?-1==sorttext.indexOf("\u2193")&&-1==sorttext.indexOf("\u2191")?(eval(arrayid+" = "+arrayid+".sort((a,b) => (a."+sortfield+".toLowerCase() > b."+sortfield+".toLowerCase()) ? 1 : ((b."+sortfield+".toLowerCase() > a."+sortfield+".toLowerCase()) ? -1 : 0));"),window[sortdir]="asc"):-1==sorttext.indexOf("\u2193")?(eval(arrayid+" = "+arrayid+".sort((a,b) => (a."+sortfield+".toLowerCase() < b."+sortfield+".toLowerCase()) ? 1 : ((b."+sortfield+".toLowerCase() < a."+sortfield+".toLowerCase()) ? -1 : 0));"),window[sortdir]="desc"):(eval(arrayid+" = "+arrayid+".sort((a,b) => (a."+sortfield+".toLowerCase() > b."+sortfield+".toLowerCase()) ? 1 : ((b."+sortfield+".toLowerCase() > a."+sortfield+".toLowerCase()) ? -1 : 0));"),window[sortdir]="asc"):"number"==sorttype&&(-1==sorttext.indexOf("\u2193")&&-1==sorttext.indexOf("\u2191")?(eval(arrayid+" = "+arrayid+".sort((a,b) => parseFloat(getNum(a."+sortfield+".replace(\"m\",\"000\"))) - parseFloat(getNum(b."+sortfield+".replace(\"m\",\"000\"))));"),window[sortdir]="asc"):-1==sorttext.indexOf("\u2193")?(eval(arrayid+" = "+arrayid+".sort((a,b) => parseFloat(getNum(b."+sortfield+".replace(\"m\",\"000\"))) - parseFloat(getNum(a."+sortfield+".replace(\"m\",\"000\"))));"),window[sortdir]="desc"):(eval(arrayid+" = "+arrayid+".sort((a,b) => parseFloat(getNum(a."+sortfield+".replace(\"m\",\"000\"))) - parseFloat(getNum(b."+sortfield+".replace(\"m\",\"000\"))));"),window[sortdir]="asc")),$j("#"+tableid).empty(),$j("#"+tableid).append(BuildSortTableHtml(tableid)),$j("#"+tableid).find(".sortable").each(function(a,b){b.innerHTML==window[sortname]&&("asc"==window[sortdir]?b.innerHTML=window[sortname]+" \u2191":b.innerHTML=window[sortname]+" \u2193")})}function getNum(a){if(isNaN(a)){if("*"==a)return-10;if(-1!=a.indexOf("*/"))return-5;if(-1!=a.indexOf("/"))return a.split("/")[0];if("Sun"==a)return 0;if("Mon"==a)return 1;if("Tue"==a)return 2;if("Wed"==a)return 3;if("Thu"==a)return 4;if("Fri"==a)return 5;if("Sat"==a)return 6}return a}function ToggleRefresh(){$j("#auto_refresh").prop("checked",function(a,b){b?get_proclist_file():clearTimeout(tout)})}function BuildAddonPageTable(a,b,c){var d="";if(0==c&&(d+="<div style=\"line-height:10px;\">&nbsp;</div>",d+="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"2\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"FormTable SettingsTable\" style=\"border:0px;\" id=\"table_services\">",d+="<thead class=\"collapsible-jquery\" id=\"addonpages\">",d+="<tr><td colspan=\"4\">WebUI Addons (click to expand/collapse)</td></tr>",d+="</thead>"),(0==c||0==c%4)&&(d+="<tr>"),d+="<td class=\"addonpageurl\"><a href=\""+b.substring(b.lastIndexOf("/")+1)+"\">"+a+"</a><br /><span class=\"addonpageurl\">"+b.substring(b.lastIndexOf("/")+1)+"</span></td>",0<c&&0==(c+1)%4&&(d+="</tr>"),c==sortedAddonPages.length-1){if(0!=sortedAddonPages.length%4){for(var e=4-sortedAddonPages.length%4,f=0;f<e;f++)d+="<td class=\"addonpageurl\"></td>";d+="</tr>"}d+="</table>"}return d}function BuildServiceTable(a,b,c,d){var e="";return 0==d&&(e+="<div style=\"line-height:10px;\">&nbsp;</div>",e+="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"2\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"FormTable SettingsTable\" style=\"border:0px;\" id=\"table_services\">",e+="<thead class=\"collapsible-jquery\" id=\"servicescontrol\">",e+="<tr><td colspan=\"4\">Services (click to expand/collapse)</td></tr>",e+="</thead>"),(0==d||0==d%2)&&(e+="<tr>"),e+=c?"<td class=\"servicename\">"+b+" <span class=\"settingname\">("+a+")</span></td>":"<td class=\"servicename\">"+b+"</td>",a=a.replace("/",""),e+="<td class=\"servicevalue\">",e+="<input type=\"button\" class=\"button_gen restartbutton\" onclick=\"RestartService('"+a+"');\" value=\"Restart\" id=\"btnRestartSrv_"+a+"\">",e+="<span id=\"txtRestartSrv_"+a+"\" style=\"display:none;\" class=\"servicespan\">Done</span>",e+="<span id=\"txtRestartSrvError_"+a+"\" style=\"display:none;\" class=\"servicespan\">Invalid - service disabled</span>",e+="<img id=\"imgRestartSrv_"+a+"\" style=\"display:none;vertical-align:middle;\" src=\"images/InternetScan.gif\"/>",e+="</td>",0<d&&0==(d+1)%2&&(e+="</tr>"),d==srvnamelist.length-1&&(e+="</table>"),e}function BuildVPNClientTable(loopindex){var vpnclientshtml="",vpnclientname="vpnclient"+loopindex,vpnclientdesc=eval("document.form.vpnc"+loopindex+"_desc").value;return 1==loopindex&&(vpnclientshtml+="<div style=\"line-height:10px;\">&nbsp;</div>",vpnclientshtml+="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"2\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"FormTable SettingsTable\" style=\"border:0px;\" id=\"table_vpnclients\">",vpnclientshtml+="<thead class=\"collapsible-jquery\" id=\"vpnclientscontrol\">",vpnclientshtml+="<tr><td colspan=\"4\">VPN Clients (click to expand/collapse)</td></tr>",vpnclientshtml+="</thead>"),(1==loopindex||0==(loopindex+1)%2)&&(vpnclientshtml+="<tr>"),vpnclientshtml+="<td class=\"servicename\">VPN Client "+loopindex,vpnclientshtml+="<br /><span class=\"settingname\">("+vpnclientdesc+")</span></td>",vpnclientshtml+="<td class=\"servicevalue\">",vpnclientshtml+="<input type=\"button\" class=\"button_gen restartbutton\" onclick=\"RestartService('"+vpnclientname+"');\" value=\"Restart\" id=\"btnRestartSrv_"+vpnclientname+"\">",vpnclientshtml+="<span id=\"txtRestartSrv_"+vpnclientname+"\" style=\"display:none;\" class=\"servicespan\">Done</span>",vpnclientshtml+="<span id=\"txtRestartSrvError_"+vpnclientname+"\" style=\"display:none;\" class=\"servicespan\">Invalid - VPN Client disabled</span>",vpnclientshtml+="<img id=\"imgRestartSrv_"+vpnclientname+"\" style=\"display:none;vertical-align:middle;\" src=\"images/InternetScan.gif\"/>",vpnclientshtml+="</td>",5==loopindex&&(vpnclientshtml+="<td class=\"servicename\"></td><td class=\"servicevalue\"></td>"),1<loopindex&&0==loopindex%2&&(vpnclientshtml+="</tr>"),5==loopindex&&(vpnclientshtml+="</table>"),vpnclientshtml}function BuildVPNServerTable(a){var b="",c="vpnserver"+a;return 1==a&&(b+="<div style=\"line-height:10px;\">&nbsp;</div>",b+="<table width=\"100%\" border=\"1\" align=\"center\" cellpadding=\"2\" cellspacing=\"0\" bordercolor=\"#6b8fa3\" class=\"FormTable SettingsTable\" style=\"border:0px;\" id=\"table_vpnservers\">",b+="<thead class=\"collapsible-jquery\" id=\"vpnserverscontrol\">",b+="<tr><td colspan=\"4\">VPN Servers (click to expand/collapse)</td></tr>",b+="</thead>",b+="<tr>"),b+="<td class=\"servicename\">VPN Server "+a+"</td>",b+="<td class=\"servicevalue\">",b+="<input type=\"button\" class=\"button_gen restartbutton\" onclick=\"RestartService('"+c+"');\" value=\"Restart\" id=\"btnRestartSrv_"+c+"\">",b+="<span id=\"txtRestartSrv_"+c+"\" style=\"display:none;\" class=\"servicespan\">Done</span>",b+="<span id=\"txtRestartSrvError_"+c+"\" style=\"display:none;\" class=\"servicespan\">Invalid - VPN Server disabled</span>",b+="<img id=\"imgRestartSrv_"+c+"\" style=\"display:none;vertical-align:middle;\" src=\"images/InternetScan.gif\"/>",b+="</td>",2==a&&(b+="</tr>",b+="</table>"),b}function round(a,b){return+(Math.round(a+"e"+b)+"e-"+b)}function Draw_Chart_NoData(a,b){document.getElementById("canvasChart"+a).width="265",document.getElementById("canvasChart"+a).height="250",document.getElementById("canvasChart"+a).style.width="265px",document.getElementById("canvasChart"+a).style.height="250px";var c=document.getElementById("canvasChart"+a).getContext("2d");c.save(),c.textAlign="center",c.textBaseline="middle",c.font="normal normal bolder 22px Arial",c.fillStyle="white",c.fillText(b,135,125),c.restore()}function Draw_Chart(a){var b=[],c=[],d=[],e="",f="";if("MemoryUsage"==a)b=[1*mem_stats_arr[0]-1*mem_stats_arr[1]-1*mem_stats_arr[2]-1*mem_stats_arr[3],mem_stats_arr[1],mem_stats_arr[2],mem_stats_arr[3]],c=["Used","Free","Buffers","Cache"],d=["#5eaec0","#12cf80","#ceca09","#9d12c4"],e="Memory Usage",f="MB";else if("SwapUsage"==a)b=[mem_stats_arr[4],1*mem_stats_arr[5]-1*mem_stats_arr[4]],c=["Used","Free"],d=["#135fee","#1aa658"],e="Swap Usage",f="MB";else if("nvramUsage"==a)b=[round(mem_stats_arr[6]/1024,2).toFixed(2),round(1*nvramtotal-1*mem_stats_arr[6]/1024,2).toFixed(2)],c=["Used","Free"],d=["#5eaec0","#12cf80"],e="NVRAM Usage",f="KB";else if("jffsUsage"==a){var g=mem_stats_arr[7].split(" ");b=[1*g[0],1*g[2]-1*g[0]],c=["Used","Free"],d=["#135fee","#1aa658"],e="JFFS Usage",f="MB"}var h=window["Chart"+a];h!=null&&h.destroy();var i=document.getElementById("canvasChart"+a).getContext("2d"),j={segmentShowStroke:!1,segmentStrokeColor:"#000",maintainAspectRatio:!1,animation:{duration:0},hover:{animationDuration:0},responsiveAnimationDuration:0,legend:{onClick:null,display:!0,position:"left",labels:{fontColor:"#ffffff"}},title:{display:!0,text:e,position:"top"},tooltips:{callbacks:{title:function(a,b){return b.labels[a[0].index]},label:function(a,b){return round(b.datasets[a.datasetIndex].data[a.index],2).toFixed(2)+" "+f}},mode:"point",position:"cursor",intersect:!0},scales:{xAxes:[{display:!1,gridLines:{display:!1},scaleLabel:{display:!1},ticks:{display:!1}}],yAxes:[{display:!1,gridLines:{display:!1},scaleLabel:{display:!1},ticks:{display:!1}}]}},k={labels:c,datasets:[{data:b,borderWidth:1,backgroundColor:d,borderColor:"#000000"}]};h=new Chart(i,{type:"pie",options:j,data:k}),window["Chart"+a]=h}function SaveConfig(){document.form.action_script.value="start_scmerlinconfig"+document.form.scmerlin_ntpwatchdog.value,document.form.action_wait.value=10,showLoading(),document.form.submit()}
 </script>
 </head>
 <body onload="initial();">
@@ -423,13 +185,13 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 <thead class="collapsible-jquery" id="scriptconfig">
 <tr><td colspan="2">Configuration (click to expand/collapse)</td></tr>
 </thead>
-<tr class="even" id="rowenableusb">
-<td class="settingname">Enable USB Features<br/><span class="settingname">(running processes in WebUI)</span></td>
+<tr class="even" id="rowenablentpwatchdog">
+<td class="settingname">Enable NTP boot watchdog script<br/></td>
 <td class="settingvalue">
-<input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_enabled" class="input" value="enable" checked>
-<label for="scmerlin_usbenabled_enabled">Yes</label>
-<input type="radio" name="scmerlin_usbenabled" id="scmerlin_usbenabled_disabled" class="input" value="disable">
-<label for="scmerlin_usbenabled_disabled">No</label>
+<input type="radio" name="scmerlin_ntpwatchdog" id="scmerlin_ntpwatchdog_enabled" class="input" value="enable">
+<label for="scmerlin_ntpwatchdog_enabled">Yes</label>
+<input type="radio" name="scmerlin_ntpwatchdog" id="scmerlin_ntpwatchdog_disabled" class="input" value="disable" checked>
+<label for="scmerlin_ntpwatchdog_disabled">No</label>
 </td>
 </tr>
 <tr class="apply_gen" valign="top" height="35px">
@@ -441,7 +203,7 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 
 <!-- Insert service control tables here -->
 
-
+<!-- Start Entware table -->
 <div style="line-height:10px;">&nbsp;</div>
 <table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_entware">
 <thead class="collapsible-jquery" id="entwarecontrol">
@@ -458,30 +220,26 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 </td>
 </tr>
 </table>
-
-<!-- Start Process List -->
+<!-- End Entware table -->
 <div style="line-height:10px;">&nbsp;</div>
-<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_proclist">
-<col style="width:35%;">
-<col style="width:65%;">
-<thead class="collapsible-jquery" id="proclist">
-<tr><td colspan="2">Process List (click to expand/collapse)</td></tr>
-</thead>
-<tr class="even">
-<th>Update automatically?</th>
-<td>
-<label style="color:#FFCC00;display:block;">
-<input type="checkbox" checked="" id="auto_refresh" style="padding:0;margin:0;vertical-align:middle;position:relative;top:-1px;" />&nbsp;&nbsp;Table will refresh every 3s</label>
-</td>
-</tr>
-<tr style="line-height:5px;"><td colspan="2">&nbsp;</td></tr>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
+<thead class="collapsible-jquery" id="router">
 <tr>
-<td colspan="2" align="center" style="padding: 0px;">
-<div id="procTableContainer" class="procTableContainer"></div>
-</td>
+<td>Router (click to expand/collapse)</td>
+</tr>
+</thead>
+<tr><td align="center" style="padding: 0px;">
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable">
+<thead class="collapsible-jquery" id="routertemps">
+<tr>
+<td colspan="2">Temperatures (click to expand/collapse)</td>
+</tr>
+</thead>
+<tr>
+<td class="settingname">Temperatures</td>
+<td id="temp_td" class="settingvalue"></td>
 </tr>
 </table>
-<!-- End Process List -->
 <div style="line-height:10px;">&nbsp;</div>
 <table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable">
 <thead class="collapsible-jquery" id="routermemory">
@@ -546,16 +304,45 @@ var tout,arrayproclistlines=[],originalarrayproclistlines=[],sortfield="CPU%",so
 <td id="jffs_td" style="width:125px;"></td>
 </tr>
 </table>
+
+<!-- Start Cron table -->
 <div style="line-height:10px;">&nbsp;</div>
-<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable">
-<thead class="collapsible-jquery" id="routertemps">
-<tr>
-<td colspan="2">Router (click to expand/collapse)</td>
-</tr>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_cron">
+<thead class="collapsible-jquery" id="thead_cron">
+<tr><td>Cron Jobs (click to expand/collapse)</td></tr>
 </thead>
 <tr>
-<td class="settingname">Temperatures</td>
-<td id="temp_td" class="settingvalue"></td>
+<td align="center" style="padding: 0px;">
+<div id="sortTableCron" class="sortTableContainer" style="height:300px;"></div>
+</td>
+</tr>
+</table>
+<!-- End Cron table -->
+
+<!-- Start Process List -->
+<div style="line-height:10px;">&nbsp;</div>
+<table width="100%" border="1" align="center" cellpadding="4" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" id="scm_table_proclist">
+<col style="width:35%;">
+<col style="width:65%;">
+<thead class="collapsible-jquery" id="proclist">
+<tr><td colspan="2">Process List (click to expand/collapse)</td></tr>
+</thead>
+<tr class="even">
+<th>Update automatically?</th>
+<td>
+<label style="color:#FFCC00;display:block;">
+<input type="checkbox" checked="" id="auto_refresh" style="padding:0;margin:0;vertical-align:middle;position:relative;top:-1px;" />&nbsp;&nbsp;Table will refresh every 5s</label>
+</td>
+</tr>
+<tr style="line-height:5px;"><td colspan="2">&nbsp;</td></tr>
+<tr>
+<td colspan="2" align="center" style="padding: 0px;">
+<div id="sortTableProcesses" class="sortTableContainer"></div>
+</td>
+</tr>
+</table>
+<!-- End Process List -->
+</td>
 </tr>
 </table>
 </td>

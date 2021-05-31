@@ -1,30 +1,30 @@
 #!/bin/sh
 
-####################################################
-##              __  __              _  _          ##
-##             |  \/  |            | |(_)         ##
-##   ___   ___ | \  / |  ___  _ __ | | _  _ __    ##
-##  / __| / __|| |\/| | / _ \| '__|| || || '_ \   ##
-##  \__ \| (__ | |  | ||  __/| |   | || || | | |  ##
-##  |___/ \___||_|  |_| \___||_|   |_||_||_| |_|  ##
-##                                                ##
-##      https://github.com/jackyaz/scMerlin       ##
-##                                                ##
-####################################################
+######################################################
+##               __  __              _  _           ##
+##              |  \/  |            | |(_)          ##
+##    ___   ___ | \  / |  ___  _ __ | | _  _ __     ##
+##   / __| / __|| |\/| | / _ \| '__|| || || '_ \    ##
+##   \__ \| (__ | |  | ||  __/| |   | || || | | |   ##
+##   |___/ \___||_|  |_| \___||_|   |_||_||_| |_|   ##
+##                                                  ##
+##       https://github.com/jackyaz/scMerlin        ##
+##                                                  ##
+######################################################
 
-########         directives      #########
+##########       Shellcheck directives     ###########
 # shellcheck disable=SC2016
 # shellcheck disable=SC2018
 # shellcheck disable=SC2019
 # shellcheck disable=SC2059
 # shellcheck disable=SC2034
-####################################################
+######################################################
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
 readonly SCRIPT_NAME_LOWER=$(echo $SCRIPT_NAME | tr 'A-Z' 'a-z' | sed 's/d//')
-readonly SCM_VERSION="v2.2.3"
-readonly SCRIPT_VERSION="v2.2.3"
+readonly SCM_VERSION="v2.3.0"
+readonly SCRIPT_VERSION="v2.3.0"
 SCRIPT_BRANCH="master"
 SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME_LOWER.d"
@@ -33,7 +33,7 @@ readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME_LOWER"
 readonly SHARED_DIR="/jffs/addons/shared-jy"
 readonly SHARED_REPO="https://raw.githubusercontent.com/jackyaz/shared-jy/master"
 readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
-readonly DISABLE_USB_FEATURES_FILE="$SCRIPT_DIR/.usbdisabled"
+readonly NTP_WATCHDOG_FILE="$SCRIPT_DIR/.watchdogenabled"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
 
@@ -42,7 +42,9 @@ readonly CRIT="\\e[41m"
 readonly ERR="\\e[31m"
 readonly WARN="\\e[33m"
 readonly PASS="\\e[32m"
-readonly SETTING="\\e[1m\\e[36m"
+readonly BOLD="\\e[1m"
+readonly SETTING="${BOLD}\\e[36m"
+readonly CLEARFORMAT="\\e[0m"
 ### End of output format variables ###
 
 # $1 = print to syslog, $2 = message to print, $3 = log level
@@ -50,7 +52,7 @@ Print_Output(){
 	if [ "$1" = "true" ]; then
 		logger -t "$SCRIPT_NAME" "$2"
 	fi
-	printf "\\e[1m${3}%s\\e[0m\\n\\n" "$2"
+	printf "${BOLD}${3}%s${CLEARFORMAT}\\n\\n" "$2"
 }
 
 Firmware_Version_Check(){
@@ -163,19 +165,17 @@ Update_Version(){
 		fi
 		
 		if [ "$isupdate" != "false" ]; then
-			printf "\\n\\e[1mDo you want to continue with the update? (y/n)\\e[0m  "
+			printf "\\n${BOLD}Do you want to continue with the update? (y/n)${CLEARFORMAT}  "
 			read -r confirm
 			case "$confirm" in
 				y|Y)
 					printf "\\n"
 					Update_File shared-jy.tar.gz
 					Update_File scmerlin_www.asp
-					
-					if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-						Update_File tailtop
-						Update_File tailtopd
-						Update_File S99tailtop
-					fi
+					Update_File tailtop
+					Update_File tailtopd
+					Update_File sc.func
+					Update_File S99tailtop
 					/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 					chmod 0755 "/jffs/scripts/$SCRIPT_NAME_LOWER"
 					Set_Version_Custom_Settings local "$serverver"
@@ -202,11 +202,10 @@ Update_Version(){
 		Print_Output true "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
 		Update_File shared-jy.tar.gz
 		Update_File scmerlin_www.asp
-		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-			Update_File tailtop
-			Update_File tailtopd
-			Update_File S99tailtop
-		fi
+		Update_File tailtop
+		Update_File tailtopd
+		Update_File sc.func
+		Update_File S99tailtop
 		/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 		chmod 0755 "/jffs/scripts/$SCRIPT_NAME_LOWER"
 		Set_Version_Custom_Settings local "$serverver"
@@ -258,29 +257,29 @@ Update_File(){
 	elif [ "$1" = "S99tailtop" ]; then
 		tmpfile="/tmp/$1"
 		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
-		if ! diff -q "$tmpfile" "/opt/etc/init.d/$1" >/dev/null 2>&1; then
-			if [ -f /opt/etc/init.d/S99tailtop ]; then
-				/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			if [ -f "$SCRIPT_DIR/S99tailtop" ]; then
+				"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 				sleep 2
 			fi
-			Download_File "$SCRIPT_REPO/$1" "/opt/etc/init.d/$1"
-			chmod 0755 "/opt/etc/init.d/$1"
-			/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
 			Print_Output true "New version of $1 downloaded" "$PASS"
 		fi
 		rm -f "$tmpfile"
-	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ]; then
+	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ] || [ "$1" = "sc.func" ]; then
 		tmpfile="/tmp/$1"
 		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
 		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
-			if [ -f /opt/etc/init.d/S99tailtop ]; then
-				/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
+			if [ -f "$SCRIPT_DIR/S99tailtop" ]; then
+				"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 				sleep 2
 			fi
 			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
 			chmod 0755 "$SCRIPT_DIR/$1"
 			Print_Output true "New version of $1 downloaded" "$PASS"
-			/opt/etc/init.d/S99tailtop start >/dev/null 2>&1
+			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
 		fi
 		rm -f "$tmpfile"
 	else
@@ -318,8 +317,10 @@ Create_Symlinks(){
 	rm -rf "${SCRIPT_WEB_DIR:?}/"* 2>/dev/null
 	
 	ln -s /tmp/scmerlin-top "$SCRIPT_WEB_DIR/top.htm" 2>/dev/null
-	ln -s /tmp/addonwebpages.tmp "$SCRIPT_WEB_DIR/addonwebpages.js" 2>/dev/null
-	ln -s "$DISABLE_USB_FEATURES_FILE" "$SCRIPT_WEB_DIR/usbdisabled.htm" 2>/dev/null
+	ln -s /tmp/addonwebpages.tmp "$SCRIPT_WEB_DIR/addonwebpages.htm" 2>/dev/null
+	ln -s /tmp/scmcronjobs.tmp "$SCRIPT_WEB_DIR/scmcronjobs.htm" 2>/dev/null
+	
+	ln -s "$NTP_WATCHDOG_FILE" "$SCRIPT_WEB_DIR/watchdogenabled.htm" 2>/dev/null
 	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
 		ln -s "$SHARED_DIR" "$SHARED_WEB_DIR" 2>/dev/null
@@ -360,53 +361,6 @@ Auto_ServiceEvent(){
 }
 
 Auto_Startup(){
-	case $1 in
-		create)
-			if [ -f /jffs/scripts/services-start ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
-				
-				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
-				fi
-			fi
-			if [ -f /jffs/scripts/post-mount ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
-				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" /jffs/scripts/post-mount)
-				
-				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
-				fi
-				
-				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
-					echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" >> /jffs/scripts/post-mount
-				fi
-			else
-				echo "#!/bin/sh" > /jffs/scripts/post-mount
-				echo "" >> /jffs/scripts/post-mount
-				echo "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' "$@" & # '"$SCRIPT_NAME" >> /jffs/scripts/post-mount
-				chmod 0755 /jffs/scripts/post-mount
-			fi
-		;;
-		delete)
-			if [ -f /jffs/scripts/services-start ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
-				
-				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
-				fi
-			fi
-			if [ -f /jffs/scripts/post-mount ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
-				
-				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
-				fi
-			fi
-		;;
-	esac
-}
-
-Auto_Startup_NoUSB(){
 	case $1 in
 		create)
 			if [ -f /jffs/scripts/post-mount ]; then
@@ -550,6 +504,20 @@ Mount_WebUI(){
 	Print_Output true "Mounted $SCRIPT_NAME WebUI page as $MyPage" "$PASS"
 }
 
+Get_Cron_Jobs(){
+	printf "%-27s┌────────── minute (0 - 59)\\n" " "
+	printf "%-27s│%-6s┌──────── hour (0 - 23)\\n" " " " "
+	printf "%-27s│%-6s│%-6s┌────── day of month (1 - 31)\\n" " " " " " "
+	printf "%-27s│%-6s│%-6s│%-6s┌──── month (1 - 12)\\n" " " " " " " " "
+	printf "%-27s│%-6s│%-6s│%-6s│%-6s┌── day of week (0 - 6 => Sunday - Saturday)\\n" " " " " " " " " " "
+	printf "%-27s│%-6s│%-6s│%-6s│%-6s│\\n" " " " " " " " " " "
+	printf "%-27s↓%-6s↓%-6s↓%-6s↓%-6s↓\\n" " " " " " " " " " "
+	printf "${BOLD}%-25s %-6s %-6s %-6s %-6s %-9s %s${CLEARFORMAT}\\n" "Cron job name" "Min" "Hour" "DayM" "Month" "DayW" "Command"
+	cru l | sed 's/,/|/g' | awk 'FS="#" {printf "%s %s\n",$2,$1}' | awk '{printf "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"",$1,$2,$3,$4,$5,$6;for(i=7; i<=NF; ++i) printf "%s ", $i; print "\""}' | sed 's/ "$/"/g' > /tmp/scmcronjobs.tmp
+	cronjobs="$(cru l | awk 'FS="#" {printf "%s %s\n",$2,$1}' | awk '{printf "%-25s %-6s %-6s %-6s %-6s %-10s",$1,$2,$3,$4,$5,$6;for(i=7; i<=NF; ++i) printf "%s ", $i; print ""}')"
+	echo "$cronjobs"
+	}
+
 Get_Addon_Pages(){
 	urlpage=""
 	urlproto=""
@@ -574,40 +542,94 @@ Get_Addon_Pages(){
 	
 	weburl="$(echo "${urlproto}://${urldomain}${urlport}/" | tr "A-Z" "a-z")"
 	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%-12s "wu"%s\n",$4,$2}' | sort -f
-	printf "var addonpages=[" > /tmp/addonwebpages.tmp
-	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "\[\"%s\",\""wu"%s\"\],",$4,$2}' >> /tmp/addonwebpages.tmp
-	sed -i 's/,$//' /tmp/addonwebpages.tmp
-	printf "];\\n" >> /tmp/addonwebpages.tmp
+	grep "user.*\.asp" /tmp/menuTree.js | awk -F'"' -v wu="$weburl" '{printf "%s,"wu"%s\n",$4,$2}' > /tmp/addonwebpages.tmp
 }
 
-
-ToggleUSBFeatures(){
+NTPBootWatchdog(){
 	case "$1" in
 		enable)
-			rm -f "$DISABLE_USB_FEATURES_FILE"
-			Auto_Startup_NoUSB delete 2>/dev/null
-			Auto_Startup create 2>/dev/null
-			Update_File tailtop
-			Update_File tailtopd
-			Update_File S99tailtop
+			touch "$NTP_WATCHDOG_FILE"
+			cat << "EOF" > /jffs/scripts/ntpbootwatchdog.sh
+#!/bin/sh
+if [ "$(nvram get ntp_ready)" -eq 1 ]; then
+	/usr/bin/logger -st ntpbootwatchdog "NTP is synced, exiting"
+else
+	/usr/bin/logger -st ntpbootwatchdog "NTP boot watchdog started..."
+	ntptimer=0
+	while [ "$(nvram get ntp_ready)" -eq 0 ] && [ "$ntptimer" -lt 600 ]; do
+		if [ "$ntptimer" -ne 0 ]; then
+			/usr/bin/logger -st ntpbootwatchdog "Still waiting for NTP to sync..."
+		fi
+		killall ntp
+		killall ntpd
+		service restart_ntpd
+		ntptimer=$((ntptimer+30))
+		sleep 30
+	done
+	
+	if [ "$ntptimer" -ge 600 ]; then
+		/usr/bin/logger -st ntpbootwatchdog "NTP failed to sync after 10 minutes - please check immediately!"
+		exit 1
+	else
+		/usr/bin/logger -st ntpbootwatchdog "NTP has synced!"
+	fi
+fi
+EOF
+			chmod +x /jffs/scripts/ntpbootwatchdog.sh
+			if [ -f /jffs/scripts/init-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c 'ntpbootwatchdog' /jffs/scripts/init-start)
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/ntpbootwatchdog/d' /jffs/scripts/init-start
+				fi
+				
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/init-start)
+				STARTUPLINECOUNTEX=$(grep -i -cx "sh /jffs/scripts/ntpbootwatchdog.sh & # $SCRIPT_NAME" /jffs/scripts/init-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/init-start
+				fi
+				
+				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
+					echo "sh /jffs/scripts/ntpbootwatchdog.sh & # $SCRIPT_NAME" >> /jffs/scripts/init-start
+				fi
+			else
+				echo "#!/bin/sh" > /jffs/scripts/init-start
+				echo "" >> /jffs/scripts/init-start
+				echo "sh /jffs/scripts/ntpbootwatchdog.sh & # $SCRIPT_NAME" >> /jffs/scripts/init-start
+				chmod 0755 /jffs/scripts/init-start
+			fi
 		;;
 		disable)
-			touch "$DISABLE_USB_FEATURES_FILE"
-			Auto_Startup delete 2>/dev/null
-			Auto_Startup_NoUSB create 2>/dev/null
-			/opt/etc/init.d/S99tailtop stop
-			rm -f "$SCRIPT_DIR/tailtop"
-			rm -f "$SCRIPT_DIR/tailtopd"
-			rm -f /opt/etc/init.d/S99tailtop
+			rm -f "$NTP_WATCHDOG_FILE"
+			rm -f /jffs/scripts/ntpbootwatchdog.sh
+			if [ -f /jffs/scripts/init-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/init-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/init-start
+				fi
+			fi
 		;;
 		check)
-			if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
+			if [ -f /jffs/scripts/ntpbootwatchdog.sh ] && [ "$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/init-start)" -gt 0 ]; then
 				echo "ENABLED"
 			else
 				echo "DISABLED"
 			fi
 		;;
 	esac
+}
+
+Process_Upgrade(){
+	if [ -f /opt/etc/init.d/S99tailtop ]; then
+		/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
+		sleep 2
+		rm -f /opt/etc/init.d/S99tailtop 2>/dev/null
+		rm -f /opt/bin/tailtopd
+		Update_File sc.func
+		Update_File S99tailtop
+		rm -f "$SCRIPT_DIR/.usbdisabled"
+	fi
 }
 
 Shortcut_Script(){
@@ -642,26 +664,26 @@ PressEnter(){
 ScriptHeader(){
 	clear
 	printf "\\n"
-	printf "\\e[1m#####################################################\\e[0m\\n"
-	printf "\\e[1m##               __  __              _  _          ##\\e[0m\\n"
-	printf "\\e[1m##              |  \/  |            | |(_)         ##\\e[0m\\n"
-	printf "\\e[1m##    ___   ___ | \  / |  ___  _ __ | | _  _ __    ##\\e[0m\\n"
-	printf "\\e[1m##   / __| / __|| |\/| | / _ \| '__|| || || '_ \   ##\\e[0m\\n"
-	printf "\\e[1m##   \__ \| (__ | |  | ||  __/| |   | || || | | |  ##\\e[0m\\n"
-	printf "\\e[1m##   |___/ \___||_|  |_| \___||_|   |_||_||_| |_|  ##\\e[0m\\n"
-	printf "\\e[1m##                                                 ##\\e[0m\\n"
-	printf "\\e[1m##               %s on %-11s             ##\\e[0m\\n" "$SCRIPT_VERSION" "$ROUTER_MODEL"
-	printf "\\e[1m##                                                 ##\\e[0m\\n"
-	printf "\\e[1m##       https://github.com/jackyaz/scMerlin       ##\\e[0m\\n"
-	printf "\\e[1m##                                                 ##\\e[0m\\n"
-	printf "\\e[1m#####################################################\\e[0m\\n"
+	printf "${BOLD}######################################################${CLEARFORMAT}\\n"
+	printf "${BOLD}##               __  __              _  _           ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##              |  \/  |            | |(_)          ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##    ___   ___ | \  / |  ___  _ __ | | _  _ __     ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##   / __| / __|| |\/| | / _ \| '__|| || || '_ \    ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##   \__ \| (__ | |  | ||  __/| |   | || || | | |   ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##   |___/ \___||_|  |_| \___||_|   |_||_||_| |_|   ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##                                                  ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##               %s on %-11s              ##${CLEARFORMAT}\\n" "$SCRIPT_VERSION" "$ROUTER_MODEL"
+	printf "${BOLD}##                                                  ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##       https://github.com/jackyaz/scMerlin        ##${CLEARFORMAT}\\n"
+	printf "${BOLD}##                                                  ##${CLEARFORMAT}\\n"
+	printf "${BOLD}######################################################${CLEARFORMAT}\\n"
 	printf "\\n"
 }
 
 MainMenu(){
-	printf "WebUI for %s is available at:\\n${SETTING}%s\\e[0m\\n\\n" "$SCRIPT_NAME" "$(Get_WebUI_URL)"
-	printf "\\e[1m\\e[4mServices\\e[0m"
-	printf "\\e[1m${WARN} (selecting an option will restart the service)\\e[0m\\n"
+	printf "WebUI for %s is available at:\\n${SETTING}%s${CLEARFORMAT}\\n\\n" "$SCRIPT_NAME" "$(Get_WebUI_URL)"
+	printf "${BOLD}\\e[4mServices${CLEARFORMAT}"
+	printf "${BOLD}${WARN} (selecting an option will restart the service)${CLEARFORMAT}\\n"
 	printf "1.    DNS/DHCP Server (dnsmasq)\\n"
 	printf "2.    Internet connection\\n"
 	printf "3.    Web Interface (httpd)\\n"
@@ -678,8 +700,8 @@ MainMenu(){
 		fi
 	done
 	if [ "$vpnclientenabled" = "true" ]; then
-		printf "\\n\\e[1m\\e[4mVPN Clients\\e[0m"
-		printf "\\e[1m${WARN} (selecting an option will restart the VPN Client)\\e[0m\\n"
+		printf "\\n${BOLD}\\e[4mVPN Clients${CLEARFORMAT}"
+		printf "${BOLD}${WARN} (selecting an option will restart the VPN Client)${CLEARFORMAT}\\n"
 		vpnclientnum=1
 		while [ "$vpnclientnum" -lt 6 ]; do
 			printf "vc%s.  VPN Client %s (%s)\\n" "$vpnclientnum" "$vpnclientnum" "$(nvram get vpn_client"$vpnclientnum"_desc)"
@@ -692,8 +714,8 @@ MainMenu(){
 		vpnserverenabled="true"
 	fi
 	if [ "$vpnserverenabled" = "true" ]; then
-		printf "\\n\\e[1m\\e[4mVPN Servers\\e[0m"
-		printf "\\e[1m${WARN} (selecting an option will restart the VPN Server)\\e[0m\\n"
+		printf "\\n${BOLD}\\e[4mVPN Servers${CLEARFORMAT}"
+		printf "${BOLD}${WARN} (selecting an option will restart the VPN Server)${CLEARFORMAT}\\n"
 		vpnservernum=1
 		while [ "$vpnservernum" -lt 3 ]; do
 			vpnsdesc=""
@@ -705,28 +727,29 @@ MainMenu(){
 		done
 	fi
 	if [ -f /opt/bin/opkg ]; then
-		printf "\\n\\e[1m\\e[4mEntware\\e[0m\\n"
+		printf "\\n${BOLD}\\e[4mEntware${CLEARFORMAT}\\n"
 		printf "et.   Restart all Entware applications\\n"
 	fi
-	printf "\\n\\e[1m\\e[4mRouter\\e[0m\\n"
+	printf "\\n${BOLD}\\e[4mRouter${CLEARFORMAT}\\n"
 	printf "c.    View running processes\\n"
-	printf "m.    View RAM/memory usage\n"
+	printf "m.    View RAM/memory usage\\n"
+	printf "cr.   View cron jobs\\n"
 	printf "t.    View router temperatures\n"
 	printf "w.    List Addon WebUI tab to page mapping\n"
 	printf "r.    Reboot router\\n\\n"
-	printf "\\e[1m\\e[4mOther\\e[0m\\n"
-	if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
-		USB_ENABLED="${PASS}Enabled"
+	printf "${BOLD}\\e[4mOther${CLEARFORMAT}\\n"
+	if [ "$(NTPBootWatchdog check)" = "ENABLED" ]; then
+		NTPBW_ENABLED="${SETTING}Enabled"
 	else
-		USB_ENABLED="${ERR}Disabled"
+		NTPBW_ENABLED="Disabled"
 	fi
-	printf "usb.  Toggle USB features (list of running processes in WebUI)\\n      Currently: \\e[1m$USB_ENABLED\\e[0m\\n\\n"
+	printf "ntp.  Toggle NTP boot watchdog script\\n      Currently: ${BOLD}$NTPBW_ENABLED${CLEARFORMAT}\\n\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
 	printf "z.    Uninstall %s\\n" "$SCRIPT_NAME"
 	printf "\\n"
-	printf "\\e[1m#####################################################\\e[0m\\n"
+	printf "${BOLD}######################################################${CLEARFORMAT}\\n"
 	printf "\\n"
 	while true; do
 		printf "Choose an option:  "
@@ -741,7 +764,7 @@ MainMenu(){
 			2)
 				printf "\\n"
 				while true; do
-					printf "\\n\\e[1mInternet connection will take 30s-60s to reconnect. Continue? (y/n)\\e[0m  "
+					printf "\\n${BOLD}Internet connection will take 30s-60s to reconnect. Continue? (y/n)${CLEARFORMAT}  "
 					read -r confirm
 					case "$confirm" in
 						y|Y)
@@ -775,7 +798,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_ftpd >/dev/null 2>&1
 				else
-				printf "\\n\\e[1m\\e[31mInvalid selection (FTP not enabled)\\e[0m\\n\\n"
+				printf "\\n${BOLD}\\e[31mInvalid selection (FTP not enabled)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -787,7 +810,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_samba >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (Samba not enabled)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (Samba not enabled)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -799,7 +822,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_ddns >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (DDNS client not enabled)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (DDNS client not enabled)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -817,7 +840,7 @@ MainMenu(){
 					printf "\\n"
 					/opt/etc/init.d/S77chronyd restart
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (NTP server not enabled/installed)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (NTP server not enabled/installed)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -827,7 +850,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient1 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -837,7 +860,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient2 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -847,7 +870,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient3 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -857,7 +880,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient4 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -867,7 +890,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnclient5 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Client not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Client not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -877,7 +900,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnserver1 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Server not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -887,7 +910,7 @@ MainMenu(){
 					printf "\\n"
 					service restart_vpnserver2 >/dev/null 2>&1
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (VPN Server not configured)\\e[0m\\n\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (VPN Server not configured)${CLEARFORMAT}\\n\\n"
 				fi
 				PressEnter
 				break
@@ -897,7 +920,7 @@ MainMenu(){
 				if [ -f /opt/bin/opkg ]; then
 					if Check_Lock menu; then
 						while true; do
-							printf "\\n\\e[1mAre you sure you want to restart all Entware scripts? (y/n)\\e[0m  "
+							printf "\\n${BOLD}Are you sure you want to restart all Entware scripts? (y/n)${CLEARFORMAT}  "
 							read -r confirm
 							case "$confirm" in
 								y|Y)
@@ -912,7 +935,7 @@ MainMenu(){
 						Clear_Lock
 					fi
 				else
-					printf "\\n\\e[1m\\e[31mInvalid selection (Entware not installed)\\e[0m\\n"
+					printf "\\n${BOLD}\\e[31mInvalid selection (Entware not installed)${CLEARFORMAT}\\n"
 				fi
 				PressEnter
 				break
@@ -926,7 +949,7 @@ MainMenu(){
 					else
 						program=""
 						while true; do
-							printf "\\n\\e[1mWould you like to install htop (enhanced version of top)? (y/n)\\e[0m  "
+							printf "\\n${BOLD}Would you like to install htop (enhanced version of top)? (y/n)${CLEARFORMAT}  "
 							read -r confirm
 							case "$confirm" in
 								y|Y)
@@ -961,9 +984,16 @@ MainMenu(){
 				PressEnter
 				break
 			;;
+			cr)
+				ScriptHeader
+				Get_Cron_Jobs
+				printf "\\n"
+				PressEnter
+				break
+			;;
 			t)
 				ScriptHeader
-				printf "\\n\\e[1mTemperatures\\e[0m\\n\\n"
+				printf "\\n${BOLD}Temperatures${CLEARFORMAT}\\n\\n"
 				if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
 					printf "CPU: %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
 				elif [ -f /proc/dmu/temperature ]; then
@@ -993,10 +1023,10 @@ MainMenu(){
 				printf "\\n"
 				while true; do
 					if [ "$ROUTER_MODEL" = "RT-AC86U" ]; then
-						printf "\\n\\e[1m${WARN}Remote reboots are not recommend for %s\\e[0m" "$ROUTER_MODEL"
-						printf "\\n\\e[1m${WARN}Some %s fail to reboot correctly and require a manual power cycle\\e[0m\\n" "$ROUTER_MODEL"
+						printf "\\n${BOLD}${WARN}Remote reboots are not recommend for %s${CLEARFORMAT}" "$ROUTER_MODEL"
+						printf "\\n${BOLD}${WARN}Some %s fail to reboot correctly and require a manual power cycle${CLEARFORMAT}\\n" "$ROUTER_MODEL"
 					fi
-					printf "\\n\\e[1mAre you sure you want to reboot? (y/n)\\e[0m  "
+					printf "\\n${BOLD}Are you sure you want to reboot? (y/n)${CLEARFORMAT}  "
 					read -r confirm
 					case "$confirm" in
 						y|Y)
@@ -1011,12 +1041,12 @@ MainMenu(){
 				PressEnter
 				break
 			;;
-			usb)
+			ntp)
 				printf "\\n"
-				if [ "$(ToggleUSBFeatures check)" = "ENABLED" ]; then
-					ToggleUSBFeatures disable
-				elif [ "$(ToggleUSBFeatures check)" = "DISABLED" ]; then
-					ToggleUSBFeatures enable
+				if [ "$(NTPBootWatchdog check)" = "ENABLED" ]; then
+					NTPBootWatchdog disable
+				elif [ "$(NTPBootWatchdog check)" = "DISABLED" ]; then
+					NTPBootWatchdog enable
 				fi
 				break
 			;;
@@ -1040,11 +1070,11 @@ MainMenu(){
 			;;
 			e)
 				ScriptHeader
-				printf "\\n\\e[1mThanks for using %s!\\e[0m\\n\\n\\n" "$SCRIPT_NAME"
+				printf "\\n${BOLD}Thanks for using %s!${CLEARFORMAT}\\n\\n\\n" "$SCRIPT_NAME"
 				exit 0
 			;;
 			z)
-				printf "\\n\\e[1mAre you sure you want to uninstall %s? (y/n)\\e[0m  " "$SCRIPT_NAME"
+				printf "\\n${BOLD}Are you sure you want to uninstall %s? (y/n)${CLEARFORMAT}  " "$SCRIPT_NAME"
 				read -r confirm
 				case "$confirm" in
 					y|Y)
@@ -1081,21 +1111,6 @@ Check_Requirements(){
 		CHECKSFAILED="true"
 	fi
 	
-	printf "\\n\\e[1mWould you like to enable USB Features (list of running processes in WebUI) (y/n)?\\nThis requires a USB device plugged into router for Entware\\e[0m  "
-	read -r confirm
-	case "$confirm" in
-		y|Y)
-			if [ ! -f /opt/bin/opkg ]; then
-				touch "$DISABLE_USB_FEATURES_FILE"
-				Print_Output false "Entware not detected, USB features disabled" "$WARN"
-			fi
-		;;
-		*)
-			touch "$DISABLE_USB_FEATURES_FILE"
-			Print_Output false "USB features can be enabled later via the WebUI or command line" "$WARN"
-		;;
-	esac
-	
 	if [ "$CHECKSFAILED" = "false" ]; then
 		return 0
 	else
@@ -1123,20 +1138,15 @@ Menu_Install(){
 	Set_Version_Custom_Settings local "$SCRIPT_VERSION"
 	Set_Version_Custom_Settings server "$SCRIPT_VERSION"
 	Create_Symlinks
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Auto_Startup create 2>/dev/null
-	else
-		Auto_Startup_NoUSB create 2>/dev/null
-	fi
+	Auto_Startup create 2>/dev/null
 	Auto_ServiceEvent create 2>/dev/null
 	
 	Update_File scmerlin_www.asp
 	Update_File shared-jy.tar.gz
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Update_File tailtop
-		Update_File tailtopd
-		Update_File S99tailtop
-	fi
+	Update_File tailtop
+	Update_File tailtopd
+	Update_File sc.func
+	Update_File S99tailtop
 	
 	Clear_Lock
 	ScriptHeader
@@ -1145,22 +1155,7 @@ Menu_Install(){
 
 Menu_Startup(){
 	Create_Dirs
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		if [ -z "$1" ]; then
-			Print_Output true "Missing argument for startup, not starting $SCRIPT_NAME" "$WARN"
-			exit 1
-		elif [ "$1" != "force" ]; then
-			if [ ! -f "$1/entware/bin/opkg" ]; then
-				Print_Output true "$1 does not contain Entware, not starting $SCRIPT_NAME" "$WARN"
-				exit 1
-			else
-				Print_Output true "$1 contains Entware, starting $SCRIPT_NAME" "$WARN"
-			fi
-		fi
-		Auto_Startup create 2>/dev/null
-	else
-		Auto_Startup_NoUSB create 2>/dev/null
-	fi
+	Auto_Startup create 2>/dev/null
 	
 	NTP_Ready
 	
@@ -1174,6 +1169,8 @@ Menu_Startup(){
 	Auto_ServiceEvent create 2>/dev/null
 	Shortcut_Script create
 	
+	"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
+	
 	Mount_WebUI
 	Clear_Lock
 }
@@ -1181,12 +1178,9 @@ Menu_Startup(){
 Menu_Uninstall(){
 	Print_Output true "Removing $SCRIPT_NAME..." "$PASS"
 	Shortcut_Script delete
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Auto_Startup delete 2>/dev/null
-	else
-		Auto_Startup_NoUSB delete 2>/dev/null
-	fi
+	Auto_Startup delete 2>/dev/null
 	Auto_ServiceEvent delete 2>/dev/null
+	NTPBootWatchdog disable
 	
 	LOCKFILE=/tmp/addonwebui.lock
 	FD=386
@@ -1197,17 +1191,15 @@ Menu_Uninstall(){
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
 		umount /www/require/modules/menuTree.js
 		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
-		rm -rf "{$SCRIPT_WEBPAGE_DIR:?}/$MyPage"
+		rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage"
+		rm -f "$SCRIPT_WEBPAGE_DIR/$(echo $MyPage | cut -f1 -d'.').title"
 	fi
 	flock -u "$FD"
-	rm -f "$SCRIPT_DIR/scmerlin_www.asp" 2>/dev/null
 	rm -rf "$SCRIPT_WEB_DIR" 2>/dev/null
 	
-	/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
+	"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 	sleep 5
-	rm -f /opt/etc/init.d/S99tailtop 2>/dev/null
-	rm -f "$SCRIPT_DIR/tailtop"* 2>/dev/null
-	
+		
 	rm -rf "$SCRIPT_DIR"
 	
 	SETTINGSFILE="/jffs/addons/custom_settings.txt"
@@ -1262,7 +1254,7 @@ Entware_Ready(){
 ### ###
 
 Show_About(){
-	cat <<EOF
+	cat << EOF
 About
   $SCRIPT_NAME allows you to easily control the most common
   services/scripts on your router.
@@ -1280,7 +1272,7 @@ EOF
 
 ### function based on @dave14305's FlexQoS show_help function ###
 Show_Help(){
-	cat <<EOF
+	cat << EOF
 Available commands:
   $SCRIPT_NAME_LOWER about              explains functionality
   $SCRIPT_NAME_LOWER update             checks for updates
@@ -1297,18 +1289,12 @@ EOF
 
 if [ -z "$1" ]; then
 	NTP_Ready
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Entware_Ready
-	fi
 	Create_Dirs
 	Shortcut_Script create
 	Create_Symlinks
-	if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-		Auto_Startup create 2>/dev/null
-	else
-		Auto_Startup_NoUSB create 2>/dev/null
-	fi
+	Auto_Startup create 2>/dev/null
 	Auto_ServiceEvent create 2>/dev/null
+	Process_Upgrade
 	ScriptHeader
 	MainMenu
 	exit 0
@@ -1327,9 +1313,10 @@ case "$1" in
 	service_event)
 		if [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}config"; then
 			settingstate="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}config//")";
-			ToggleUSBFeatures "$settingstate"
+			NTPBootWatchdog "$settingstate"
 			exit 0
 		elif [ "$2" = "start" ] && echo "$3" | grep "${SCRIPT_NAME_LOWER}servicerestart"; then
+			rm -f "$SCRIPT_WEB_DIR/detect_service.js"
 			echo 'var servicestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_service.js"
 			srvname="$(echo "$3" | sed "s/${SCRIPT_NAME_LOWER}servicerestart//")";
 			if [ "$srvname" = "vsftpd" ]; then
@@ -1398,6 +1385,9 @@ case "$1" in
 		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}getaddonpages" ]; then
 			Get_Addon_Pages
 			exit 0
+		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}getcronjobs" ]; then
+			Get_Cron_Jobs
+			exit 0
 		fi
 		exit 0
 	;;
@@ -1409,30 +1399,13 @@ case "$1" in
 		Update_Version force
 		exit 0
 	;;
-	setversion)
-		Create_Dirs
-		Shortcut_Script create
-		Create_Symlinks
-		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-			Auto_Startup create 2>/dev/null
-		else
-			Auto_Startup_NoUSB create 2>/dev/null
-		fi
-		Auto_ServiceEvent create 2>/dev/null
-		Set_Version_Custom_Settings local "$SCRIPT_VERSION"
-		Set_Version_Custom_Settings server "$SCRIPT_VERSION"
-		exit 0
-	;;
 	postupdate)
 		Create_Dirs
 		Shortcut_Script create
 		Create_Symlinks
-		if [ ! -f "$DISABLE_USB_FEATURES_FILE" ]; then
-			Auto_Startup create 2>/dev/null
-		else
-			Auto_Startup_NoUSB create 2>/dev/null
-		fi
+		Auto_Startup create 2>/dev/null
 		Auto_ServiceEvent create 2>/dev/null
+		Process_Upgrade
 		exit 0
 	;;
 	checkupdate)
@@ -1440,7 +1413,6 @@ case "$1" in
 		exit 0
 	;;
 	uninstall)
-		Check_Lock
 		Menu_Uninstall
 		exit 0
 	;;

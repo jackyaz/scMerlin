@@ -2,8 +2,8 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/bfd397624cdf4803a465d4ae1530e7fe)](https://www.codacy.com/app/jackyaz/scMerlin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jackyaz/scMerlin&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://travis-ci.com/jackyaz/scMerlin.svg?branch=master)](https://travis-ci.com/jackyaz/scMerlin)
 
-## v2.2.3
-### Updated on 2021-04-06
+## v2.3.0
+### Updated on 2021-05-31
 ## About
 scMerlin allows you to easily control the most common services/scripts on your router.
 
@@ -43,9 +43,9 @@ If this does not work, you will need to use the full path:
 
 ## Screenshots
 
-![WebUI](https://puu.sh/HtY7S/ee6be15eb8.png)
+![WebUI](https://puu.sh/HLbzj/a8d2b5b15e.png)
 
-![CLI UI](https://puu.sh/HtY1c/f4fbc47a62.png)
+![CLI UI](https://puu.sh/HKZbb/a85852adea.png)
 
 ## Help
 Please post about any issues and problems here: [Asuswrt-Merlin AddOns on SNBForums](https://www.snbforums.com/forums/asuswrt-merlin-addons.60/?prefix_id=23)
