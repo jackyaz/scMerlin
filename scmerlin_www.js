@@ -29,10 +29,10 @@ function initial(){
 	LoadCustomSettings();
 	show_menu();
 	
-	Draw_Chart_NoData('nvramUsage');
-	Draw_Chart_NoData('jffsUsage');
-	Draw_Chart_NoData('MemoryUsage')
-	Draw_Chart_NoData('SwapUsage');
+	Draw_Chart_NoData('nvramUsage','Data loading...');
+	Draw_Chart_NoData('jffsUsage','Data loading...');
+	Draw_Chart_NoData('MemoryUsage','Data loading...')
+	Draw_Chart_NoData('SwapUsage','No swap file configured');
 	
 	$j('#sortTableCron').empty();
 	$j('#sortTableCron').append(BuildSortTableHtmlNoData());
@@ -439,7 +439,7 @@ function AddEventHandlers(){
 						Draw_Chart('SwapUsage');
 					}
 					else{
-						Draw_Chart_NoData('SwapUsage');
+						Draw_Chart_NoData('SwapUsage','No swap file configured');
 					}
 				}
 				else if($j(this).siblings()[0].id == 'routerstorage'){
@@ -711,7 +711,7 @@ function round(value,decimals){
 	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
 }
 
-function Draw_Chart_NoData(txtchartname){
+function Draw_Chart_NoData(txtchartname,txtmessage){
 	document.getElementById('canvasChart'+txtchartname).width = '265';
 	document.getElementById('canvasChart'+txtchartname).height = '250';
 	document.getElementById('canvasChart'+txtchartname).style.width = '265px';
@@ -722,7 +722,7 @@ function Draw_Chart_NoData(txtchartname){
 	ctx.textBaseline = 'middle';
 	ctx.font = 'normal normal bolder 22px Arial';
 	ctx.fillStyle = 'white';
-	ctx.fillText('No swap file configured',135,125);
+	ctx.fillText(txtmessage,135,125);
 	ctx.restore();
 }
 
