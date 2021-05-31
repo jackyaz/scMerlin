@@ -134,6 +134,11 @@ div.sortTableContainer {
   border: 1px solid #000;
 }
 
+.sortTable {
+  table-layout: fixed !important;
+  border: none;
+}
+
 thead.sortTableHeader th {
   background-image: linear-gradient(rgb(146, 160, 165) 0%, rgb(102, 117, 124) 100%);
   border-top: none !important;
