@@ -237,7 +237,7 @@ span.addonpageurl {
   font-size: 10px !important;
 }
 
-td.nodata {
+.nodata {
   font-size: 48px !important;
   font-weight: bolder !important;
   height: 65px !important;
