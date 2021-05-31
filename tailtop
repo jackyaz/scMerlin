@@ -12,6 +12,6 @@ printf "%s,%s,%s,%s,%s,%s,%s,%s,", $1,$2,$3,$4,$5,$6,$7,$8;for(i=9; i<=NF; ++i) 
 }
 }' | \
 sed 's/,$//g;s/S</S </g;s/SN/S N/g;s/SD/S D/g;s/SN/R N/g;' > /tmp/scmerlin-top
-	sleep 3
+	sleep 4
 done
 renice 0 $$
