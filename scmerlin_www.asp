@@ -55,7 +55,7 @@ function update_sysinfo(e){
 				Draw_Chart('SwapUsage');
 			}
 			else{
-				Draw_Chart_NoData('SwapUsage');
+				Draw_Chart_NoData('SwapUsage','No swap file configured');
 			}
 			Draw_Chart('nvramUsage');
 			Draw_Chart('jffsUsage');
