@@ -195,7 +195,7 @@ function BuildSortTableHtmlNoData(){
 }
 
 function BuildSortTableHtml(type) {
-	var tablehtml = '<table border="0" cellpadding="0" cellspacing="0" width="100%" class="procTable" style="table-layout:fixed;">';
+	var tablehtml = '<table border="0" cellpadding="0" cellspacing="0" width="100%" class="sortTable">';
 	if(type == 'sortTableProcesses'){
 		tablehtml += '<col style="width:50px;">';
 		tablehtml += '<col style="width:50px;">';
