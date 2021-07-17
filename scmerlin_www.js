@@ -59,9 +59,9 @@ function initial(){
 	
 	document.formScriptActions.action_script.value='start_scmerlingetaddonpages;start_scmerlingetcronjobs';
 	document.formScriptActions.submit();
-	load_addonpages();
+	setTimeout(load_addonpages,5000);
 	get_proclist_file();
-	get_cronlist_file();
+	setTimeout(get_cronlist_file,5000);
 	get_ntpwatchdogenabled_file();
 	update_temperatures();
 	update_sysinfo();
@@ -89,7 +89,6 @@ function update_status(){
 	$j.ajax({
 		url: '/ext/scmerlin/detect_update.js',
 		dataType: 'script',
-		timeout: 3000,
 		error: function(xhr){
 			setTimeout(update_status,1000);
 		},
@@ -143,7 +142,6 @@ function service_status(servicename){
 	$j.ajax({
 		url: '/ext/scmerlin/detect_service.js',
 		dataType: 'script',
-		timeout: 3000,
 		error:	function(xhr){
 			setTimeout(service_status,1000,servicename);
 		},
@@ -277,7 +275,6 @@ function get_ntpwatchdogenabled_file(){
 	$j.ajax({
 		url: '/ext/scmerlin/watchdogenabled.htm',
 		dataType: 'text',
-		timeout: 10000,
 		error: function(xhr){
 			document.form.scmerlin_ntpwatchdog.value = 'disable';
 		},
