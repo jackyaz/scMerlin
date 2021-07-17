@@ -1384,9 +1384,13 @@ case "$1" in
 			Update_Version force unattended
 			exit 0
 		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}getaddonpages" ]; then
+			rm -f /tmp/addonwebpages.tmp
+			sleep 3
 			Get_Addon_Pages
 			exit 0
 		elif [ "$2" = "start" ] && [ "$3" = "${SCRIPT_NAME_LOWER}getcronjobs" ]; then
+			rm -f /tmp/scmcronjobs.tmp
+			sleep 3
 			Get_Cron_Jobs
 			exit 0
 		fi

@@ -59,9 +59,9 @@ function initial(){
 	
 	document.formScriptActions.action_script.value='start_scmerlingetaddonpages;start_scmerlingetcronjobs';
 	document.formScriptActions.submit();
-	load_addonpages();
+	setTimeout(load_addonpages,5000);
 	get_proclist_file();
-	get_cronlist_file();
+	setTimeout(get_cronlist_file,5000);
 	get_ntpwatchdogenabled_file();
 	update_temperatures();
 	update_sysinfo();
