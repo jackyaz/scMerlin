@@ -125,7 +125,7 @@ function CheckUpdate(){
 
 function DoUpdate(){
 	document.form.action_script.value = 'start_scmerlindoupdate';
-	document.form.action_wait.value = 10;
+	document.form.action_wait.value = 15;
 	$j('#auto_refresh').prop('checked',false);
 	clearTimeout(tout);
 	showLoading();
