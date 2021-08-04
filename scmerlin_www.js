@@ -125,6 +125,8 @@ function CheckUpdate(){
 function DoUpdate(){
 	document.form.action_script.value = 'start_scmerlindoupdate';
 	document.form.action_wait.value = 10;
+	$j('#auto_refresh').prop('checked',false);
+	clearTimeout(tout);
 	showLoading();
 	document.form.submit();
 }
@@ -456,7 +458,7 @@ function AddEventHandlers(){
 		}
 	});
 	
-	$j('#auto_refresh')[0].addEventListener('click',function(){ToggleRefresh();});
+	$j('#auto_refresh').off('click').on('click',function(){ToggleRefresh();});
 }
 
 function SortTable(tableid,arrayid,sorttext,sortname,sortdir){
@@ -560,8 +562,14 @@ function getNum(val){
 }
 
 function ToggleRefresh(){
-	$j('#auto_refresh').prop('checked',function(i,v) { if(v){get_proclist_file();} else{clearTimeout(tout);} });
+	if($j('#auto_refresh').prop('checked') == true){
+		get_proclist_file();
+	}
+	else{
+		clearTimeout(tout);
+	}
 }
+
 
 function BuildAddonPageTable(addonname,addonurl,loopindex){
 	var addonpageshtml = '';
@@ -848,6 +856,8 @@ function Draw_Chart(txtchartname){
 function SaveConfig(){
 	document.form.action_script.value = 'start_scmerlinconfig'+document.form.scmerlin_ntpwatchdog.value;
 	document.form.action_wait.value = 10;
+	$j('#auto_refresh').prop('checked',false);
+	clearTimeout(tout);
 	showLoading();
 	document.form.submit();
 }
