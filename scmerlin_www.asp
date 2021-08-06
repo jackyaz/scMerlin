@@ -563,7 +563,12 @@ function GenerateSiteMap(){
 			return !menuExclude.tabs.includes(item.url);
 		});
 		myTabs = myTabs.filter(function(item){
-			return item.tabName != '__INHERIT__';
+			if(item.tabName == '__INHERIT__' && item.url == 'NULL'){
+				return false;
+			}
+			else{
+				return true;
+			}
 		});
 		myTabs = myTabs.filter(function(item){
 			if(item.tabName == '__HIDE__' && item.url == 'NULL'){
@@ -572,6 +577,12 @@ function GenerateSiteMap(){
 			else{
 				return true;
 			}
+		});
+		myTabs = myTabs.filter(function(item){
+			return item.url.indexOf('TrafficMonitor_dev') == -1;
+		});
+		myTabs = myTabs.filter(function(item){
+			return item.url != 'AdaptiveQoS_Adaptive.asp';
 		});
 		myobj.tabs = myTabs;
 		
@@ -594,18 +605,20 @@ function GenerateSiteMap(){
 		else{
 			sitemapstring += '<span style="font-size:14px;"><b>'+myMenu[i].menuName+'</b></span><br>';
 		}
-		if(myMenu[i].tabs.length > 1){
 			for(var i2 = 0; i2 < myMenu[i].tabs.length; i2++){
 				if(myMenu[i].tabs[i2].tabName == '__HIDE__'){
 					continue;
 				}
+				var tabname = myMenu[i].tabs[i2].tabName;
 				var taburl = myMenu[i].tabs[i2].url;
-				if(myMenu[i].tabs[i2].url.indexOf('redirect.htm') != -1){
+				if(tabname == '__INHERIT__'){
+					tabname = taburl.split('.')[0];
+				}
+				if(taburl.indexOf('redirect.htm') != -1){
 					taburl = '/ext/shared-jy/redirect.htm';
 				}
-				sitemapstring += '<a style="text-decoration:underline;" href="'+taburl+'" target="_blank">'+myMenu[i].tabs[i2].tabName+'</a><br>';
+				sitemapstring += '<a style="text-decoration:underline;" href="'+taburl+'" target="_blank">'+tabname+'</a><br>';
 			}
-		}
 		sitemapstring += '<br>';
 	}
 	$j('#sitemapcontent').html(sitemapstring);
