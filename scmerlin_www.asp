@@ -593,7 +593,12 @@ function GenerateSiteMap(){
 		}
 		else{
 			sitemapstring += '<span style="font-size:14px;"><b>'+myMenu[i].menuName+'</b></span><br>';
+		}
+		if(myMenu[i].tabs.length > 1){
 			for(var i2 = 0; i2 < myMenu[i].tabs.length; i2++){
+				if(myMenu[i].tabs[i2].tabName == '__HIDE__'){
+					continue;
+				}
 				var taburl = myMenu[i].tabs[i2].url;
 				if(myMenu[i].tabs[i2].url.indexOf('redirect.htm') != -1){
 					taburl = '/ext/shared-jy/redirect.htm';
