@@ -485,6 +485,15 @@ Mount_WebUI(){
 			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); }" >> /tmp/index_style.css
 		fi
 		
+		if ! grep -q '.dropdown-content' /tmp/index_style.css ; then
+			{
+				echo ".dropdown-content {display: none; position: absolute; background-color: #3a4042; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;}"
+				echo ".dropdown-content a {padding: 12px 16px; text-decoration: none; display: block; height: 20px; font-weight: bold; text-shadow: 1px 1px 0px black; font-family: Verdana, MS UI Gothic, MS P Gothic, Microsoft Yahei UI, sans-serif; font-size: 12px; border: 1px solid #6B7071;}"
+				echo ".dropdown-content a:hover {background-color: #77a5c6;}"
+				echo ".dropdown:hover .dropdown-content {display: block;}"
+			} >> /tmp/index_style.css
+		fi
+		
 		umount /www/index_style.css 2>/dev/null
 		mount -o bind /tmp/index_style.css /www/index_style.css
 		
@@ -516,6 +525,125 @@ Mount_WebUI(){
 			umount /www/state.js 2>/dev/null
 			cp -f /www/state.js /tmp/
 			sed -i 's~<td width=\\"335\\" id=\\"bottom_help_link\\" align=\\"left\\">~<td width=\\"335\\" id=\\"bottom_help_link\\" align=\\"left\\"><a style=\\"font-weight: bolder;text-decoration:underline;cursor:pointer;\\" href=\\"\/'"$MyPage"'\\" target=\\"_blank\\">Sitemap<\/a>\&nbsp\|\&nbsp~' /tmp/state.js
+			
+			cat << 'EOF' >> /tmp/state.js
+var myMenu = [];
+function AddDropdowns(){
+	if(myMenu.length == 0){
+		setTimeout(AddDropdowns,1000);
+		return;
+	}
+	for(var i = 0; i < myMenu.length; i++){
+		var sitemapstring = '<div class="dropdown-content">';
+		for(var i2 = 0; i2 < myMenu[i].tabs.length; i2++){
+			if(myMenu[i].tabs[i2].tabName == '__HIDE__'){
+				continue;
+			}
+		var tabname = myMenu[i].tabs[i2].tabName;
+		var taburl = myMenu[i].tabs[i2].url;
+		if(tabname == '__INHERIT__'){
+			tabname = taburl.split('.')[0];
+		}
+		if(taburl.indexOf('redirect.htm') != -1){
+			taburl = '/ext/shared-jy/redirect.htm';
+		}
+		sitemapstring += '<a href="'+taburl+'">'+tabname+'</a>';
+		}
+		document.getElementsByClassName(myMenu[i].index)[0].parentElement.parentElement.parentElement.parentElement.parentElement.innerHTML += sitemapstring;
+		document.getElementsByClassName(myMenu[i].index)[0].parentElement.parentElement.parentElement.parentElement.parentElement.classList.add('dropdown');
+	}
+}
+
+function GenerateSiteMap(showurls){
+	myMenu = [];
+	
+	if(typeof menuList == 'undefined' || menuList == null){
+		setTimeout(GenerateSiteMap,1000,false);
+		return;
+	}
+	
+	for(var i = 0; i < menuList.length; i++){
+		var myobj = {};
+		myobj.menuName = menuList[i].menuName;
+		myobj.index = menuList[i].index;
+		
+		var myTabs = menuList[i].tab.filter(function(item){
+			return !menuExclude.tabs.includes(item.url);
+		});
+		myTabs = myTabs.filter(function(item){
+			if(item.tabName == '__INHERIT__' && item.url == 'NULL'){
+				return false;
+			}
+			else{
+				return true;
+			}
+		});
+		myTabs = myTabs.filter(function(item){
+			if(item.tabName == '__HIDE__' && item.url == 'NULL'){
+				return false;
+			}
+			else{
+				return true;
+			}
+		});
+		myTabs = myTabs.filter(function(item){
+			return item.url.indexOf('TrafficMonitor_dev') == -1;
+		});
+		myTabs = myTabs.filter(function(item){
+			return item.url != 'AdaptiveQoS_Adaptive.asp';
+		});
+		myobj.tabs = myTabs;
+		
+		myMenu.push(myobj);
+	}
+	
+	myMenu = myMenu.filter(function(item) {
+		return !menuExclude.menus.includes(item.index);
+	});
+	myMenu = myMenu.filter(function(item) {
+		return item.index != 'menu_Split';
+	});
+	
+	var sitemapstring = '';
+	
+	for(var i = 0; i < myMenu.length; i++){
+		if(myMenu[i].tabs[0].tabName == '__HIDE__' && myMenu[i].tabs[0].url != 'NULL'){
+			if(showurls == true){
+				sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b><a style="color:#FFCC00;background-color:#4D595D;" href="'+myMenu[i].tabs[0].url+'" target="_blank">'+myMenu[i].menuName+'</a> - '+myMenu[i].tabs[0].url+'</b></span><br>';
+			}
+			else{
+				sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b><a style="color:#FFCC00;background-color:#4D595D;" href="'+myMenu[i].tabs[0].url+'" target="_blank">'+myMenu[i].menuName+'</a></b></span><br>';
+			}
+		}
+		else{
+			sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b>'+myMenu[i].menuName+'</b></span><br>';
+		}
+		for(var i2 = 0; i2 < myMenu[i].tabs.length; i2++){
+			if(myMenu[i].tabs[i2].tabName == '__HIDE__'){
+				continue;
+			}
+			var tabname = myMenu[i].tabs[i2].tabName;
+			var taburl = myMenu[i].tabs[i2].url;
+			if(tabname == '__INHERIT__'){
+				tabname = taburl.split('.')[0];
+			}
+			if(taburl.indexOf('redirect.htm') != -1){
+				taburl = '/ext/shared-jy/redirect.htm';
+			}
+			if(showurls == true){
+				sitemapstring += '<a style="text-decoration:underline;background-color:#4D595D;" href="'+taburl+'" target="_blank">'+tabname+'</a> - '+taburl+'<br>';
+			}
+			else{
+				sitemapstring += '<a style="text-decoration:underline;background-color:#4D595D;" href="'+taburl+'" target="_blank">'+tabname+'</a><br>';
+			}
+		}
+		sitemapstring += '<br>';
+	}
+	return sitemapstring;
+}
+GenerateSiteMap(false);
+AddDropdowns();
+EOF
 			mount -o bind /tmp/state.js /www/state.js
 			
 			Print_Output true "Mounted Sitemap page as $MyPage" "$PASS"
