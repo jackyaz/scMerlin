@@ -513,14 +513,9 @@ Mount_WebUI(){
 			sed -i "\\~$MyPage~d" /tmp/menuTree.js
 			sed -i "/url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm'/a {url: \"$MyPage\", tabName: \"Sitemap\"}," /tmp/menuTree.js
 			
-			if [ ! -f /tmp/state.js ]; then
-				cp -f /www/state.js /tmp/
-			fi
-			if ! grep -q 'sitemap' /tmp/state.js ; then
-				sed -i 's~<td width=\\"335\\" id=\\"bottom_help_link\\" align=\\"left\\">~<td width=\\"335\\" id=\\"bottom_help_link\\" align=\\"left\\"><a style=\\"font-weight: bolder;text-decoration:underline;cursor:pointer;\\" href=\\"\/'"$MyPage"'\\" target=\\"_blank\\">Sitemap<\/a>\&nbsp\|\&nbsp~' /tmp/state.js
-			fi
-			
 			umount /www/state.js 2>/dev/null
+			cp -f /www/state.js /tmp/
+			sed -i 's~<td width=\\"335\\" id=\\"bottom_help_link\\" align=\\"left\\">~<td width=\\"335\\" id=\\"bottom_help_link\\" align=\\"left\\"><a style=\\"font-weight: bolder;text-decoration:underline;cursor:pointer;\\" href=\\"\/'"$MyPage"'\\" target=\\"_blank\\">Sitemap<\/a>\&nbsp\|\&nbsp~' /tmp/state.js
 			mount -o bind /tmp/state.js /www/state.js
 			
 			Print_Output true "Mounted Sitemap page as $MyPage" "$PASS"
