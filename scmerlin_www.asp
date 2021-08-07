@@ -185,7 +185,6 @@ function initial(){
 	get_ntpwatchdogenabled_file();
 	update_temperatures();
 	update_sysinfo();
-	GenerateSiteMap();
 	ScriptUpdateLayout();
 	AddEventHandlers();
 }
@@ -544,84 +543,6 @@ function GetCookie(cookiename,returntype){
 
 function SetCookie(cookiename,cookievalue){
 	cookie.set('scm_'+cookiename,cookievalue,10 * 365);
-}
-
-function GenerateSiteMap(){
-	var myMenu = [];
-	
-	if(typeof menuList == 'undefined' || menuList == null){
-		setTimeout(GenerateSiteMap,1000);
-		return;
-	}
-	
-	for(var i = 0; i < menuList.length; i++){
-		var myobj = {};
-		myobj.menuName = menuList[i].menuName;
-		myobj.index = menuList[i].index;
-		
-		var myTabs = menuList[i].tab.filter(function(item){
-			return !menuExclude.tabs.includes(item.url);
-		});
-		myTabs = myTabs.filter(function(item){
-			if(item.tabName == '__INHERIT__' && item.url == 'NULL'){
-				return false;
-			}
-			else{
-				return true;
-			}
-		});
-		myTabs = myTabs.filter(function(item){
-			if(item.tabName == '__HIDE__' && item.url == 'NULL'){
-				return false;
-			}
-			else{
-				return true;
-			}
-		});
-		myTabs = myTabs.filter(function(item){
-			return item.url.indexOf('TrafficMonitor_dev') == -1;
-		});
-		myTabs = myTabs.filter(function(item){
-			return item.url != 'AdaptiveQoS_Adaptive.asp';
-		});
-		myobj.tabs = myTabs;
-		
-		myMenu.push(myobj);
-	}
-	
-	myMenu = myMenu.filter(function(item) {
-		return !menuExclude.menus.includes(item.index);
-	});
-	myMenu = myMenu.filter(function(item) {
-		return item.index != 'menu_Split';
-	});
-	
-	var sitemapstring = '';
-	
-	for(var i = 0; i < myMenu.length; i++){
-		if(myMenu[i].tabs[0].tabName == '__HIDE__' && myMenu[i].tabs[0].url != 'NULL'){
-			sitemapstring += '<span style="font-size:14px;"><b><a style="color:#FFCC00;" href="'+myMenu[i].tabs[0].url+'" target="_blank">'+myMenu[i].menuName+'</a></b></span><br>';
-		}
-		else{
-			sitemapstring += '<span style="font-size:14px;"><b>'+myMenu[i].menuName+'</b></span><br>';
-		}
-			for(var i2 = 0; i2 < myMenu[i].tabs.length; i2++){
-				if(myMenu[i].tabs[i2].tabName == '__HIDE__'){
-					continue;
-				}
-				var tabname = myMenu[i].tabs[i2].tabName;
-				var taburl = myMenu[i].tabs[i2].url;
-				if(tabname == '__INHERIT__'){
-					tabname = taburl.split('.')[0];
-				}
-				if(taburl.indexOf('redirect.htm') != -1){
-					taburl = '/ext/shared-jy/redirect.htm';
-				}
-				sitemapstring += '<a style="text-decoration:underline;" href="'+taburl+'" target="_blank">'+tabname+'</a><br>';
-			}
-		sitemapstring += '<br>';
-	}
-	$j('#sitemapcontent').html(sitemapstring);
 }
 
 function AddEventHandlers(){
@@ -1285,19 +1206,6 @@ function SaveConfig(){
 </tr>
 </table>
 <!-- End Process List -->
-<!-- Start Sitemap -->
-<div style="line-height:10px;">&nbsp;</div>
-<table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_sitemap">
-<thead class="collapsible-jquery" id="sitemap">
-<tr><td colspan="2">Site Map (click to expand/collapse)</td></tr>
-</thead>
-<tr class="even" id="rowsitemap">
-<td colspan="2">
-<div id="sitemapcontent" style="overflow-y:scroll;height:250px;"></div>
-</td>
-<!-- End Sitemap -->
-</tr>
-</table>
 </td>
 </tr>
 </table>

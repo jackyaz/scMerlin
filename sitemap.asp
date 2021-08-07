@@ -95,10 +95,10 @@ function GenerateSiteMap(){
 	
 	for(var i = 0; i < myMenu.length; i++){
 		if(myMenu[i].tabs[0].tabName == '__HIDE__' && myMenu[i].tabs[0].url != 'NULL'){
-			sitemapstring += '<span style="font-size:14px;"><b><a style="color:#FFCC00;" href="'+myMenu[i].tabs[0].url+'" target="_blank">'+myMenu[i].menuName+'</a></b></span><br>';
+			sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b><a style="color:#FFCC00;background-color:#4D595D;" href="'+myMenu[i].tabs[0].url+'" target="_blank">'+myMenu[i].menuName+'</a></b></span><br>';
 		}
 		else{
-			sitemapstring += '<span style="font-size:14px;"><b>'+myMenu[i].menuName+'</b></span><br>';
+			sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b>'+myMenu[i].menuName+'</b></span><br>';
 		}
 			for(var i2 = 0; i2 < myMenu[i].tabs.length; i2++){
 				if(myMenu[i].tabs[i2].tabName == '__HIDE__'){
@@ -112,7 +112,7 @@ function GenerateSiteMap(){
 				if(taburl.indexOf('redirect.htm') != -1){
 					taburl = '/ext/shared-jy/redirect.htm';
 				}
-				sitemapstring += '<a style="text-decoration:underline;" href="'+taburl+'" target="_blank">'+tabname+'</a><br>';
+				sitemapstring += '<a style="text-decoration:underline;background-color:#4D595D;" href="'+taburl+'" target="_blank">'+tabname+'</a><br>';
 			}
 		sitemapstring += '<br>';
 	}
@@ -157,16 +157,13 @@ function GenerateSiteMap(){
 <tr bgcolor="#4D595D">
 <td valign="top">
 <div>&nbsp;</div>
-<div class="formfonttitle" id="scripttitle" style="text-align:center;">scMerlin</div>
+<div class="formfonttitle" id="scripttitle" style="text-align:center;">Sitemap</div>
 <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
-<div class="formfontdesc">scMerlin allows you to use easily control the most common services/scripts on your router.</div>
+<div class="formfontdesc">This page shows a dynamically generated sitemap of the router WebUI. Provided by scMerlin.</div>
 <table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_sitemap">
-<thead class="collapsible-jquery" id="sitemap">
-<tr><td colspan="2">Site Map (click to expand/collapse)</td></tr>
-</thead>
 <tr class="even" id="rowsitemap">
-<td colspan="2">
-<div id="sitemapcontent" style="overflow-y:scroll;height:250px;"></div>
+<td colspan="2" border="0" style="border:0px;background-color:#4D595D;">
+<div id="sitemapcontent" style="height:100%;background-color:#4D595D;"></div>
 </td>
 <!-- End Sitemap -->
 </tr>

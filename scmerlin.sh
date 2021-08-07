@@ -173,6 +173,7 @@ Update_Version(){
 					printf "\\n"
 					Update_File shared-jy.tar.gz
 					Update_File scmerlin_www.asp
+					Update_File sitemap.asp
 					Update_File tailtop
 					Update_File tailtopd
 					Update_File sc.func
@@ -203,6 +204,7 @@ Update_Version(){
 		Print_Output true "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
 		Update_File shared-jy.tar.gz
 		Update_File scmerlin_www.asp
+		Update_File sitemap.asp
 		Update_File tailtop
 		Update_File tailtopd
 		Update_File sc.func
@@ -223,7 +225,7 @@ Update_Version(){
 }
 
 Update_File(){
-	if [ "$1" = "scmerlin_www.asp" ]; then
+	if [ "$1" = "scmerlin_www.asp" ] || [ "$1" = "sitemap.asp" ] ; then
 		tmpfile="/tmp/$1"
 		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
 		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
@@ -459,7 +461,8 @@ Get_WebUI_URL(){
 
 ### locking mechanism code credit to Martineau (@MartineauUK) ###
 Mount_WebUI(){
-	Print_Output true "Mounting WebUI tab for $SCRIPT_NAME" "$PASS"
+	realpage=""
+	Print_Output true "Mounting WebUI tabs for $SCRIPT_NAME" "$PASS"
 	LOCKFILE=/tmp/addonwebui.lock
 	FD=386
 	eval exec "$FD>$LOCKFILE"
@@ -497,12 +500,37 @@ Mount_WebUI(){
 		fi
 		
 		sed -i "/url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm'/i {url: \"$MyPage\", tabName: \"$SCRIPT_NAME\"}," /tmp/menuTree.js
+		realpage="$MyPage"
+		
+		if [ -f "$SCRIPT_DIR/sitemap.asp" ]; then
+			Get_WebUI_Page "$SCRIPT_DIR/sitemap.asp"
+			if [ "$MyPage" = "none" ]; then
+				Print_Output true "Unable to mount $SCRIPT_NAME sitemap page, exiting" "$CRIT"
+				flock -u "$FD"
+				return 1
+			fi
+			cp -f "$SCRIPT_DIR/sitemap.asp" "$SCRIPT_WEBPAGE_DIR/$MyPage"
+			sed -i "\\~$MyPage~d" /tmp/menuTree.js
+			sed -i "/url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm'/a {url: \"$MyPage\", tabName: \"Sitemap\"}," /tmp/menuTree.js
+			
+			if [ ! -f /tmp/state.js ]; then
+				cp -f /www/state.js /tmp/
+			fi
+			if ! grep -q 'sitemap' /tmp/state.js ; then
+				sed -i 's~<td width=\\"335\\" id=\\"bottom_help_link\\" align=\\"left\\">~<td width=\\"335\\" id=\\"bottom_help_link\\" align=\\"left\\"><a style=\\"font-weight: bolder;text-decoration:underline;cursor:pointer;\\" href=\\"\/'"$MyPage"'\\" target=\\"_blank\\">Sitemap<\/a>\&nbsp\|\&nbsp~' /tmp/state.js
+			fi
+			
+			umount /www/state.js 2>/dev/null
+			mount -o bind /tmp/state.js /www/state.js
+			
+			Print_Output true "Mounted Sitemap page as $MyPage" "$PASS"
+		fi
 		
 		umount /www/require/modules/menuTree.js 2>/dev/null
 		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
 	fi
 	flock -u "$FD"
-	Print_Output true "Mounted $SCRIPT_NAME WebUI page as $MyPage" "$PASS"
+	Print_Output true "Mounted $SCRIPT_NAME WebUI page as $realpage" "$PASS"
 }
 
 Get_Cron_Jobs(){
@@ -630,6 +658,9 @@ Process_Upgrade(){
 		Update_File sc.func
 		Update_File S99tailtop
 		rm -f "$SCRIPT_DIR/.usbdisabled"
+	fi
+	if [ ! -f "$SCRIPT_DIR/sitemap.asp" ]; then
+		Update_File sitemap.asp
 	fi
 }
 
@@ -1143,6 +1174,7 @@ Menu_Install(){
 	Auto_ServiceEvent create 2>/dev/null
 	
 	Update_File scmerlin_www.asp
+	Update_File sitemap.asp
 	Update_File shared-jy.tar.gz
 	Update_File tailtop
 	Update_File tailtopd
