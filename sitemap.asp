@@ -34,6 +34,7 @@ function initial(){
 	SetCurrentPage();
 	show_menu();
 	GenerateSiteMap();
+	$j('#sitemap_showurls').off('click').on('click',function(){GenerateSiteMap();});
 }
 
 function reload(){
@@ -92,9 +93,16 @@ function GenerateSiteMap(){
 	
 	var sitemapstring = '';
 	
+	var showurls = $j('#sitemap_showurls').prop('checked');
+	
 	for(var i = 0; i < myMenu.length; i++){
 		if(myMenu[i].tabs[0].tabName == '__HIDE__' && myMenu[i].tabs[0].url != 'NULL'){
-			sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b><a style="color:#FFCC00;background-color:#4D595D;" href="'+myMenu[i].tabs[0].url+'" target="_blank">'+myMenu[i].menuName+'</a></b></span><br>';
+			if(showurls == true){
+				sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b><a style="color:#FFCC00;background-color:#4D595D;" href="'+myMenu[i].tabs[0].url+'" target="_blank">'+myMenu[i].menuName+'</a> - '+myMenu[i].tabs[0].url+'</b></span><br>';
+			}
+			else{
+				sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b><a style="color:#FFCC00;background-color:#4D595D;" href="'+myMenu[i].tabs[0].url+'" target="_blank">'+myMenu[i].menuName+'</a></b></span><br>';
+			}
 		}
 		else{
 			sitemapstring += '<span style="font-size:14px;background-color:#4D595D;"><b>'+myMenu[i].menuName+'</b></span><br>';
@@ -111,7 +119,12 @@ function GenerateSiteMap(){
 				if(taburl.indexOf('redirect.htm') != -1){
 					taburl = '/ext/shared-jy/redirect.htm';
 				}
-				sitemapstring += '<a style="text-decoration:underline;background-color:#4D595D;" href="'+taburl+'" target="_blank">'+tabname+'</a><br>';
+				if(showurls == true){
+					sitemapstring += '<a style="text-decoration:underline;background-color:#4D595D;" href="'+taburl+'" target="_blank">'+tabname+'</a> - '+taburl+'<br>';
+				}
+				else{
+					sitemapstring += '<a style="text-decoration:underline;background-color:#4D595D;" href="'+taburl+'" target="_blank">'+tabname+'</a><br>';
+				}
 			}
 		sitemapstring += '<br>';
 	}
@@ -159,6 +172,8 @@ function GenerateSiteMap(){
 <div class="formfonttitle" id="scripttitle" style="text-align:center;">Sitemap</div>
 <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
 <div class="formfontdesc">This page shows a dynamically generated sitemap of the router WebUI. Provided by scMerlin.</div>
+<span style="margin-left:5px;">Show page URLs?</span>&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" id="sitemap_showurls" style="padding:0;margin:0;vertical-align:middle;position:relative;top:-1px;" />
+<div style="line-height:10px;">&nbsp;</div>
 <table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable SettingsTable" style="border:0px;" id="table_sitemap">
 <tr class="even" id="rowsitemap">
 <td colspan="2" border="0" style="border:0px;background-color:#4D595D;">
