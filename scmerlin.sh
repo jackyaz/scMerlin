@@ -487,8 +487,8 @@ Mount_WebUI(){
 		
 		if ! grep -q '.dropdown-content' /tmp/index_style.css ; then
 			{
-				echo ".dropdown-content {display: none; position: absolute; background-color: #3a4042; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;}"
-				echo ".dropdown-content a {padding: 12px 16px; text-decoration: none; display: block; height: 20px; font-weight: bold; text-shadow: 1px 1px 0px black; font-family: Verdana, MS UI Gothic, MS P Gothic, Microsoft Yahei UI, sans-serif; font-size: 12px; border: 1px solid #6B7071;}"
+				echo ".dropdown-content {display: none; position: absolute; background-color: #3a4042; min-width: 165px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;}"
+				echo ".dropdown-content a {padding: 6px 8px; text-decoration: none; display: block; height: 100%; min-height: 20px; max-height: 40px; font-weight: bold; text-shadow: 1px 1px 0px black; font-family: Verdana, MS UI Gothic, MS P Gothic, Microsoft Yahei UI, sans-serif; font-size: 12px; border: 1px solid #6B7071;}"
 				echo ".dropdown-content a:hover {background-color: #77a5c6;}"
 				echo ".dropdown:hover .dropdown-content {display: block;}"
 			} >> /tmp/index_style.css
