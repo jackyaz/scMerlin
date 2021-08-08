@@ -2,10 +2,10 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/bfd397624cdf4803a465d4ae1530e7fe)](https://www.codacy.com/app/jackyaz/scMerlin?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=jackyaz/scMerlin&amp;utm_campaign=Badge_Grade)
 ![Shellcheck](https://github.com/jackyaz/scMerlin/actions/workflows/shellcheck.yml/badge.svg)
 
-## v2.3.1
-### Updated on 2021-08-04
+## v2.4.0
+### Updated on 2021-08-08
 ## About
-scMerlin allows you to easily control the most common services/scripts on your router.
+scMerlin allows you to easily control the most common services/scripts on your router. scMerlin also augments your router's WebUI with a Sitemap and dynamic submenus for the main left menu of Asuswrt-Merlin.
 
 scMerlin is free to use under the [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0) (GPL 3.0).
 
