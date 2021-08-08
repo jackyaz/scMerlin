@@ -24,8 +24,8 @@
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
 readonly SCRIPT_NAME_LOWER=$(echo $SCRIPT_NAME | tr 'A-Z' 'a-z' | sed 's/d//')
-readonly SCM_VERSION="v2.3.2"
-readonly SCRIPT_VERSION="v2.3.2"
+readonly SCM_VERSION="v2.4.0"
+readonly SCRIPT_VERSION="v2.4.0"
 SCRIPT_BRANCH="develop"
 SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME_LOWER.d"
