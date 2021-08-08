@@ -1413,7 +1413,9 @@ Show_About(){
 	cat << EOF
 About
   $SCRIPT_NAME allows you to easily control the most common
-  services/scripts on your router.
+  services/scripts on your router. scMerlin also augments your
+  router's WebUI with a Sitemap and dynamic submenus for the
+  main left menu of Asuswrt-Merlin.
 License
   $SCRIPT_NAME is free to use under the GNU General Public License
   version 3 (GPL-3.0) https://opensource.org/licenses/GPL-3.0

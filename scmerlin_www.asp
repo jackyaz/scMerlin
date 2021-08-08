@@ -160,7 +160,7 @@ var tout,arrayproclistlines=[],sortnameproc="CPU%",sortdirproc="desc",arraycronj
 <div>&nbsp;</div>
 <div class="formfonttitle" id="scripttitle" style="text-align:center;">scMerlin</div>
 <div style="margin:10px 0 10px 5px;" class="splitLine"></div>
-<div class="formfontdesc">scMerlin allows you to use easily control the most common services/scripts on your router.</div>
+<div class="formfontdesc">scMerlin allows you to use easily control the most common services/scripts on your router. scMerlin also augments your router's WebUI with a Sitemap and dynamic submenus for the main left menu of Asuswrt-Merlin.</div>
 <table width="100%" border="1" align="center" cellpadding="2" cellspacing="0" bordercolor="#6b8fa3" class="FormTable" style="border:0px;" id="table_buttons">
 <thead class="collapsible-jquery" id="scripttools">
 <tr><td colspan="2">Utilities (click to expand/collapse)</td></tr>

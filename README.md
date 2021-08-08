@@ -5,7 +5,7 @@
 ## v2.4.0
 ### Updated on 2021-08-08
 ## About
-scMerlin allows you to easily control the most common services/scripts on your router.
+scMerlin allows you to easily control the most common services/scripts on your router. scMerlin also augments your router's WebUI with a Sitemap and dynamic submenus for the main left menu of Asuswrt-Merlin.
 
 scMerlin is free to use under the [GNU General Public License version 3](https://opensource.org/licenses/GPL-3.0) (GPL 3.0).
 
