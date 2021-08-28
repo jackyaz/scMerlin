@@ -145,7 +145,7 @@ function service_status(servicename){
 	$j.ajax({
 		url: '/ext/scmerlin/detect_service.js',
 		dataType: 'script',
-		error:	function(xhr){
+		error: function(xhr){
 			setTimeout(service_status,1000,servicename);
 		},
 		success: function(){
