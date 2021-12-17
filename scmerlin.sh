@@ -23,7 +23,7 @@
 
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
-readonly SCRIPT_NAME_LOWER=$(echo $SCRIPT_NAME | tr 'A-Z' 'a-z' | sed 's/d//')
+readonly SCRIPT_NAME_LOWER="$(echo "$SCRIPT_NAME" | tr 'A-Z' 'a-z' | sed 's/d//')"
 readonly SCM_VERSION="v2.4.0"
 readonly SCRIPT_VERSION="v2.4.0"
 SCRIPT_BRANCH="master"
