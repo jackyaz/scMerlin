@@ -791,7 +791,7 @@ Process_Upgrade(){
 	fi
 	
 	if [ "$(uname -o)" = "ASUSWRT-Merlin" ]; then
-		if grep '.dropdown-content' /tmp/index_style.css | grep -q 'z-index: 1;'; then
+		if grep '.dropdown-content' /tmp/index_style.css | grep -q '{display: block;}'; then
 			
 			umount /www/index_style.css 2>/dev/null
 			cp -f /www/index_style.css /tmp/
@@ -799,16 +799,15 @@ Process_Upgrade(){
 			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); }" >> /tmp/index_style.css
 			
 			{
-				echo ".dropdown-content {top: 0px; left: 185px; display: none; position: absolute; background-color: #3a4042; min-width: 165px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000;}"
+				echo ".dropdown-content {top: 0px; left: 185px; visibility: hidden; position: absolute; background-color: #3a4042; min-width: 165px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000;}"
 				echo ".dropdown-content a {padding: 6px 8px; text-decoration: none; display: block; height: 100%; min-height: 20px; max-height: 40px; font-weight: bold; text-shadow: 1px 1px 0px black; font-family: Verdana, MS UI Gothic, MS P Gothic, Microsoft Yahei UI, sans-serif; font-size: 12px; border: 1px solid #6B7071;}"
 				echo ".dropdown-content a:hover {background-color: #77a5c6;}"
-				echo ".dropdown:hover .dropdown-content {display: block;}"
+				echo ".dropdown:hover .dropdown-content {visibility: visible;}"
 			} >> /tmp/index_style.css
 			
 			mount -o bind /tmp/index_style.css /www/index_style.css
 		fi
 	fi
-	
 }
 
 Shortcut_Script(){
