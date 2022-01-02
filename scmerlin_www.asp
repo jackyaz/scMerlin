@@ -39,7 +39,7 @@ function LoadCustomSettings(){
 	}
 }
 
-/* Taken from firmware WebUI, Tools_SysInfo.asp */
+/*  Taken from firmware WebUI, Tools_SysInfo.asp  */
 function update_sysinfo(e){
 	$j.ajax({
 		url: '/ajax_sysinfo.asp',
