@@ -485,6 +485,10 @@ Mount_WebUI(){
 			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); }" >> /tmp/index_style.css
 		fi
 		
+		if grep -q '.dropdown-content {display: block;}' /tmp/index_style.css ; then
+			sed -i '/dropdown-content/d' /tmp/index_style.css
+		fi
+		
 		if ! grep -q '.dropdown-content {visibility: visible;}' /tmp/index_style.css ; then
 			{
 				echo ".dropdown-content {top: 0px; left: 185px; visibility: hidden; position: absolute; background-color: #3a4042; min-width: 165px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000;}"
