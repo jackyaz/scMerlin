@@ -12,9 +12,8 @@ scMerlin is free to use under the [GNU General Public License version 3](https:/
 ### Supporting development
 Love the script and want to support future development? Any and all donations gratefully received!
 
-[**PayPal donation**](https://paypal.me/jackyaz21)
-
-[**Buy me a coffee**](https://www.buymeacoffee.com/jackyaz)
+| [![paypal](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif)](https://www.paypal.com/donate/?hosted_button_id=47UTYVRBDKSTL) <br /><br /> [**PayPal donation**](https://www.paypal.com/donate/?hosted_button_id=47UTYVRBDKSTL) | [![paypal](https://puu.sh/IAhtp/3788f3a473.png)](https://www.paypal.com/donate/?hosted_button_id=47UTYVRBDKSTL) |
+| :----: | --- |
 
 ## Installation
 Using your preferred SSH client/terminal, copy and paste the following command, then press Enter:
