@@ -1,4 +1,5 @@
 #!/bin/sh
+# shellcheck disable=SC1091
 # shellcheck disable=SC2034
 
 if [ "$1" = "restart" ] || [ "$1" = "stop" ] || [ "$1" = "kill" ]; then
