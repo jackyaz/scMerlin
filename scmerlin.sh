@@ -35,6 +35,7 @@ readonly SHARED_DIR="/jffs/addons/shared-jy"
 readonly SHARED_REPO="https://jackyaz.io/shared-jy/master"
 readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
 readonly NTP_WATCHDOG_FILE="$SCRIPT_DIR/.watchdogenabled"
+readonly TAIL_TAINTED_FILE="$SCRIPT_DIR/.tailtaintdnsenabled"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
 
@@ -176,8 +177,11 @@ Update_Version(){
 					Update_File sitemap.asp
 					Update_File tailtop
 					Update_File tailtopd
+					Update_File tailtaintdns
+					Update_File tailtaintdnsd
 					Update_File sc.func
 					Update_File S99tailtop
+					Update_File S95tailtaintdns
 					Download_File "$SCRIPT_REPO/update/$SCRIPT_NAME_LOWER.sh" "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 					chmod 0755 "/jffs/scripts/$SCRIPT_NAME_LOWER"
 					Set_Version_Custom_Settings local "$serverver"
@@ -207,8 +211,11 @@ Update_Version(){
 		Update_File sitemap.asp
 		Update_File tailtop
 		Update_File tailtopd
+		Update_File tailtaintdns
+		Update_File tailtaintdnsd
 		Update_File sc.func
 		Update_File S99tailtop
+		Update_File S95tailtaintdns
 		Download_File "$SCRIPT_REPO/update/$SCRIPT_NAME_LOWER.sh" "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 		chmod 0755 "/jffs/scripts/$SCRIPT_NAME_LOWER"
 		Set_Version_Custom_Settings local "$serverver"
@@ -279,10 +286,51 @@ Update_File(){
 				"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 				sleep 2
 			fi
-			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
+			Print_Output true "New version of $1 downloaded" "$PASS"
+		fi
+		rm -f "$tmpfile"
+	elif [ "$1" = "S95tailtaintdns" ]; then
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			if [ -f "$SCRIPT_DIR/S95tailtaintdns" ]; then
+				"$SCRIPT_DIR/S95tailtaintdns" stop >/dev/null 2>&1
+				sleep 2
+			fi
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			if [ "$(NTPBootWatchdog check)" = "ENABLED" ]; then
+				"$SCRIPT_DIR/S95tailtaintdns" start >/dev/null 2>&1
+			fi
+			Print_Output true "New version of $1 downloaded" "$PASS"
+		fi
+		rm -f "$tmpfile"
+	elif [ "$1" = "tailtaintdns" ] || [ "$1" = "tailtaintdnsd" ]; then
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			if [ -f "$SCRIPT_DIR/S95tailtaintdns" ]; then
+				"$SCRIPT_DIR/S95tailtaintdns" stop >/dev/null 2>&1
+				sleep 2
+			fi
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			if [ "$(NTPBootWatchdog check)" = "ENABLED" ]; then
+				"$SCRIPT_DIR/S95tailtaintdns" start >/dev/null 2>&1
+			fi
+			Print_Output true "New version of $1 downloaded" "$PASS"
+		fi
+		rm -f "$tmpfile"
+	elif [ "$1" = "sc.func" ]; then
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
 			chmod 0755 "$SCRIPT_DIR/$1"
 			Print_Output true "New version of $1 downloaded" "$PASS"
-			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
 		fi
 		rm -f "$tmpfile"
 	else
@@ -324,6 +372,7 @@ Create_Symlinks(){
 	ln -s /tmp/scmcronjobs.tmp "$SCRIPT_WEB_DIR/scmcronjobs.htm" 2>/dev/null
 	
 	ln -s "$NTP_WATCHDOG_FILE" "$SCRIPT_WEB_DIR/watchdogenabled.htm" 2>/dev/null
+	ln -s "$TAIL_TAINTED_FILE" "$SCRIPT_WEB_DIR/tailtaintdnsenabled.htm" 2>/dev/null
 	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
 		ln -s "$SHARED_DIR" "$SHARED_WEB_DIR" 2>/dev/null
@@ -776,6 +825,49 @@ EOF
 	esac
 }
 
+TailTaintDns(){
+	case "$1" in
+		enable)
+			touch "$TAIL_TAINTED_FILE"
+			if [ -f /jffs/scripts/services-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
+				STARTUPLINECOUNTEX=$(grep -i -cx "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
+					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
+				fi
+				
+				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
+					echo "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME" >> /jffs/scripts/services-start
+				fi
+			else
+				echo "#!/bin/sh" > /jffs/scripts/services-start
+				echo "" >> /jffs/scripts/services-start
+				echo "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME" >> /jffs/scripts/services-start
+				chmod 0755 /jffs/scripts/services-start
+			fi
+		;;
+		disable)
+			rm -f "$TAIL_TAINTED_FILE"
+			"$SCRIPT_DIR/S95tailtaintdns" stop >/dev/null 2>&1
+			if [ -f /jffs/scripts/services-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"' - tailtaintdns/d' /jffs/scripts/services-start
+				fi
+			fi
+		;;
+		check)
+			if [ -f "$TAIL_TAINTED_FILE" ] && [ "$(grep -i -c '# '"$SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)" -gt 0 ]; then
+				echo "ENABLED"
+			else
+				echo "DISABLED"
+			fi
+		;;
+	esac
+}
+
 Process_Upgrade(){
 	if [ -f /opt/etc/init.d/S99tailtop ]; then
 		/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
@@ -784,6 +876,10 @@ Process_Upgrade(){
 		rm -f /opt/bin/tailtopd
 		Update_File sc.func
 		Update_File S99tailtop
+		rm -f "$SCRIPT_DIR/.usbdisabled"
+	fi
+	if [ ! -f "$SCRIPT_DIR/S95tailtaintdns" ]; then
+		Update_File S95tailtaintdns
 		rm -f "$SCRIPT_DIR/.usbdisabled"
 	fi
 	if [ ! -f "$SCRIPT_DIR/sitemap.asp" ]; then
@@ -921,7 +1017,13 @@ MainMenu(){
 	else
 		NTPBW_ENABLED="Disabled"
 	fi
-	printf "ntp.  Toggle NTP boot watchdog script\\n      Currently: ${BOLD}$NTPBW_ENABLED${CLEARFORMAT}\\n\\n"
+	printf "ntp.  Toggle NTP boot watchdog script\\n      Currently: ${BOLD}$NTPBW_ENABLED${CLEARFORMAT}\\n"
+	if [ "$(TailTaintDns check)" = "ENABLED" ]; then
+		TAILTAINT_ENABLED="${SETTING}Enabled"
+	else
+		TAILTAINT_ENABLED="Disabled"
+	fi
+	printf "dns.  Toggle dnsmasq tainted watchdog script\\n      Currently: ${BOLD}$TAILTAINT_ENABLED${CLEARFORMAT}\\n\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
@@ -1228,6 +1330,15 @@ MainMenu(){
 				fi
 				break
 			;;
+			dns)
+				printf "\\n"
+				if [ "$(TailTaintDns check)" = "ENABLED" ]; then
+					TailTaintDns disable
+				elif [ "$(TailTaintDns check)" = "DISABLED" ]; then
+					TailTaintDns enable
+				fi
+				break
+			;;
 			u)
 				printf "\\n"
 				if Check_Lock menu; then
@@ -1324,8 +1435,11 @@ Menu_Install(){
 	Update_File shared-jy.tar.gz
 	Update_File tailtop
 	Update_File tailtopd
+	Update_File tailtaintdns
+	Update_File tailtaintdnsd
 	Update_File sc.func
 	Update_File S99tailtop
+	Update_File S95tailtaintdns
 	
 	Clear_Lock
 	
@@ -1363,6 +1477,7 @@ Menu_Uninstall(){
 	Auto_Startup delete 2>/dev/null
 	Auto_ServiceEvent delete 2>/dev/null
 	NTPBootWatchdog disable
+	TailTaintDns disable
 	
 	LOCKFILE=/tmp/addonwebui.lock
 	FD=386
