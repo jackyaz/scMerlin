@@ -1,0 +1,17 @@
+#!/bin/sh
+# shellcheck disable=SC2039
+# shellcheck disable=SC3048
+trap '' SIGHUP
+
+/jffs/addons/scmerlin.d/tailtaintdns &
+
+while true; do
+	sleep 5
+	if [ "$(pidof tailtaintdns | wc -w)" -lt 1 ]; then
+		logger "tailtaintdns dead, restarting..."
+		killall -q tailtaintdns
+		sleep 5
+		/jffs/addons/scmerlin.d/tailtaintdns &
+		logger "tailtaintdns restarted"
+	fi
+done
