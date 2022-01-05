@@ -879,6 +879,8 @@ Process_Upgrade(){
 		rm -f "$SCRIPT_DIR/.usbdisabled"
 	fi
 	if [ ! -f "$SCRIPT_DIR/S95tailtaintdns" ]; then
+		Update_File tailtaintdns
+		Update_File tailtaintdnsd
 		Update_File S95tailtaintdns
 		rm -f "$SCRIPT_DIR/.usbdisabled"
 	fi
