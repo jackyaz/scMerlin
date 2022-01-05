@@ -834,16 +834,16 @@ TailTaintDns(){
 				STARTUPLINECOUNTEX=$(grep -i -cx "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
 				
 				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
+					sed -i -e '/# '"$SCRIPT_NAME - tailtaintdns"'/d' /jffs/scripts/services-start
 				fi
 				
 				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
-					echo "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME" >> /jffs/scripts/services-start
+					echo "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME - tailtaintdns" >> /jffs/scripts/services-start
 				fi
 			else
 				echo "#!/bin/sh" > /jffs/scripts/services-start
 				echo "" >> /jffs/scripts/services-start
-				echo "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME" >> /jffs/scripts/services-start
+				echo "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME - tailtaintdns" >> /jffs/scripts/services-start
 				chmod 0755 /jffs/scripts/services-start
 			fi
 		;;
