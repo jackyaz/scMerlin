@@ -829,6 +829,7 @@ TailTaintDns(){
 	case "$1" in
 		enable)
 			touch "$TAIL_TAINTED_FILE"
+			"$SCRIPT_DIR/S95tailtaintdns" start >/dev/null 2>&1
 			if [ -f /jffs/scripts/services-start ]; then
 				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
 				STARTUPLINECOUNTEX=$(grep -i -cx "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
