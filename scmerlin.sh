@@ -1017,7 +1017,7 @@ MainMenu(){
 	else
 		NTPBW_ENABLED="Disabled"
 	fi
-	printf "ntp.  Toggle NTP boot watchdog script\\n      Currently: ${BOLD}$NTPBW_ENABLED${CLEARFORMAT}\\n"
+	printf "ntp.  Toggle NTP boot watchdog script\\n      Currently: ${BOLD}$NTPBW_ENABLED${CLEARFORMAT}\\n\\n"
 	if [ "$(TailTaintDns check)" = "ENABLED" ]; then
 		TAILTAINT_ENABLED="${SETTING}Enabled"
 	else
