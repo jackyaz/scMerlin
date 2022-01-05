@@ -58,11 +58,6 @@ function LoadSiteMap(){
 <input type="hidden" name="SystemCmd" value="">
 <input type="hidden" name="preferred_lang" id="preferred_lang" value="<% nvram_get("preferred_lang"); %>">
 <input type="hidden" name="firmver" value="<% nvram_get("firmver"); %>">
-<input type="hidden" name="vpnc1_desc" value="<% nvram_get("vpn_client1_desc"); %>">
-<input type="hidden" name="vpnc2_desc" value="<% nvram_get("vpn_client2_desc"); %>">
-<input type="hidden" name="vpnc3_desc" value="<% nvram_get("vpn_client3_desc"); %>">
-<input type="hidden" name="vpnc4_desc" value="<% nvram_get("vpn_client4_desc"); %>">
-<input type="hidden" name="vpnc5_desc" value="<% nvram_get("vpn_client5_desc"); %>">
 <input type="hidden" name="amng_custom" id="amng_custom" value="">
 <table class="content" align="center" cellpadding="0" cellspacing="0">
 <tr>
