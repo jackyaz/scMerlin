@@ -10,8 +10,7 @@ if [ "$(pidof syslog-ng | wc -w)" -gt 0 ]; then
 fi
 
 renice 15 $$
-tail -F "$tailfile" | \
-while read -r line; do \
+tail -F "$tailfile" | while read -r line; do
 if echo "$line" | grep -q "Comm: dnsmasq Tainted:"; then logger "dnsmasq tainted detected, restarting dnsmasq"; service restart_dnsmasq; fi
 if [ "$tailfile" = "/tmp/syslog.log" ] && [ "$(pidof syslog-ng | wc -w)" -gt 0 ]; then break; fi
 done
