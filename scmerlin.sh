@@ -482,7 +482,7 @@ Mount_WebUI(){
 		fi
 		
 		if ! grep -q '.menu_Addons' /tmp/index_style.css ; then
-			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); }" >> /tmp/index_style.css
+			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); background-size: contain; }" >> /tmp/index_style.css
 		fi
 		
 		if ! grep -q '.dropdown-content' /tmp/index_style.css ; then
