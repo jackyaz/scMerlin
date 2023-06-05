@@ -150,7 +150,7 @@ function GetTemperatureValue (bandIDstr)
 }
 
 /**----------------------------------------**/
-/** Modified by Martinski W. [2023-Jun-02] **/
+/** Modified by Martinski W. [2023-Jun-05] **/
 /**----------------------------------------**/
 function update_temperatures(){
 	$j.ajax({
@@ -179,9 +179,9 @@ function update_temperatures(){
 
 		var CPUTemp = '';
 		if (typeof curr_cpuTemp == 'undefined' || curr_cpuTemp == null)
-        { CPUTemp = curr_coreTmp_cpu; }
+		{ CPUTemp = curr_coreTmp_cpu; }
 		else
-        { CPUTemp = curr_cpuTemp; }
+		{ CPUTemp = curr_cpuTemp; }
 		
 		if(CPUTemp != ''){
 			code +='&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU: </b><span>' + parseInt(CPUTemp) +'&deg;C</span>';
