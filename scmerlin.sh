@@ -533,6 +533,10 @@ Mount_WebUI(){
 		if ! grep -q '.menu_Addons' /tmp/index_style.css ; then
 			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); background-size: contain; }" >> /tmp/index_style.css
 		fi
+
+		if grep -q '.menu_Addons' /tmp/index_style.css && ! grep -q 'url(ext/shared-jy/addons.png); background-size: contain;' /tmp/index_style.css; then
+			sed -i 's/addons.png);/addons.png); background-size: contain;/' /tmp/index_style.css
+		fi
 		
 		if grep -q '.dropdown-content {display: block;}' /tmp/index_style.css ; then
 			sed -i '/dropdown-content/d' /tmp/index_style.css
