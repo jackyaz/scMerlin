@@ -11,7 +11,7 @@
 ##       https://github.com/jackyaz/scMerlin        ##
 ##                                                  ##
 ######################################################
-# Last Modified: Martinski W. [2023-Jun-04].
+# Last Modified: 2023-Jun-09
 #-----------------------------------------------------
 
 ##########       Shellcheck directives     ###########
@@ -51,9 +51,11 @@ readonly SETTING="${BOLD}\\e[36m"
 readonly CLEARFORMAT="\\e[0m"
 ### End of output format variables ###
 
-##-------------------------------------##
-## Added by Martinski W. [2023-Jun-02] ##
-##-------------------------------------##
+##----------------------------------------------##
+## Added/Modified by Martinski W. [2023-Jun-09] ##
+##----------------------------------------------##
+readonly BEGIN_InsertTag="/\*\*BEGIN:scMerlin\*\*/"
+readonly ENDIN_InsertTag="/\*\*END:scMerlin\*\*/"
 readonly SUPPORTstr="$(nvram get rc_support)"
 
 if echo "$SUPPORTstr" | grep -qw '2.4G'
@@ -594,6 +596,9 @@ Get_WebUI_URL(){
 }
 ### ###
 
+##----------------------------------------##
+## Modified by Martinski W. [2023-Jun-09] ##
+##----------------------------------------##
 ### locking mechanism code credit to Martineau (@MartineauUK) ###
 Mount_WebUI(){
 	realpage=""
@@ -646,10 +651,20 @@ Mount_WebUI(){
 		
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
 		
-		## Make sure to synchronize code changes here with those needed in the "Menu_Uninstall()" function ##
-		if ! grep -q 'menuName: "Addons"' /tmp/menuTree.js ; then
-			lineinsbefore="$(( $(grep -n "exclude:" /tmp/menuTree.js | cut -f1 -d':') - 1))"
-			sed -i "$lineinsbefore"'i,\n{\nmenuName: "Addons",\nindex: "menu_Addons",\ntab: [\n{url: "javascript:var helpwindow=window.open('"'"'/ext/shared-jy/redirect.htm'"'"')", tabName: "Help & Support"},\n{url: "NULL", tabName: "__INHERIT__"}\n]\n}' /tmp/menuTree.js
+		## Use the same BEGIN/END insert tags here as those used in the "Menu_Uninstall()" function ##
+		if ! grep -qE '^menuName: "Addons"' /tmp/menuTree.js
+		then
+			lineinsbefore="$(($(grep -n "^exclude:" /tmp/menuTree.js | cut -f1 -d':') - 1))"
+			sed -i "$lineinsbefore""i\
+${BEGIN_InsertTag}\n\
+,\n{\n\
+menuName: \"Addons\",\n\
+index: \"menu_Addons\",\n\
+tab: [\n\
+{url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm')\", tabName: \"Help & Support\"},\n\
+{url: \"NULL\", tabName: \"__INHERIT__\"}\n\
+]\n}\n\
+${ENDIN_InsertTag}" /tmp/menuTree.js
 		fi
 		
 		sed -i "/url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm'/i {url: \"$MyPage\", tabName: \"$SCRIPT_NAME\"}," /tmp/menuTree.js
@@ -1588,7 +1603,7 @@ Menu_Startup(){
 }
 
 ##----------------------------------------##
-## Modified by Martinski W. [2023-Jun-04] ##
+## Modified by Martinski W. [2023-Jun-09] ##
 ##----------------------------------------##
 Menu_Uninstall(){
 	Print_Output true "Removing $SCRIPT_NAME..." "$PASS"
@@ -1604,12 +1619,15 @@ Menu_Uninstall(){
 	flock -x "$FD"
 
 	resetWebGUI=false
-	Get_WebUI_Page "$SCRIPT_DIR/sitemap.asp"
-	if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]
+	if [ -f "$SCRIPT_DIR/sitemap.asp" ]
 	then
-		resetWebGUI=true
-		sed -i "\\~$MyPage~d" /tmp/menuTree.js
-		rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage"
+		Get_WebUI_Page "$SCRIPT_DIR/sitemap.asp"
+		if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]
+		then
+			resetWebGUI=true
+			sed -i "\\~$MyPage~d" /tmp/menuTree.js
+			rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage"
+		fi
 	fi
 	Get_WebUI_Page "$SCRIPT_DIR/scmerlin_www.asp"
 	if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]
@@ -1620,23 +1638,37 @@ Menu_Uninstall(){
 		rm -f "$SCRIPT_WEBPAGE_DIR/$(echo $MyPage | cut -f1 -d'.').title"
 	fi
 
-	## Make sure to synchronize code changes here with those made in the "Mount_WebUI()" function ##
-	if grep -qE '^menuName: "Addons",$|tabName: "Help & Support"},$' /tmp/menuTree.js
+	## Use the same BEGIN/END insert tags here as those used in the "Mount_WebUI()" function ##
+	if grep -qE "^${BEGIN_InsertTag}$" /tmp/menuTree.js && \
+	   grep -qE "^${ENDIN_InsertTag}$" /tmp/menuTree.js
 	then
 		resetWebGUI=true
-		STARTnum="$(grep -n '^menuName: "Addons",$' /tmp/menuTree.js | awk -F ':' '{print $1}')"
-		[ -n "$STARTnum" ] && STARTnum=$((STARTnum - 2))
-		ENDnum="$(grep -n '{url: "javascript:var helpwindow=window.open('"'"'/ext/shared-jy/redirect.htm'"'"')", tabName: "Help & Support"},' /tmp/menuTree.js | awk -F ':' '{print $1}')"
-		[ -n "$ENDnum" ] && ENDnum=$((ENDnum + 3))
-		[ -n "$STARTnum" ] && [ -n "$ENDnum" ] && sed -i "${STARTnum},${ENDnum}d" /tmp/menuTree.js
+		BEGINnum="$(grep -nE "^${BEGIN_InsertTag}$" /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		ENDINnum="$(grep -nE "^${ENDIN_InsertTag}$" /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		[ -n "$BEGINnum" ] && [ -n "$ENDINnum" ] && [ "$BEGINnum" -lt "$ENDINnum" ] && \
+		sed -i "${BEGINnum},${ENDINnum}d" /tmp/menuTree.js
 	fi
+	## Remove any "old" previous lines left behind ##
+	if grep -qE '^menuName: "Addons",$' /tmp/menuTree.js && \
+	   grep -qE 'tabName: "Help & Support"},$' /tmp/menuTree.js
+	then
+		resetWebGUI=true
+		BEGINnum="$(grep -nE '^menuName: "Addons",$' /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		ENDINnum="$(grep -nE 'tabName: "Help & Support"},$' /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		[ -n "$BEGINnum" ] && [ -n "$ENDINnum" ] && [ "$BEGINnum" -lt "$ENDINnum" ] && \
+		BEGINnum=$((BEGINnum - 2)) && ENDINnum=$((ENDINnum + 3)) && \
+		[ "$(sed -n "${BEGINnum}p" /tmp/menuTree.js)" = "," ] && \
+		[ "$(sed -n "${ENDINnum}p" /tmp/menuTree.js)" = "}" ] && \
+		sed -i "${BEGINnum},${ENDINnum}d" /tmp/menuTree.js
+	fi
+
 	if "$resetWebGUI"
 	then
 		umount /www/require/modules/menuTree.js 2>/dev/null
-		if [ -f /tmp/index_style.css ] && grep -q '.menu_Addons' /tmp/index_style.css
+		if [ -f /tmp/index_style.css ] && grep -qF '.menu_Addons { background:' /tmp/index_style.css
 		then rm -f /tmp/index_style.css ; umount /www/index_style.css 2>/dev/null
 		fi
-		if [ -f /tmp/state.js ] && grep -qwE 'GenerateSiteMap|AddDropdowns' /tmp/state.js
+		if [ -f /tmp/state.js ] && grep -qE 'function GenerateSiteMap|function AddDropdowns' /tmp/state.js
 		then rm -f /tmp/state.js ; umount /www/state.js 2>/dev/null
 		fi
 		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
