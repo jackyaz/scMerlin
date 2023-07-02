@@ -11,6 +11,8 @@
 ##       https://github.com/jackyaz/scMerlin        ##
 ##                                                  ##
 ######################################################
+# Last Modified: 2023-Jun-09
+#-----------------------------------------------------
 
 ##########       Shellcheck directives     ###########
 # shellcheck disable=SC2016
@@ -48,6 +50,92 @@ readonly BOLD="\\e[1m"
 readonly SETTING="${BOLD}\\e[36m"
 readonly CLEARFORMAT="\\e[0m"
 ### End of output format variables ###
+
+##----------------------------------------------##
+## Added/Modified by Martinski W. [2023-Jun-09] ##
+##----------------------------------------------##
+readonly BEGIN_InsertTag="/\*\*BEGIN:scMerlin\*\*/"
+readonly ENDIN_InsertTag="/\*\*END:scMerlin\*\*/"
+readonly SUPPORTstr="$(nvram get rc_support)"
+
+if echo "$SUPPORTstr" | grep -qw '2.4G'
+then Band_24G_Support=true
+else Band_24G_Support=false
+fi
+
+if echo "$SUPPORTstr" | grep -qw '5G'
+then Band_5G_1_Support=true
+else Band_5G_1_Support=false
+fi
+
+if echo "$SUPPORTstr" | grep -qw '5G-2'
+then Band_5G_2_support=true
+else Band_5G_2_support=false
+fi
+
+if echo "$SUPPORTstr" | grep -qw 'wifi6e'
+then Band_6G_1_Support=true
+else Band_6G_1_Support=false
+fi
+
+##----------------------------------------------##
+## Added/Modified by Martinski W. [2023-Jun-03] ##
+##----------------------------------------------##
+GetIFaceName()
+{
+    if [ $# -eq 0 ] || [ -z "$1" ] ; then echo "" ; return 1 ; fi
+
+    theIFnamePrefix=""
+    case "$1" in
+        "2.4GHz")
+            if "$Band_24G_Support"
+            then
+                if [ "$ROUTER_MODEL" = "GT-AXE16000" ]
+                then theIFnamePrefix="wl3"
+                else theIFnamePrefix="wl0"
+                fi
+            fi
+            ;;
+        "5GHz_1")
+            if "$Band_5G_1_Support"
+            then
+                if [ "$ROUTER_MODEL" = "GT-AXE16000" ]
+                then theIFnamePrefix="wl0"
+                else theIFnamePrefix="wl1"
+                fi
+            fi
+            ;;
+        "5GHz_2")
+            if "$Band_5G_2_support"
+            then
+                if [ "$ROUTER_MODEL" = "GT-AXE16000" ]
+                then theIFnamePrefix="wl1"
+                else theIFnamePrefix="wl2"
+                fi
+            fi
+            ;;
+        "6GHz_1")
+            if [ "$ROUTER_MODEL" = "GT-AXE16000" ] || "$Band_6G_1_Support"
+            then theIFnamePrefix="wl2" ; fi
+            ;;
+    esac
+    if [ -z "$theIFnamePrefix" ]
+    then echo ""
+    else echo "$(nvram get "${theIFnamePrefix}_ifname")"
+    fi
+}
+
+##-------------------------------------##
+## Added by Martinski W. [2023-Jun-02] ##
+##-------------------------------------##
+GetTemperatureValue()
+{
+    theIFname="$(GetIFaceName "$1")"
+    if [ -z "$theIFname" ]
+    then echo "[N/A]"
+    else echo "$(wl -i "$theIFname" phy_tempsense | awk '{print $1/2+20}')"
+    fi
+}
 
 # $1 = print to syslog, $2 = message to print, $3 = log level
 Print_Output(){
@@ -508,6 +596,9 @@ Get_WebUI_URL(){
 }
 ### ###
 
+##----------------------------------------##
+## Modified by Martinski W. [2023-Jun-09] ##
+##----------------------------------------##
 ### locking mechanism code credit to Martineau (@MartineauUK) ###
 Mount_WebUI(){
 	realpage=""
@@ -560,9 +651,20 @@ Mount_WebUI(){
 		
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
 		
-		if ! grep -q 'menuName: "Addons"' /tmp/menuTree.js ; then
-			lineinsbefore="$(( $(grep -n "exclude:" /tmp/menuTree.js | cut -f1 -d':') - 1))"
-			sed -i "$lineinsbefore"'i,\n{\nmenuName: "Addons",\nindex: "menu_Addons",\ntab: [\n{url: "javascript:var helpwindow=window.open('"'"'/ext/shared-jy/redirect.htm'"'"')", tabName: "Help & Support"},\n{url: "NULL", tabName: "__INHERIT__"}\n]\n}' /tmp/menuTree.js
+		## Use the same BEGIN/END insert tags here as those used in the "Menu_Uninstall()" function ##
+		if ! grep -qE '^menuName: "Addons"' /tmp/menuTree.js
+		then
+			lineinsbefore="$(($(grep -n "^exclude:" /tmp/menuTree.js | cut -f1 -d':') - 1))"
+			sed -i "$lineinsbefore""i\
+${BEGIN_InsertTag}\n\
+,\n{\n\
+menuName: \"Addons\",\n\
+index: \"menu_Addons\",\n\
+tab: [\n\
+{url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm')\", tabName: \"Help & Support\"},\n\
+{url: \"NULL\", tabName: \"__INHERIT__\"}\n\
+]\n}\n\
+${ENDIN_InsertTag}" /tmp/menuTree.js
 		fi
 		
 		sed -i "/url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm'/i {url: \"$MyPage\", tabName: \"$SCRIPT_NAME\"}," /tmp/menuTree.js
@@ -1282,21 +1384,43 @@ MainMenu(){
 				ScriptHeader
 				printf "\\n${BOLD}Temperatures${CLEARFORMAT}\\n\\n"
 				if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
-					printf "CPU: %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
+					printf "CPU:\t %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
 				elif [ -f /proc/dmu/temperature ]; then
-					printf "CPU:%s\\n" "$(cut -f2 -d':' /proc/dmu/temperature | awk '{$1=$1;print}' | sed 's/..$/°C/')"
+					printf "CPU:\t %s\\n" "$(cut -f2 -d':' /proc/dmu/temperature | awk '{$1=$1;print}' | sed 's/..$/°C/')"
 				else
-					printf "CPU: N/A\\n"
+					printf "CPU:\t [N/A]\\n"
 				fi
 				
-				printf "2.4 GHz: %s°C\\n" "$(wl -i "$(nvram get wl0_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
+				##----------------------------------------------##
+				## Added/Modified by Martinski W. [2023-Jun-03] ##
+				##----------------------------------------------##
+				theTemptrVal="$(GetTemperatureValue "2.4GHz")"
+				if [ -n "$theTemptrVal" ] ; then printf "2.4 GHz: %s°C\n" "$theTemptrVal" ; fi
 				
 				if [ "$ROUTER_MODEL" = "RT-AC87U" ] || [ "$ROUTER_MODEL" = "RT-AC87R" ]; then
-					printf "5 GHz: %s°C\\n\\n" "$(qcsapi_sockrpc get_temperature | awk 'FNR == 2 {print $3}')"
-				else
-					printf "5 GHz: %s°C\\n\\n" "$(wl -i "$(nvram get wl1_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
+					printf "5 GHz:   %s°C\n" "$(qcsapi_sockrpc get_temperature | awk 'FNR == 2 {print $3}')"
+					echo ; PressEnter
+					break
 				fi
-				PressEnter
+
+				if "$Band_5G_2_support"
+				then
+					theTemptrVal="$(GetTemperatureValue "5GHz_1")"
+					if [ -n "$theTemptrVal" ] ; then printf "5 GHz-1: %s°C\n" "$theTemptrVal" ; fi
+
+					theTemptrVal="$(GetTemperatureValue "5GHz_2")"
+					if [ -n "$theTemptrVal" ] ; then printf "5 GHz-2: %s°C\n" "$theTemptrVal" ; fi
+				elif "$Band_5G_1_Support"
+				then
+					theTemptrVal="$(GetTemperatureValue "5GHz_1")"
+					if [ -n "$theTemptrVal" ] ; then printf "5 GHz:   %s°C\n" "$theTemptrVal" ; fi
+				fi
+				if "$Band_6G_1_Support"
+				then
+					theTemptrVal="$(GetTemperatureValue "6GHz_1")"
+					if [ -n "$theTemptrVal" ] ; then printf "6 GHz:   %s°C\n" "$theTemptrVal" ; fi
+				fi
+				echo ; PressEnter
 				break
 			;;
 			w)
@@ -1478,6 +1602,9 @@ Menu_Startup(){
 	Clear_Lock
 }
 
+##----------------------------------------##
+## Modified by Martinski W. [2023-Jun-09] ##
+##----------------------------------------##
 Menu_Uninstall(){
 	Print_Output true "Removing $SCRIPT_NAME..." "$PASS"
 	Shortcut_Script delete
@@ -1490,13 +1617,61 @@ Menu_Uninstall(){
 	FD=386
 	eval exec "$FD>$LOCKFILE"
 	flock -x "$FD"
+
+	resetWebGUI=false
+	if [ -f "$SCRIPT_DIR/sitemap.asp" ]
+	then
+		Get_WebUI_Page "$SCRIPT_DIR/sitemap.asp"
+		if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]
+		then
+			resetWebGUI=true
+			sed -i "\\~$MyPage~d" /tmp/menuTree.js
+			rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage"
+		fi
+	fi
 	Get_WebUI_Page "$SCRIPT_DIR/scmerlin_www.asp"
-	if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]; then
+	if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]
+	then
+		resetWebGUI=true
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
-		umount /www/require/modules/menuTree.js
-		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
 		rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage"
 		rm -f "$SCRIPT_WEBPAGE_DIR/$(echo $MyPage | cut -f1 -d'.').title"
+	fi
+
+	## Use the same BEGIN/END insert tags here as those used in the "Mount_WebUI()" function ##
+	if grep -qE "^${BEGIN_InsertTag}$" /tmp/menuTree.js && \
+	   grep -qE "^${ENDIN_InsertTag}$" /tmp/menuTree.js
+	then
+		resetWebGUI=true
+		BEGINnum="$(grep -nE "^${BEGIN_InsertTag}$" /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		ENDINnum="$(grep -nE "^${ENDIN_InsertTag}$" /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		[ -n "$BEGINnum" ] && [ -n "$ENDINnum" ] && [ "$BEGINnum" -lt "$ENDINnum" ] && \
+		sed -i "${BEGINnum},${ENDINnum}d" /tmp/menuTree.js
+	fi
+	## Remove any "old" previous lines left behind ##
+	if grep -qE '^menuName: "Addons",$' /tmp/menuTree.js && \
+	   grep -qE 'tabName: "Help & Support"},$' /tmp/menuTree.js
+	then
+		resetWebGUI=true
+		BEGINnum="$(grep -nE '^menuName: "Addons",$' /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		ENDINnum="$(grep -nE 'tabName: "Help & Support"},$' /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		[ -n "$BEGINnum" ] && [ -n "$ENDINnum" ] && [ "$BEGINnum" -lt "$ENDINnum" ] && \
+		BEGINnum=$((BEGINnum - 2)) && ENDINnum=$((ENDINnum + 3)) && \
+		[ "$(sed -n "${BEGINnum}p" /tmp/menuTree.js)" = "," ] && \
+		[ "$(sed -n "${ENDINnum}p" /tmp/menuTree.js)" = "}" ] && \
+		sed -i "${BEGINnum},${ENDINnum}d" /tmp/menuTree.js
+	fi
+
+	if "$resetWebGUI"
+	then
+		umount /www/require/modules/menuTree.js 2>/dev/null
+		if [ -f /tmp/index_style.css ] && grep -qF '.menu_Addons { background:' /tmp/index_style.css
+		then rm -f /tmp/index_style.css ; umount /www/index_style.css 2>/dev/null
+		fi
+		if [ -f /tmp/state.js ] && grep -qE 'function GenerateSiteMap|function AddDropdowns' /tmp/state.js
+		then rm -f /tmp/state.js ; umount /www/state.js 2>/dev/null
+		fi
+		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
 	fi
 	flock -u "$FD"
 	rm -rf "$SCRIPT_WEB_DIR" 2>/dev/null
