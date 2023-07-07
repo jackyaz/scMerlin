@@ -101,7 +101,7 @@ else
 }
 
 /**----------------------------------------------**/
-/** Added/Modified by Martinski W. [2023-Jun-03] **/
+/** Added/Modified by Martinski W. [2023-Jul-05] **/
 /**----------------------------------------------**/
 function GetTemperatureValue (bandIDstr)
 {
@@ -110,31 +110,50 @@ function GetTemperatureValue (bandIDstr)
     switch (bandIDstr)
     {
         case '2.4GHz':
-            if (productid == 'GT-AXE16000' &&
-                typeof curr_coreTmp_wl3_raw != 'undefined' && curr_coreTmp_wl3_raw != null)
-            { temperatureVal = curr_coreTmp_wl3_raw; }
+            if (productid == 'GT-AXE16000')
+            {
+                if (typeof curr_coreTmp_wl3_raw != 'undefined' && curr_coreTmp_wl3_raw != null)
+                { temperatureVal = curr_coreTmp_wl3_raw; }
+                else if (typeof curr_coreTmp_3_raw != 'undefined' && curr_coreTmp_3_raw != null)
+                { temperatureVal = curr_coreTmp_3_raw; }
+            }
             else if (typeof curr_coreTmp_wl0_raw != 'undefined' && curr_coreTmp_wl0_raw != null)
             { temperatureVal = curr_coreTmp_wl0_raw; }
+            else if (typeof curr_coreTmp_0_raw != 'undefined' && curr_coreTmp_0_raw != null)
+            { temperatureVal = curr_coreTmp_0_raw; }
             else if (typeof curr_coreTmp_2_raw != 'undefined' && curr_coreTmp_2_raw != null)
             { temperatureVal = curr_coreTmp_2_raw; }
             break;
 
         case '5GHz_1':
-            if (productid == 'GT-AXE16000' &&
-                typeof curr_coreTmp_wl0_raw != 'undefined' && curr_coreTmp_wl0_raw != null)
-            { temperatureVal = curr_coreTmp_wl0_raw; }
+            if (productid == 'GT-AXE16000')
+            {
+                if (typeof curr_coreTmp_wl0_raw != 'undefined' && curr_coreTmp_wl0_raw != null)
+                { temperatureVal = curr_coreTmp_wl0_raw; }
+                else if (typeof curr_coreTmp_0_raw != 'undefined' && curr_coreTmp_0_raw != null)
+                { temperatureVal = curr_coreTmp_0_raw; }
+            }
             else if (typeof curr_coreTmp_wl1_raw != 'undefined' && curr_coreTmp_wl1_raw != null)
             { temperatureVal = curr_coreTmp_wl1_raw; }
+            else if (typeof curr_coreTmp_1_raw != 'undefined' && curr_coreTmp_1_raw != null)
+            { temperatureVal = curr_coreTmp_1_raw; }
             else if (typeof curr_coreTmp_5_raw != 'undefined' && curr_coreTmp_5_raw != null)
             { temperatureVal = curr_coreTmp_5_raw; }
             break;
 
         case '5GHz_2':
-            if (productid == 'GT-AXE16000' &&
-                typeof curr_coreTmp_wl1_raw != 'undefined' && curr_coreTmp_wl1_raw != null)
-            { temperatureVal = curr_coreTmp_wl1_raw; }
+            if (productid == 'GT-AXE16000')
+            {
+                if (typeof curr_coreTmp_wl1_raw != 'undefined' && curr_coreTmp_wl1_raw != null)
+                { temperatureVal = curr_coreTmp_wl1_raw; }
+                else if (typeof curr_coreTmp_1_raw != 'undefined' && curr_coreTmp_1_raw != null)
+                { temperatureVal = curr_coreTmp_1_raw; }
+            }
             else if (typeof curr_coreTmp_wl2_raw != 'undefined' && curr_coreTmp_wl2_raw != null)
             { temperatureVal = curr_coreTmp_wl2_raw; }
+            else if (typeof curr_coreTmp_0_raw != 'undefined' && curr_coreTmp_0_raw != null &&
+                     typeof curr_coreTmp_2_raw != 'undefined' && curr_coreTmp_2_raw != null)
+            { temperatureVal = curr_coreTmp_2_raw; }
             else if (typeof curr_coreTmp_52_raw != 'undefined' && curr_coreTmp_52_raw != null)
             { temperatureVal = curr_coreTmp_52_raw; }
             break;
@@ -142,6 +161,9 @@ function GetTemperatureValue (bandIDstr)
         case '6GHz_1':
             if (typeof curr_coreTmp_wl2_raw != 'undefined' && curr_coreTmp_wl2_raw != null)
             { temperatureVal = curr_coreTmp_wl2_raw; }
+            else if (typeof curr_coreTmp_0_raw != 'undefined' && curr_coreTmp_0_raw != null &&
+                     typeof curr_coreTmp_2_raw != 'undefined' && curr_coreTmp_2_raw != null)
+            { temperatureVal = curr_coreTmp_2_raw; }
             else if (typeof curr_coreTmp_52_raw != 'undefined' && curr_coreTmp_52_raw != null)
             { temperatureVal = curr_coreTmp_52_raw; }
             break;
