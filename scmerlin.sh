@@ -11,6 +11,8 @@
 ##       https://github.com/jackyaz/scMerlin        ##
 ##                                                  ##
 ######################################################
+# Last Modified: 2024-Mar-12
+#-----------------------------------------------------
 
 ##########       Shellcheck directives     ###########
 # shellcheck disable=SC2016
@@ -24,17 +26,18 @@
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
 readonly SCRIPT_NAME_LOWER="$(echo "$SCRIPT_NAME" | tr 'A-Z' 'a-z' | sed 's/d//')"
-readonly SCM_VERSION="v2.4.0"
-readonly SCRIPT_VERSION="v2.4.0"
+readonly SCM_VERSION="v2.4.1"
+readonly SCRIPT_VERSION="v2.4.1"
 SCRIPT_BRANCH="master"
-SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/$SCRIPT_NAME/$SCRIPT_BRANCH"
+SCRIPT_REPO="https://jackyaz.io/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME_LOWER.d"
 readonly SCRIPT_WEBPAGE_DIR="$(readlink /www/user)"
 readonly SCRIPT_WEB_DIR="$SCRIPT_WEBPAGE_DIR/$SCRIPT_NAME_LOWER"
 readonly SHARED_DIR="/jffs/addons/shared-jy"
-readonly SHARED_REPO="https://raw.githubusercontent.com/jackyaz/shared-jy/master"
+readonly SHARED_REPO="https://jackyaz.io/shared-jy/master"
 readonly SHARED_WEB_DIR="$SCRIPT_WEBPAGE_DIR/shared-jy"
 readonly NTP_WATCHDOG_FILE="$SCRIPT_DIR/.watchdogenabled"
+readonly TAIL_TAINTED_FILE="$SCRIPT_DIR/.tailtaintdnsenabled"
 [ -z "$(nvram get odmpid)" ] && ROUTER_MODEL=$(nvram get productid) || ROUTER_MODEL=$(nvram get odmpid)
 ### End of script variables ###
 
@@ -47,6 +50,92 @@ readonly BOLD="\\e[1m"
 readonly SETTING="${BOLD}\\e[36m"
 readonly CLEARFORMAT="\\e[0m"
 ### End of output format variables ###
+
+##----------------------------------------------##
+## Added/Modified by Martinski W. [2023-Jun-09] ##
+##----------------------------------------------##
+readonly BEGIN_InsertTag="/\*\*BEGIN:scMerlin\*\*/"
+readonly ENDIN_InsertTag="/\*\*END:scMerlin\*\*/"
+readonly SUPPORTstr="$(nvram get rc_support)"
+
+if echo "$SUPPORTstr" | grep -qw '2.4G'
+then Band_24G_Support=true
+else Band_24G_Support=false
+fi
+
+if echo "$SUPPORTstr" | grep -qw '5G'
+then Band_5G_1_Support=true
+else Band_5G_1_Support=false
+fi
+
+if echo "$SUPPORTstr" | grep -qw '5G-2'
+then Band_5G_2_support=true
+else Band_5G_2_support=false
+fi
+
+if echo "$SUPPORTstr" | grep -qw 'wifi6e'
+then Band_6G_1_Support=true
+else Band_6G_1_Support=false
+fi
+
+##----------------------------------------------##
+## Added/Modified by Martinski W. [2023-Jun-03] ##
+##----------------------------------------------##
+GetIFaceName()
+{
+    if [ $# -eq 0 ] || [ -z "$1" ] ; then echo "" ; return 1 ; fi
+
+    theIFnamePrefix=""
+    case "$1" in
+        "2.4GHz")
+            if "$Band_24G_Support"
+            then
+                if [ "$ROUTER_MODEL" = "GT-AXE16000" ]
+                then theIFnamePrefix="wl3"
+                else theIFnamePrefix="wl0"
+                fi
+            fi
+            ;;
+        "5GHz_1")
+            if "$Band_5G_1_Support"
+            then
+                if [ "$ROUTER_MODEL" = "GT-AXE16000" ]
+                then theIFnamePrefix="wl0"
+                else theIFnamePrefix="wl1"
+                fi
+            fi
+            ;;
+        "5GHz_2")
+            if "$Band_5G_2_support"
+            then
+                if [ "$ROUTER_MODEL" = "GT-AXE16000" ]
+                then theIFnamePrefix="wl1"
+                else theIFnamePrefix="wl2"
+                fi
+            fi
+            ;;
+        "6GHz_1")
+            if [ "$ROUTER_MODEL" = "GT-AXE16000" ] || "$Band_6G_1_Support"
+            then theIFnamePrefix="wl2" ; fi
+            ;;
+    esac
+    if [ -z "$theIFnamePrefix" ]
+    then echo ""
+    else echo "$(nvram get "${theIFnamePrefix}_ifname")"
+    fi
+}
+
+##-------------------------------------##
+## Added by Martinski W. [2023-Jun-02] ##
+##-------------------------------------##
+GetTemperatureValue()
+{
+    theIFname="$(GetIFaceName "$1")"
+    if [ -z "$theIFname" ]
+    then echo "[N/A]"
+    else echo "$(wl -i "$theIFname" phy_tempsense | awk '{print $1/2+20}')"
+    fi
+}
 
 # $1 = print to syslog, $2 = message to print, $3 = log level
 Print_Output(){
@@ -131,15 +220,15 @@ Update_Check(){
 	echo 'var updatestatus = "InProgress";' > "$SCRIPT_WEB_DIR/detect_update.js"
 	doupdate="false"
 	localver=$(grep "SCRIPT_VERSION=" "/jffs/scripts/$SCRIPT_NAME_LOWER" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
-	/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" | grep -qF "jackyaz" || { Print_Output true "404 error detected - stopping update" "$ERR"; return 1; }
-	serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
+	/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/404/$SCRIPT_NAME_LOWER.sh" | grep -qF "jackyaz" || { Print_Output true "404 error detected - stopping update" "$ERR"; return 1; }
+	serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/version/$SCRIPT_NAME_LOWER.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
 	if [ "$localver" != "$serverver" ]; then
 		doupdate="version"
 		Set_Version_Custom_Settings server "$serverver"
 		echo 'var updatestatus = "'"$serverver"'";'  > "$SCRIPT_WEB_DIR/detect_update.js"
 	else
 		localmd5="$(md5sum "/jffs/scripts/$SCRIPT_NAME_LOWER" | awk '{print $1}')"
-		remotemd5="$(curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" | md5sum | awk '{print $1}')"
+		remotemd5="$(curl -fsL --retry 3 "$SCRIPT_REPO/md5/$SCRIPT_NAME_LOWER.sh" | md5sum | awk '{print $1}')"
 		if [ "$localmd5" != "$remotemd5" ]; then
 			doupdate="md5"
 			Set_Version_Custom_Settings server "$serverver-hotfix"
@@ -176,9 +265,12 @@ Update_Version(){
 					Update_File sitemap.asp
 					Update_File tailtop
 					Update_File tailtopd
+					Update_File tailtaintdns
+					Update_File tailtaintdnsd
 					Update_File sc.func
 					Update_File S99tailtop
-					/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
+					Update_File S95tailtaintdns
+					Download_File "$SCRIPT_REPO/update/$SCRIPT_NAME_LOWER.sh" "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 					chmod 0755 "/jffs/scripts/$SCRIPT_NAME_LOWER"
 					Set_Version_Custom_Settings local "$serverver"
 					Set_Version_Custom_Settings server "$serverver"
@@ -200,16 +292,19 @@ Update_Version(){
 	fi
 	
 	if [ "$1" = "force" ]; then
-		serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
+		serverver=$(/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/version/$SCRIPT_NAME_LOWER.sh" | grep "SCRIPT_VERSION=" | grep -m1 -oE 'v[0-9]{1,2}([.][0-9]{1,2})([.][0-9]{1,2})')
 		Print_Output true "Downloading latest version ($serverver) of $SCRIPT_NAME" "$PASS"
 		Update_File shared-jy.tar.gz
 		Update_File scmerlin_www.asp
 		Update_File sitemap.asp
 		Update_File tailtop
 		Update_File tailtopd
+		Update_File tailtaintdns
+		Update_File tailtaintdnsd
 		Update_File sc.func
 		Update_File S99tailtop
-		/usr/sbin/curl -fsL --retry 3 "$SCRIPT_REPO/$SCRIPT_NAME_LOWER.sh" -o "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
+		Update_File S95tailtaintdns
+		Download_File "$SCRIPT_REPO/update/$SCRIPT_NAME_LOWER.sh" "/jffs/scripts/$SCRIPT_NAME_LOWER" && Print_Output true "$SCRIPT_NAME successfully updated"
 		chmod 0755 "/jffs/scripts/$SCRIPT_NAME_LOWER"
 		Set_Version_Custom_Settings local "$serverver"
 		Set_Version_Custom_Settings server "$serverver"
@@ -227,14 +322,14 @@ Update_Version(){
 Update_File(){
 	if [ "$1" = "scmerlin_www.asp" ] || [ "$1" = "sitemap.asp" ] ; then
 		tmpfile="/tmp/$1"
-		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
 		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
 			if [ -f "$SCRIPT_DIR/$1" ]; then
 				Get_WebUI_Page "$SCRIPT_DIR/$1"
 				sed -i "\\~$MyPage~d" /tmp/menuTree.js
 				rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage" 2>/dev/null
 			fi
-			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
 			Print_Output true "New version of $1 downloaded" "$PASS"
 			Mount_WebUI
 		fi
@@ -259,30 +354,71 @@ Update_File(){
 		fi
 	elif [ "$1" = "S99tailtop" ]; then
 		tmpfile="/tmp/$1"
-		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
 		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
 			if [ -f "$SCRIPT_DIR/S99tailtop" ]; then
 				"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 				sleep 2
 			fi
-			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
 			chmod 0755 "$SCRIPT_DIR/$1"
 			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
 			Print_Output true "New version of $1 downloaded" "$PASS"
 		fi
 		rm -f "$tmpfile"
-	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ] || [ "$1" = "sc.func" ]; then
+	elif [ "$1" = "tailtop" ] || [ "$1" = "tailtopd" ]; then
 		tmpfile="/tmp/$1"
-		Download_File "$SCRIPT_REPO/$1" "$tmpfile"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
 		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
 			if [ -f "$SCRIPT_DIR/S99tailtop" ]; then
 				"$SCRIPT_DIR/S99tailtop" stop >/dev/null 2>&1
 				sleep 2
 			fi
-			Download_File "$SCRIPT_REPO/$1" "$SCRIPT_DIR/$1"
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
+			Print_Output true "New version of $1 downloaded" "$PASS"
+		fi
+		rm -f "$tmpfile"
+	elif [ "$1" = "S95tailtaintdns" ]; then
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			if [ -f "$SCRIPT_DIR/S95tailtaintdns" ]; then
+				"$SCRIPT_DIR/S95tailtaintdns" stop >/dev/null 2>&1
+				sleep 2
+			fi
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			if [ "$(NTPBootWatchdog check)" = "ENABLED" ]; then
+				"$SCRIPT_DIR/S95tailtaintdns" start >/dev/null 2>&1
+			fi
+			Print_Output true "New version of $1 downloaded" "$PASS"
+		fi
+		rm -f "$tmpfile"
+	elif [ "$1" = "tailtaintdns" ] || [ "$1" = "tailtaintdnsd" ]; then
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			if [ -f "$SCRIPT_DIR/S95tailtaintdns" ]; then
+				"$SCRIPT_DIR/S95tailtaintdns" stop >/dev/null 2>&1
+				sleep 2
+			fi
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
+			chmod 0755 "$SCRIPT_DIR/$1"
+			if [ "$(NTPBootWatchdog check)" = "ENABLED" ]; then
+				"$SCRIPT_DIR/S95tailtaintdns" start >/dev/null 2>&1
+			fi
+			Print_Output true "New version of $1 downloaded" "$PASS"
+		fi
+		rm -f "$tmpfile"
+	elif [ "$1" = "sc.func" ]; then
+		tmpfile="/tmp/$1"
+		Download_File "$SCRIPT_REPO/files/$1" "$tmpfile"
+		if ! diff -q "$tmpfile" "$SCRIPT_DIR/$1" >/dev/null 2>&1; then
+			Download_File "$SCRIPT_REPO/files/$1" "$SCRIPT_DIR/$1"
 			chmod 0755 "$SCRIPT_DIR/$1"
 			Print_Output true "New version of $1 downloaded" "$PASS"
-			"$SCRIPT_DIR/S99tailtop" start >/dev/null 2>&1
 		fi
 		rm -f "$tmpfile"
 	else
@@ -324,6 +460,7 @@ Create_Symlinks(){
 	ln -s /tmp/scmcronjobs.tmp "$SCRIPT_WEB_DIR/scmcronjobs.htm" 2>/dev/null
 	
 	ln -s "$NTP_WATCHDOG_FILE" "$SCRIPT_WEB_DIR/watchdogenabled.htm" 2>/dev/null
+	ln -s "$TAIL_TAINTED_FILE" "$SCRIPT_WEB_DIR/tailtaintdnsenabled.htm" 2>/dev/null
 	
 	if [ ! -d "$SHARED_WEB_DIR" ]; then
 		ln -s "$SHARED_DIR" "$SHARED_WEB_DIR" 2>/dev/null
@@ -363,22 +500,25 @@ Auto_ServiceEvent(){
 	esac
 }
 
+##----------------------------------------##
+## Modified by Martinski W. [2024-Mar-12] ##
+##----------------------------------------##
 Auto_Startup(){
 	case $1 in
 		create)
 			if [ -f /jffs/scripts/post-mount ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME$" /jffs/scripts/post-mount)
 				
 				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
+					sed -i -e '/# '"$SCRIPT_NAME$"'/d' /jffs/scripts/post-mount
 				fi
 			fi
 			if [ -f /jffs/scripts/services-start ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
-				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' & # '"$SCRIPT_NAME" /jffs/scripts/services-start)
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME$" /jffs/scripts/services-start)
+				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' & # '"$SCRIPT_NAME$" /jffs/scripts/services-start)
 				
 				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
+					sed -i -e '/# '"$SCRIPT_NAME$"'/d' /jffs/scripts/services-start
 				fi
 				
 				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
@@ -393,17 +533,17 @@ Auto_Startup(){
 		;;
 		delete)
 			if [ -f /jffs/scripts/post-mount ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/post-mount)
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME$" /jffs/scripts/post-mount)
 				
 				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/post-mount
+					sed -i -e '/# '"$SCRIPT_NAME$"'/d' /jffs/scripts/post-mount
 				fi
 			fi
 			if [ -f /jffs/scripts/services-start ]; then
-				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME" /jffs/scripts/services-start)
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME$" /jffs/scripts/services-start)
 				
 				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
-					sed -i -e '/# '"$SCRIPT_NAME"'/d' /jffs/scripts/services-start
+					sed -i -e '/# '"$SCRIPT_NAME$"'/d' /jffs/scripts/services-start
 				fi
 			fi
 		;;
@@ -459,6 +599,9 @@ Get_WebUI_URL(){
 }
 ### ###
 
+##----------------------------------------##
+## Modified by Martinski W. [2023-Jun-09] ##
+##----------------------------------------##
 ### locking mechanism code credit to Martineau (@MartineauUK) ###
 Mount_WebUI(){
 	realpage=""
@@ -482,15 +625,23 @@ Mount_WebUI(){
 		fi
 		
 		if ! grep -q '.menu_Addons' /tmp/index_style.css ; then
-			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); }" >> /tmp/index_style.css
+			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); background-size: contain; }" >> /tmp/index_style.css
+		fi
+
+		if grep -q '.menu_Addons' /tmp/index_style.css && ! grep -q 'url(ext/shared-jy/addons.png); background-size: contain;' /tmp/index_style.css; then
+			sed -i 's/addons.png);/addons.png); background-size: contain;/' /tmp/index_style.css
 		fi
 		
-		if ! grep -q '.dropdown-content' /tmp/index_style.css ; then
+		if grep -q '.dropdown-content {display: block;}' /tmp/index_style.css ; then
+			sed -i '/dropdown-content/d' /tmp/index_style.css
+		fi
+		
+		if ! grep -q '.dropdown-content {visibility: visible;}' /tmp/index_style.css ; then
 			{
-				echo ".dropdown-content {top: 0px; left: 185px; display: none; position: absolute; background-color: #3a4042; min-width: 165px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000;}"
+				echo ".dropdown-content {top: 0px; left: 185px; visibility: hidden; position: absolute; background-color: #3a4042; min-width: 165px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000;}"
 				echo ".dropdown-content a {padding: 6px 8px; text-decoration: none; display: block; height: 100%; min-height: 20px; max-height: 40px; font-weight: bold; text-shadow: 1px 1px 0px black; font-family: Verdana, MS UI Gothic, MS P Gothic, Microsoft Yahei UI, sans-serif; font-size: 12px; border: 1px solid #6B7071;}"
 				echo ".dropdown-content a:hover {background-color: #77a5c6;}"
-				echo ".dropdown:hover .dropdown-content {display: block;}"
+				echo ".dropdown:hover .dropdown-content {visibility: visible;}"
 			} >> /tmp/index_style.css
 		fi
 		
@@ -503,9 +654,20 @@ Mount_WebUI(){
 		
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
 		
-		if ! grep -q 'menuName: "Addons"' /tmp/menuTree.js ; then
-			lineinsbefore="$(( $(grep -n "exclude:" /tmp/menuTree.js | cut -f1 -d':') - 1))"
-			sed -i "$lineinsbefore"'i,\n{\nmenuName: "Addons",\nindex: "menu_Addons",\ntab: [\n{url: "javascript:var helpwindow=window.open('"'"'/ext/shared-jy/redirect.htm'"'"')", tabName: "Help & Support"},\n{url: "NULL", tabName: "__INHERIT__"}\n]\n}' /tmp/menuTree.js
+		## Use the same BEGIN/END insert tags here as those used in the "Menu_Uninstall()" function ##
+		if ! grep -qE '^menuName: "Addons"' /tmp/menuTree.js
+		then
+			lineinsbefore="$(($(grep -n "^exclude:" /tmp/menuTree.js | cut -f1 -d':') - 1))"
+			sed -i "$lineinsbefore""i\
+${BEGIN_InsertTag}\n\
+,\n{\n\
+menuName: \"Addons\",\n\
+index: \"menu_Addons\",\n\
+tab: [\n\
+{url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm')\", tabName: \"Help & Support\"},\n\
+{url: \"NULL\", tabName: \"__INHERIT__\"}\n\
+]\n}\n\
+${ENDIN_InsertTag}" /tmp/menuTree.js
 		fi
 		
 		sed -i "/url: \"javascript:var helpwindow=window.open('\/ext\/shared-jy\/redirect.htm'/i {url: \"$MyPage\", tabName: \"$SCRIPT_NAME\"}," /tmp/menuTree.js
@@ -772,6 +934,50 @@ EOF
 	esac
 }
 
+TailTaintDns(){
+	case "$1" in
+		enable)
+			touch "$TAIL_TAINTED_FILE"
+			"$SCRIPT_DIR/S95tailtaintdns" start >/dev/null 2>&1
+			if [ -f /jffs/scripts/services-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
+				STARTUPLINECOUNTEX=$(grep -i -cx "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 1 ] || { [ "$STARTUPLINECOUNTEX" -eq 0 ] && [ "$STARTUPLINECOUNT" -gt 0 ]; }; then
+					sed -i -e '/# '"$SCRIPT_NAME - tailtaintdns"'/d' /jffs/scripts/services-start
+				fi
+				
+				if [ "$STARTUPLINECOUNTEX" -eq 0 ]; then
+					echo "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME - tailtaintdns" >> /jffs/scripts/services-start
+				fi
+			else
+				echo "#!/bin/sh" > /jffs/scripts/services-start
+				echo "" >> /jffs/scripts/services-start
+				echo "$SCRIPT_DIR/S95tailtaintdns start >/dev/null 2>&1 & # $SCRIPT_NAME - tailtaintdns" >> /jffs/scripts/services-start
+				chmod 0755 /jffs/scripts/services-start
+			fi
+		;;
+		disable)
+			rm -f "$TAIL_TAINTED_FILE"
+			"$SCRIPT_DIR/S95tailtaintdns" stop >/dev/null 2>&1
+			if [ -f /jffs/scripts/services-start ]; then
+				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)
+				
+				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
+					sed -i -e '/# '"$SCRIPT_NAME"' - tailtaintdns/d' /jffs/scripts/services-start
+				fi
+			fi
+		;;
+		check)
+			if [ -f "$TAIL_TAINTED_FILE" ] && [ "$(grep -i -c '# '"$SCRIPT_NAME - tailtaintdns" /jffs/scripts/services-start)" -gt 0 ]; then
+				echo "ENABLED"
+			else
+				echo "DISABLED"
+			fi
+		;;
+	esac
+}
+
 Process_Upgrade(){
 	if [ -f /opt/etc/init.d/S99tailtop ]; then
 		/opt/etc/init.d/S99tailtop stop >/dev/null 2>&1
@@ -782,12 +988,18 @@ Process_Upgrade(){
 		Update_File S99tailtop
 		rm -f "$SCRIPT_DIR/.usbdisabled"
 	fi
+	if [ ! -f "$SCRIPT_DIR/S95tailtaintdns" ]; then
+		Update_File tailtaintdns
+		Update_File tailtaintdnsd
+		Update_File S95tailtaintdns
+		rm -f "$SCRIPT_DIR/.usbdisabled"
+	fi
 	if [ ! -f "$SCRIPT_DIR/sitemap.asp" ]; then
 		Update_File sitemap.asp
 	fi
 	
 	if [ "$(uname -o)" = "ASUSWRT-Merlin" ]; then
-		if grep '.dropdown-content' /tmp/index_style.css | grep -q 'z-index: 1;'; then
+		if grep '.dropdown-content' /tmp/index_style.css | grep -q '{display: block;}'; then
 			
 			umount /www/index_style.css 2>/dev/null
 			cp -f /www/index_style.css /tmp/
@@ -795,16 +1007,15 @@ Process_Upgrade(){
 			echo ".menu_Addons { background: url(ext/shared-jy/addons.png); }" >> /tmp/index_style.css
 			
 			{
-				echo ".dropdown-content {top: 0px; left: 185px; display: none; position: absolute; background-color: #3a4042; min-width: 165px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000;}"
+				echo ".dropdown-content {top: 0px; left: 185px; visibility: hidden; position: absolute; background-color: #3a4042; min-width: 165px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1000;}"
 				echo ".dropdown-content a {padding: 6px 8px; text-decoration: none; display: block; height: 100%; min-height: 20px; max-height: 40px; font-weight: bold; text-shadow: 1px 1px 0px black; font-family: Verdana, MS UI Gothic, MS P Gothic, Microsoft Yahei UI, sans-serif; font-size: 12px; border: 1px solid #6B7071;}"
 				echo ".dropdown-content a:hover {background-color: #77a5c6;}"
-				echo ".dropdown:hover .dropdown-content {display: block;}"
+				echo ".dropdown:hover .dropdown-content {visibility: visible;}"
 			} >> /tmp/index_style.css
 			
 			mount -o bind /tmp/index_style.css /www/index_style.css
 		fi
 	fi
-	
 }
 
 Shortcut_Script(){
@@ -919,6 +1130,12 @@ MainMenu(){
 		NTPBW_ENABLED="Disabled"
 	fi
 	printf "ntp.  Toggle NTP boot watchdog script\\n      Currently: ${BOLD}$NTPBW_ENABLED${CLEARFORMAT}\\n\\n"
+	if [ "$(TailTaintDns check)" = "ENABLED" ]; then
+		TAILTAINT_ENABLED="${SETTING}Enabled"
+	else
+		TAILTAINT_ENABLED="Disabled"
+	fi
+	printf "dns.  Toggle dnsmasq tainted watchdog script\\n      Currently: ${BOLD}$TAILTAINT_ENABLED${CLEARFORMAT}\\n\\n"
 	printf "u.    Check for updates\\n"
 	printf "uf.   Update %s with latest version (force update)\\n\\n" "$SCRIPT_NAME"
 	printf "e.    Exit %s\\n\\n" "$SCRIPT_NAME"
@@ -1170,21 +1387,43 @@ MainMenu(){
 				ScriptHeader
 				printf "\\n${BOLD}Temperatures${CLEARFORMAT}\\n\\n"
 				if [ -f /sys/class/thermal/thermal_zone0/temp ]; then
-					printf "CPU: %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
+					printf "CPU:\t %s°C\\n" "$(awk '{ print int($1/1000) }' /sys/class/thermal/thermal_zone0/temp)"
 				elif [ -f /proc/dmu/temperature ]; then
-					printf "CPU:%s\\n" "$(cut -f2 -d':' /proc/dmu/temperature | awk '{$1=$1;print}' | sed 's/..$/°C/')"
+					printf "CPU:\t %s\\n" "$(cut -f2 -d':' /proc/dmu/temperature | awk '{$1=$1;print}' | sed 's/..$/°C/')"
 				else
-					printf "CPU: N/A\\n"
+					printf "CPU:\t [N/A]\\n"
 				fi
 				
-				printf "2.4 GHz: %s°C\\n" "$(wl -i "$(nvram get wl0_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
+				##----------------------------------------------##
+				## Added/Modified by Martinski W. [2023-Jun-03] ##
+				##----------------------------------------------##
+				theTemptrVal="$(GetTemperatureValue "2.4GHz")"
+				if [ -n "$theTemptrVal" ] ; then printf "2.4 GHz: %s°C\n" "$theTemptrVal" ; fi
 				
 				if [ "$ROUTER_MODEL" = "RT-AC87U" ] || [ "$ROUTER_MODEL" = "RT-AC87R" ]; then
-					printf "5 GHz: %s°C\\n\\n" "$(qcsapi_sockrpc get_temperature | awk 'FNR == 2 {print $3}')"
-				else
-					printf "5 GHz: %s°C\\n\\n" "$(wl -i "$(nvram get wl1_ifname)" phy_tempsense | awk '{ print $1/2+20 }')"
+					printf "5 GHz:   %s°C\n" "$(qcsapi_sockrpc get_temperature | awk 'FNR == 2 {print $3}')"
+					echo ; PressEnter
+					break
 				fi
-				PressEnter
+
+				if "$Band_5G_2_support"
+				then
+					theTemptrVal="$(GetTemperatureValue "5GHz_1")"
+					if [ -n "$theTemptrVal" ] ; then printf "5 GHz-1: %s°C\n" "$theTemptrVal" ; fi
+
+					theTemptrVal="$(GetTemperatureValue "5GHz_2")"
+					if [ -n "$theTemptrVal" ] ; then printf "5 GHz-2: %s°C\n" "$theTemptrVal" ; fi
+				elif "$Band_5G_1_Support"
+				then
+					theTemptrVal="$(GetTemperatureValue "5GHz_1")"
+					if [ -n "$theTemptrVal" ] ; then printf "5 GHz:   %s°C\n" "$theTemptrVal" ; fi
+				fi
+				if "$Band_6G_1_Support"
+				then
+					theTemptrVal="$(GetTemperatureValue "6GHz_1")"
+					if [ -n "$theTemptrVal" ] ; then printf "6 GHz:   %s°C\n" "$theTemptrVal" ; fi
+				fi
+				echo ; PressEnter
 				break
 			;;
 			w)
@@ -1222,6 +1461,15 @@ MainMenu(){
 					NTPBootWatchdog disable
 				elif [ "$(NTPBootWatchdog check)" = "DISABLED" ]; then
 					NTPBootWatchdog enable
+				fi
+				break
+			;;
+			dns)
+				printf "\\n"
+				if [ "$(TailTaintDns check)" = "ENABLED" ]; then
+					TailTaintDns disable
+				elif [ "$(TailTaintDns check)" = "DISABLED" ]; then
+					TailTaintDns enable
 				fi
 				break
 			;;
@@ -1321,10 +1569,16 @@ Menu_Install(){
 	Update_File shared-jy.tar.gz
 	Update_File tailtop
 	Update_File tailtopd
+	Update_File tailtaintdns
+	Update_File tailtaintdnsd
 	Update_File sc.func
 	Update_File S99tailtop
+	Update_File S95tailtaintdns
 	
 	Clear_Lock
+	
+	Download_File "$SCRIPT_REPO/install-success/LICENSE" "$SCRIPT_DIR/LICENSE"
+	
 	ScriptHeader
 	MainMenu
 }
@@ -1351,24 +1605,76 @@ Menu_Startup(){
 	Clear_Lock
 }
 
+##----------------------------------------##
+## Modified by Martinski W. [2023-Jun-09] ##
+##----------------------------------------##
 Menu_Uninstall(){
 	Print_Output true "Removing $SCRIPT_NAME..." "$PASS"
 	Shortcut_Script delete
 	Auto_Startup delete 2>/dev/null
 	Auto_ServiceEvent delete 2>/dev/null
 	NTPBootWatchdog disable
+	TailTaintDns disable
 	
 	LOCKFILE=/tmp/addonwebui.lock
 	FD=386
 	eval exec "$FD>$LOCKFILE"
 	flock -x "$FD"
+
+	resetWebGUI=false
+	if [ -f "$SCRIPT_DIR/sitemap.asp" ]
+	then
+		Get_WebUI_Page "$SCRIPT_DIR/sitemap.asp"
+		if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]
+		then
+			resetWebGUI=true
+			sed -i "\\~$MyPage~d" /tmp/menuTree.js
+			rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage"
+		fi
+	fi
 	Get_WebUI_Page "$SCRIPT_DIR/scmerlin_www.asp"
-	if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]; then
+	if [ -n "$MyPage" ] && [ "$MyPage" != "none" ] && [ -f /tmp/menuTree.js ]
+	then
+		resetWebGUI=true
 		sed -i "\\~$MyPage~d" /tmp/menuTree.js
-		umount /www/require/modules/menuTree.js
-		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
 		rm -f "$SCRIPT_WEBPAGE_DIR/$MyPage"
 		rm -f "$SCRIPT_WEBPAGE_DIR/$(echo $MyPage | cut -f1 -d'.').title"
+	fi
+
+	## Use the same BEGIN/END insert tags here as those used in the "Mount_WebUI()" function ##
+	if grep -qE "^${BEGIN_InsertTag}$" /tmp/menuTree.js && \
+	   grep -qE "^${ENDIN_InsertTag}$" /tmp/menuTree.js
+	then
+		resetWebGUI=true
+		BEGINnum="$(grep -nE "^${BEGIN_InsertTag}$" /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		ENDINnum="$(grep -nE "^${ENDIN_InsertTag}$" /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		[ -n "$BEGINnum" ] && [ -n "$ENDINnum" ] && [ "$BEGINnum" -lt "$ENDINnum" ] && \
+		sed -i "${BEGINnum},${ENDINnum}d" /tmp/menuTree.js
+	fi
+	## Remove any "old" previous lines left behind ##
+	if grep -qE '^menuName: "Addons",$' /tmp/menuTree.js && \
+	   grep -qE 'tabName: "Help & Support"},$' /tmp/menuTree.js
+	then
+		resetWebGUI=true
+		BEGINnum="$(grep -nE '^menuName: "Addons",$' /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		ENDINnum="$(grep -nE 'tabName: "Help & Support"},$' /tmp/menuTree.js | awk -F ':' '{print $1}')"
+		[ -n "$BEGINnum" ] && [ -n "$ENDINnum" ] && [ "$BEGINnum" -lt "$ENDINnum" ] && \
+		BEGINnum=$((BEGINnum - 2)) && ENDINnum=$((ENDINnum + 3)) && \
+		[ "$(sed -n "${BEGINnum}p" /tmp/menuTree.js)" = "," ] && \
+		[ "$(sed -n "${ENDINnum}p" /tmp/menuTree.js)" = "}" ] && \
+		sed -i "${BEGINnum},${ENDINnum}d" /tmp/menuTree.js
+	fi
+
+	if "$resetWebGUI"
+	then
+		umount /www/require/modules/menuTree.js 2>/dev/null
+		if [ -f /tmp/index_style.css ] && grep -qF '.menu_Addons { background:' /tmp/index_style.css
+		then rm -f /tmp/index_style.css ; umount /www/index_style.css 2>/dev/null
+		fi
+		if [ -f /tmp/state.js ] && grep -qE 'function GenerateSiteMap|function AddDropdowns' /tmp/state.js
+		then rm -f /tmp/state.js ; umount /www/state.js 2>/dev/null
+		fi
+		mount -o bind /tmp/menuTree.js /www/require/modules/menuTree.js
 	fi
 	flock -u "$FD"
 	rm -rf "$SCRIPT_WEB_DIR" 2>/dev/null
@@ -1610,13 +1916,13 @@ case "$1" in
 	;;
 	develop)
 		SCRIPT_BRANCH="develop"
-		SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/$SCRIPT_NAME/$SCRIPT_BRANCH"
+		SCRIPT_REPO="https://jackyaz.io/$SCRIPT_NAME/$SCRIPT_BRANCH"
 		Update_Version force
 		exit 0
 	;;
 	stable)
 		SCRIPT_BRANCH="master"
-		SCRIPT_REPO="https://raw.githubusercontent.com/jackyaz/$SCRIPT_NAME/$SCRIPT_BRANCH"
+		SCRIPT_REPO="https://jackyaz.io/$SCRIPT_NAME/$SCRIPT_BRANCH"
 		Update_Version force
 		exit 0
 	;;

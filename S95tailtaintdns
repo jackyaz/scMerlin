@@ -3,13 +3,12 @@
 # shellcheck disable=SC2034
 
 if [ "$1" = "restart" ] || [ "$1" = "stop" ] || [ "$1" = "kill" ]; then
-	killall -q tailtopd
-	killall -q tailtop
-	rm -f /tmp/scmerlin-top*
+	killall -q tailtaintdnsd
+	killall -q tailtaintdns
 fi
 
 ENABLED=yes
-PROCS=/jffs/addons/scmerlin.d/tailtopd
+PROCS=/jffs/addons/scmerlin.d/tailtaintdnsd
 ARGS=""
 PREARGS=""
 PRECMD=""

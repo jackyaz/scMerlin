@@ -80,6 +80,100 @@ function show_memcpu(){
 	}
 }
 
+/**-------------------------------------**/
+/** Added by Martinski W. [2023-Jun-02] **/
+/**-------------------------------------**/
+let band_5GHz_1_supported=false,
+    band_5GHz_2_supported=false,
+    band_6GHz_1_supported=false;
+
+if (typeof wl_info == 'undefined' || wl_info == null)
+{
+    band_5GHz_1_supported = band5g_support;
+    band_5GHz_2_supported = band5g2_support;
+    band_6GHz_1_supported = band6g_support;
+}
+else
+{
+    band_5GHz_1_supported = wl_info.band5g_support;
+    band_5GHz_2_supported = wl_info.band5g_2_support;
+    band_6GHz_1_supported = wl_info.band6g_support;
+}
+
+/**----------------------------------------------**/
+/** Added/Modified by Martinski W. [2023-Jul-05] **/
+/**----------------------------------------------**/
+function GetTemperatureValue (bandIDstr)
+{
+    let temperatureVal="[N/A]";
+
+    switch (bandIDstr)
+    {
+        case '2.4GHz':
+            if (productid == 'GT-AXE16000')
+            {
+                if (typeof curr_coreTmp_wl3_raw != 'undefined' && curr_coreTmp_wl3_raw != null)
+                { temperatureVal = curr_coreTmp_wl3_raw; }
+                else if (typeof curr_coreTmp_3_raw != 'undefined' && curr_coreTmp_3_raw != null)
+                { temperatureVal = curr_coreTmp_3_raw; }
+            }
+            else if (typeof curr_coreTmp_wl0_raw != 'undefined' && curr_coreTmp_wl0_raw != null)
+            { temperatureVal = curr_coreTmp_wl0_raw; }
+            else if (typeof curr_coreTmp_0_raw != 'undefined' && curr_coreTmp_0_raw != null)
+            { temperatureVal = curr_coreTmp_0_raw; }
+            else if (typeof curr_coreTmp_2_raw != 'undefined' && curr_coreTmp_2_raw != null)
+            { temperatureVal = curr_coreTmp_2_raw; }
+            break;
+
+        case '5GHz_1':
+            if (productid == 'GT-AXE16000')
+            {
+                if (typeof curr_coreTmp_wl0_raw != 'undefined' && curr_coreTmp_wl0_raw != null)
+                { temperatureVal = curr_coreTmp_wl0_raw; }
+                else if (typeof curr_coreTmp_0_raw != 'undefined' && curr_coreTmp_0_raw != null)
+                { temperatureVal = curr_coreTmp_0_raw; }
+            }
+            else if (typeof curr_coreTmp_wl1_raw != 'undefined' && curr_coreTmp_wl1_raw != null)
+            { temperatureVal = curr_coreTmp_wl1_raw; }
+            else if (typeof curr_coreTmp_1_raw != 'undefined' && curr_coreTmp_1_raw != null)
+            { temperatureVal = curr_coreTmp_1_raw; }
+            else if (typeof curr_coreTmp_5_raw != 'undefined' && curr_coreTmp_5_raw != null)
+            { temperatureVal = curr_coreTmp_5_raw; }
+            break;
+
+        case '5GHz_2':
+            if (productid == 'GT-AXE16000')
+            {
+                if (typeof curr_coreTmp_wl1_raw != 'undefined' && curr_coreTmp_wl1_raw != null)
+                { temperatureVal = curr_coreTmp_wl1_raw; }
+                else if (typeof curr_coreTmp_1_raw != 'undefined' && curr_coreTmp_1_raw != null)
+                { temperatureVal = curr_coreTmp_1_raw; }
+            }
+            else if (typeof curr_coreTmp_wl2_raw != 'undefined' && curr_coreTmp_wl2_raw != null)
+            { temperatureVal = curr_coreTmp_wl2_raw; }
+            else if (typeof curr_coreTmp_0_raw != 'undefined' && curr_coreTmp_0_raw != null &&
+                     typeof curr_coreTmp_2_raw != 'undefined' && curr_coreTmp_2_raw != null)
+            { temperatureVal = curr_coreTmp_2_raw; }
+            else if (typeof curr_coreTmp_52_raw != 'undefined' && curr_coreTmp_52_raw != null)
+            { temperatureVal = curr_coreTmp_52_raw; }
+            break;
+
+        case '6GHz_1':
+            if (typeof curr_coreTmp_wl2_raw != 'undefined' && curr_coreTmp_wl2_raw != null)
+            { temperatureVal = curr_coreTmp_wl2_raw; }
+            else if (typeof curr_coreTmp_0_raw != 'undefined' && curr_coreTmp_0_raw != null &&
+                     typeof curr_coreTmp_2_raw != 'undefined' && curr_coreTmp_2_raw != null)
+            { temperatureVal = curr_coreTmp_2_raw; }
+            else if (typeof curr_coreTmp_52_raw != 'undefined' && curr_coreTmp_52_raw != null)
+            { temperatureVal = curr_coreTmp_52_raw; }
+            break;
+    }
+    return (temperatureVal);
+}
+
+/**----------------------------------------**/
+/** Modified by Martinski W. [2023-Jun-05] **/
+/**----------------------------------------**/
 function update_temperatures(){
 	$j.ajax({
 		url: '/ajax_coretmp.asp',
@@ -87,29 +181,32 @@ function update_temperatures(){
 		error: function(xhr){
 		update_temperatures();
 	},
-	success: function(response){
-		code = '<b>2.4 GHz:</b><span> ' + curr_coreTmp_2_raw + '</span>';
-		if(wl_info.band5g_2_support){
-			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1:</b> <span>' + curr_coreTmp_5_raw + '</span>';
-			if(typeof curr_coreTmp_52_raw == 'undefined' || curr_coreTmp_52_raw == null){
-				curr_coreTmp_52_raw = 'N/A'
-			}
-			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2:</b> <span>' + curr_coreTmp_52_raw + '</span>';
+	success: function(response)
+	{
+		code = '<b>2.4 GHz: </b><span>' + GetTemperatureValue ('2.4GHz') + '</span>';
+
+		if (band_5GHz_2_supported)
+		{
+			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-1: </b><span>' + GetTemperatureValue ('5GHz_1') + '</span>';
+			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz-2: </b><span>' + GetTemperatureValue ('5GHz_2') + '</span>';
 		}
-		else if(band5g_support){
-			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz:</b> <span>' + curr_coreTmp_5_raw + '</span>';
+		else if (band_5GHz_1_supported)
+		{
+			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>5 GHz: </b><span>' + GetTemperatureValue ('5GHz_1') + '</span>';
 		}
-		
+		if (band_6GHz_1_supported)
+		{
+			code += '&nbsp;&nbsp;-&nbsp;&nbsp;<b>6 GHz: </b><span>' + GetTemperatureValue ('6GHz_1') + '</span>';
+		}
+
 		var CPUTemp = '';
-		if(typeof curr_cpuTemp === 'undefined' || curr_cpuTemp === null){
-			CPUTemp = curr_coreTmp_cpu;
-		}
-		else{
-			CPUTemp = curr_cpuTemp;
-		}
+		if (typeof curr_cpuTemp == 'undefined' || curr_cpuTemp == null)
+		{ CPUTemp = curr_coreTmp_cpu; }
+		else
+		{ CPUTemp = curr_cpuTemp; }
 		
 		if(CPUTemp != ''){
-			code +='&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU:</b> <span>' + parseInt(CPUTemp) +'&deg;C</span>';
+			code +='&nbsp;&nbsp;-&nbsp;&nbsp;<b>CPU: </b><span>' + parseInt(CPUTemp) +'&deg;C</span>';
 		}
 		document.getElementById('temp_td').innerHTML = code;
 		setTimeout(update_temperatures, 3000);
@@ -236,7 +333,7 @@ var tout,arrayproclistlines=[],sortnameproc="CPU%",sortdirproc="desc",arraycronj
 </tr>
 </thead>
 <tr>
-<td class="settingname">Temperatures</td>
+<td class="servicename">Temperatures</td>
 <td id="temp_td" class="settingvalue"></td>
 </tr>
 </table>

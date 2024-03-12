@@ -1,0 +1,13 @@
+#!/bin/sh
+# shellcheck disable=SC2039
+# shellcheck disable=SC3048
+trap '' SIGHUP
+
+tailfile="/tmp/syslog.log"
+
+renice 15 $$
+tail -F "$tailfile" | while read -r line; do
+if echo "$line" | grep -q "Comm: dnsmasq Tainted:"; then logger "dnsmasq tainted detected, restarting dnsmasq"; service restart_dnsmasq; fi
+done
+
+renice 0 $$
