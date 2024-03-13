@@ -26,8 +26,8 @@
 ### Start of script variables ###
 readonly SCRIPT_NAME="scMerlin"
 readonly SCRIPT_NAME_LOWER="$(echo "$SCRIPT_NAME" | tr 'A-Z' 'a-z' | sed 's/d//')"
-readonly SCM_VERSION="v2.4.2"
-readonly SCRIPT_VERSION="v2.4.2"
+readonly SCM_VERSION="v2.4.1"
+readonly SCRIPT_VERSION="v2.4.1"
 SCRIPT_BRANCH="develop"
 SCRIPT_REPO="https://jackyaz.io/$SCRIPT_NAME/$SCRIPT_BRANCH"
 readonly SCRIPT_DIR="/jffs/addons/$SCRIPT_NAME_LOWER.d"
@@ -514,10 +514,6 @@ Auto_Startup(){
 				fi
 			fi
 			if [ -f /jffs/scripts/services-start ]; then
-				## Clean up erroneous entries ##
-				grep -iq '# '"${SCRIPT_NAME}[$]$" /jffs/scripts/services-start && \
-				sed -i -e '/# '"${SCRIPT_NAME}[$]$"'/d' /jffs/scripts/services-start
-
 				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME$" /jffs/scripts/services-start)
 				STARTUPLINECOUNTEX=$(grep -i -cx "/jffs/scripts/$SCRIPT_NAME_LOWER startup"' & # '"$SCRIPT_NAME$" /jffs/scripts/services-start)
 				
@@ -544,10 +540,6 @@ Auto_Startup(){
 				fi
 			fi
 			if [ -f /jffs/scripts/services-start ]; then
-				## Clean up erroneous entries ##
-				grep -iq '# '"${SCRIPT_NAME}[$]$" /jffs/scripts/services-start && \
-				sed -i -e '/# '"${SCRIPT_NAME}[$]$"'/d' /jffs/scripts/services-start
-
 				STARTUPLINECOUNT=$(grep -i -c '# '"$SCRIPT_NAME$" /jffs/scripts/services-start)
 				
 				if [ "$STARTUPLINECOUNT" -gt 0 ]; then
